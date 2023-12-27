@@ -1,0 +1,14 @@
+GenericException:
+  ClientException:
+    AuthException:
+      UnauthorizedException:
+        SessionException:
+        LoginException:
+      ForbiddenException:
+        AccessException:
+        AdminException:
+    NotFoundException:
+
+  ServerException:
+    DBException:
+      DBConnectionException:

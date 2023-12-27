@@ -1,0 +1,38 @@
+<?php
+
+setlocale(LC_ALL, "fr_FR.utf8", "fr-FR");
+date_default_timezone_set('Europe/Paris');
+
+/**
+ * This is the main controller or router.
+ */
+
+define("ROOT", dirname(__DIR__));
+define("TEMPLATES", ROOT . "/templates");
+
+require_once(ROOT . "/vendor/autoload.php");
+require_once(ROOT . "/utils/utils.php");
+
+// Load environment variables
+$dotenv = Dotenv\Dotenv::createImmutable(ROOT, "/.env");
+$dotenv->load();
+
+use App\Core\Router;
+use App\Controllers\HomepageController;
+use App\Controllers\ErrorController;
+use App\Core\Exceptions\AppException;
+use App\Core\Exceptions\Server\ServerException;
+
+$routes = [
+    "/" => fn () => new HomepageController(),
+];
+
+try {
+    $router = new Router($routes);
+    $router->match();
+} catch (AppException $e) {
+    (new ErrorController($e))->show();
+} catch (\Throwable $th) {
+    error_logger($th);
+    (new ErrorController(new ServerException))->show();
+}
