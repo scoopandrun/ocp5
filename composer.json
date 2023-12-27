@@ -16,6 +16,7 @@
     }
   ],
   "require": {
+    "php": ">=8.0",
     "twig/twig": "^3.0",
     "vlucas/phpdotenv": "^5.6"
   }

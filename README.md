@@ -7,7 +7,7 @@ This repository is primarily a way of sharing code with the tutor.
 
 ## Installation
 
-This project uses [Composer](https://getcomposer.org).
+This project uses [Composer](https://getcomposer.org) with PHP `>= 8.0`.
 
 ```shell
 git clone https://github.com/scoopandrun/ocp5

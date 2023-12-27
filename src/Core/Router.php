@@ -9,12 +9,16 @@ use App\Core\Exceptions\Client\NotFoundException;
  */
 class Router
 {
+    /**
+     * @param array $routes An array of routes.  
+     *                      Routes must be of the form `["path_regex" => fn (...) => new Controller(...)]`
+     */
     public function __construct(public array $routes)
     {
     }
 
     /**
-     * Match a route and calls the associated controller.
+     * Match a route and call the associated controller.
      * 
      * @param string $uri Optional. Path to be matched.
      */
