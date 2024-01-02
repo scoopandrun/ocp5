@@ -18,24 +18,24 @@ $dotenv = Dotenv\Dotenv::createImmutable(ROOT, "/.env");
 $dotenv->load();
 
 use App\Core\Router;
-use App\Controllers\HomepageController;
-use App\Controllers\ErrorController;
+use App\Controllers\Homepage;
+use App\Controllers\Error;
 use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
 
 $routes = [
-    "/" => fn () => (new HomepageController())->show(),
+    "/" => fn () => (new Homepage())->show(),
 ];
 
 try {
     $router = new Router($routes);
     $router->match();
 } catch (ClientException $e) {
-    (new ErrorController($e))->show();
+    (new Error($e))->show();
 } catch (ServerException $e) {
     error_logger($e);
-    (new ErrorController($e))->show();
+    (new Error($e))->show();
 } catch (\Throwable $th) {
     error_logger($th);
-    (new ErrorController(new ServerException))->show();
+    (new Error(new ServerException))->show();
 }

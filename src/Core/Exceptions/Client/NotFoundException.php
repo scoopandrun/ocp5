@@ -11,7 +11,7 @@ use App\Core\Exceptions\Client\ClientException;
  */
 class NotFoundException extends ClientException
 {
-    private const DEFAULT_MESSAGE = "Ressource non trouvée";
+    private const DEFAULT_MESSAGE = "Page non trouvée";
     private const HTTP_STATUS = 404;
 
     public function __construct(

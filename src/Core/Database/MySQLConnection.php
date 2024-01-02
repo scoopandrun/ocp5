@@ -7,7 +7,7 @@ use App\Core\Exceptions\Server\DB\DBConnectionException;
 /**
  * Connection to MySQL database.
  */
-class MySQL extends \PDO
+class MySQLConnection extends \PDO
 {
     public function __construct()
     {

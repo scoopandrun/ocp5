@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-class HomepageController extends Controller
+
+class Homepage extends Controller
 {
     public function __construct()
     {
