@@ -20,7 +20,7 @@ $dotenv->load();
 use App\Core\Router;
 use App\Controllers\HomepageController;
 use App\Controllers\ErrorController;
-use App\Core\Exceptions\AppException;
+use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
 
 $routes = [
@@ -30,7 +30,10 @@ $routes = [
 try {
     $router = new Router($routes);
     $router->match();
-} catch (AppException $e) {
+} catch (ClientException $e) {
+    (new ErrorController($e))->show();
+} catch (ServerException $e) {
+    error_logger($e);
     (new ErrorController($e))->show();
 } catch (\Throwable $th) {
     error_logger($th);

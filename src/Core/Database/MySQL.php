@@ -33,22 +33,4 @@ class MySQL extends \PDO
             throw new DBConnectionException(previous: $pdo_exception);
         }
     }
-
-    /**
-     * Vérifie si une entrée existe dans la base de données.
-     * 
-     * @param string $table Nom de la table.
-     * @param int    $id    Identifiant de l'entrée.
-     */
-    public function exists(string $table, int $id)
-    {
-        $statement = "SELECT EXISTS (SELECT * FROM `$table` WHERE id = :id)";
-
-        $requete = $this->prepare($statement);
-        $requete->execute(["id" => $id]);
-
-        $exists = (bool) $requete->fetch();
-
-        return $exists;
-    }
 }
