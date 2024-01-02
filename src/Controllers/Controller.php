@@ -7,7 +7,7 @@ use Twig\Environment;
 use App\Core\HTTP\HTTPRequest;
 use App\Models\Model;
 
-abstract class Controller implements IController
+abstract class Controller
 {
     private FilesystemLoader $loader;
     protected Environment $twig;
@@ -22,9 +22,4 @@ abstract class Controller implements IController
 
         $this->request = new HTTPRequest;
     }
-}
-
-interface IController
-{
-    public function processRequest(): void;
 }

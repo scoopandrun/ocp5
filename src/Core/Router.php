@@ -34,7 +34,7 @@ class Router
             if (preg_match("#^{$path}/?$#i", $uri, $matches)) {
                 $routeMatched = true;
                 array_shift($matches); // Preserve only captured matches
-                $controller(...$matches)->processRequest();
+                $controller(...$matches);
                 return;
             }
         }

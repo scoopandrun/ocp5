@@ -24,7 +24,7 @@ use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
 
 $routes = [
-    "/" => fn () => new HomepageController(),
+    "/" => fn () => (new HomepageController())->show(),
 ];
 
 try {

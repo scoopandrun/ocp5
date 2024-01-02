@@ -9,10 +9,6 @@ class ErrorController extends Controller
         parent::__construct();
     }
 
-    public function processRequest(): void
-    {
-    }
-
     public function show()
     {
         $this->twig->display("error.html.twig", [
