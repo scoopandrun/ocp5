@@ -3,7 +3,7 @@
 namespace App\Core\Exceptions\Client\Auth;
 
 /**
- * Exception thorn when the user session doesn't exist.
+ * Exception thrown when the user session doesn't exist.
  */
 class SessionException extends UnauthorizedException
 {
