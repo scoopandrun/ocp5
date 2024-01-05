@@ -3,13 +3,19 @@
 {% block body %}
 	<!-- Page Header-->
 	<header class="masthead" style="background-image: url('/assets/img/home-bg.jpg')">
-		<div class="container position-relative px-4 px-lg-5">
-			<div class="row gx-4 gx-lg-5 justify-content-center">
+		<div class="container position-relative px-4 px-lg-5 site-heading">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
 				<div class="col-md-10 col-lg-8 col-xl-7">
-					<div class="site-heading">
-						<h1>Clean Blog</h1>
-						<span class="subheading">A Blog Theme by Start Bootstrap</span>
-					</div>
+					<h1>Nicolas DENIS</h1>
+					<span class="subheading">Un pseudo-site de présentation</span>
+				</div>
+				<div class="col-md-10 col-lg-4 col-xl-5 text-center">
+					<img src="/assets/img/gerdy_400x400.jpg" alt="Photo Gerdy" width="200" height="200" class="rounded-circle">
+				</div>
+			</div>
+			<div class="row mt-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 subheading">
+					<a href="/assets/cv.pdf" target="_blank" class="link-light">Voir mon CV</a>
 				</div>
 			</div>
 		</div>
@@ -18,72 +24,69 @@
 	<!-- Main Content-->
 	<div class="container px-4 px-lg-5">
 		<div class="row gx-4 gx-lg-5 justify-content-center">
-			<div
-				class="col-md-10 col-lg-8 col-xl-7">
-				<!-- Post preview-->
-				<div class="post-preview">
-					<a href="post.html">
-						<h2 class="post-title">Man must explore, and this is exploration at its greatest</h2>
-						<h3 class="post-subtitle">Problems look mighty small from 150 miles up</h3>
-					</a>
-					<p class="post-meta">
-						Posted by
-						<a href="#!">Start Bootstrap</a>
-						on September 24, 2023
-					</p>
-				</div>
-				<!-- Divider-->
-				<hr
-				class="my-4"/>
-				<!-- Post preview-->
-				<div class="post-preview">
-					<a href="post.html">
-						<h2 class="post-title">I believe every human has a finite number of heartbeats. I don't intend to waste any of mine.</h2>
-					</a>
-					<p class="post-meta">
-						Posted by
-						<a href="#!">Start Bootstrap</a>
-						on September 18, 2023
-					</p>
-				</div>
-				<!-- Divider-->
-				<hr
-				class="my-4"/>
-				<!-- Post preview-->
-				<div class="post-preview">
-					<a href="post.html">
-						<h2 class="post-title">Science has not yet mastered prophecy</h2>
-						<h3 class="post-subtitle">We predict too much for the next year and yet far too little for the next ten.</h3>
-					</a>
-					<p class="post-meta">
-						Posted by
-						<a href="#!">Start Bootstrap</a>
-						on August 24, 2023
-					</p>
-				</div>
-				<!-- Divider-->
-				<hr
-				class="my-4"/>
-				<!-- Post preview-->
-				<div class="post-preview">
-					<a href="post.html">
-						<h2 class="post-title">Failure is not an option</h2>
-						<h3 class="post-subtitle">Many say exploration is part of our destiny, but it’s actually our duty to future generations.</h3>
-					</a>
-					<p class="post-meta">
-						Posted by
-						<a href="#!">Start Bootstrap</a>
-						on July 8, 2023
-					</p>
-				</div>
-				<!-- Divider-->
-				<hr
-				class="my-4"/>
+			<div class="col-md-10 col-lg-8 col-xl-7">
+
+				{% for post in latestPosts %}
+					<!-- Post preview-->
+					<div class="post-preview">
+						<a href="/posts/{{ post.id }}">
+							<h2 class="post-title">{{ post.title }}</h2>
+							<h3 class="post-subtitle">{{ post.leadParagraph }}</h3>
+						</a>
+						<p class="post-meta">
+							Posté par
+							<a href="#!">{{ post.author.name }}</a>
+							le
+							{{ post.createdAt|format_datetime("full", "none", locale="fr") }}
+						</p>
+					</div>
+					<!-- Divider-->
+					<hr class="my-4"/>
+				{% endfor %}
+
 				<!-- Pager-->
 				<div class="d-flex justify-content-end mb-4">
-					<a class="btn btn-primary text-uppercase" href="#!">Older Posts →</a>
+					<a class="btn btn-primary text-uppercase" href="/blog">Posts plus anciens →</a>
 				</div>
+
+				<!-- Contact form -->
+				<div class="my-5">
+					<form id="contactForm">
+						<div class="form-floating">
+							<input class="form-control" id="name" type="text" placeholder="Entrez votre nom..." required/>
+							<label for="name">Nom</label>
+							<div class="invalid-feedback" data-sb-feedback="name:required">Le nom est requis.</div>
+						</div>
+						<div class="form-floating">
+							<input class="form-control" id="email" type="email" placeholder="Entrez votre adresse e-mail..." required/>
+							<label for="email">Addresse e-mail</label>
+							<div class="invalid-feedback" data-sb-feedback="email:required">l'adresse e-mail est requise.</div>
+							<div class="invalid-feedback" data-sb-feedback="email:email">L'adresse n'est pas valide.</div>
+						</div>
+						<div class="form-floating">
+							<textarea class="form-control" id="message" placeholder="Entrez votre message..." style="height: 12rem" required/></textarea>
+						<label for="message">Message</label>
+						<div class="invalid-feedback" data-sb-feedback="message:required">Le message ne peut pas être vide.</div>
+					</div>
+					<br/>
+					<!-- Submit success message-->
+					<!---->
+					<!-- This is what your users will see when the form-->
+					<!-- has successfully submitted-->
+						<div class="d-none" id="submitSuccessMessage"> <div class="text-center mb-3">
+							<div class="fw-bolder">Message envoyé</div>
+						</div>
+					</div>
+					<!-- Submit error message-->
+					<!---->
+					<!-- This is what your users will see when there is-->
+					<!-- an error submitting the form-->
+						<div class="d-none" id="submitErrorMessage"> <div class="text-center text-danger mb-3">Erreur lors de l'envoi.</div>
+					</div>
+					<!-- Submit Button-->
+					<button class="btn btn-primary text-uppercase disabled" id="submitButton" type="submit">Envoyer</button>
+				</form>
 			</div>
 		</div>
 	</div>
-{% endblock %}
+</div>{% endblock %}

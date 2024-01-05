@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\PostRepository;
 
 class Homepage extends Controller
 {
@@ -12,6 +13,7 @@ class Homepage extends Controller
 
     public function show()
     {
-        $this->twig->display("homepage.html.twig");
+        $latestPosts = (new PostRepository)->getLatestPostsSummary();
+        $this->twig->display("homepage.html.twig", compact("latestPosts"));
     }
 }
