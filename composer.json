@@ -1,0 +1,23 @@
+{
+  "name": "sar/ocp5",
+  "description": "Blog exercise for the PHP course at OpenClassrooms",
+  "type": "project",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Nicolas DENIS",
+      "email": "me@scoopandrun.ovh",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.0",
+    "twig/twig": "^3.0",
+    "vlucas/phpdotenv": "^5.6"
+  }
+}
