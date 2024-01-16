@@ -2,9 +2,9 @@
 
 namespace App\Controllers;
 
-use App\Models\PostRepository;
+use App\Repositories\PostRepository;
 
-class Homepage extends Controller
+class HomepageController extends Controller
 {
     public function __construct()
     {
