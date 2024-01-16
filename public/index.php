@@ -26,7 +26,7 @@ use App\Core\Exceptions\Server\ServerException;
 
 $routes = [
     "/" => fn () => (new HomepageController())->show(),
-    "/" => fn () => (new Homepage())->show(),
+    "/contact" => fn () => (new ContactFormController)->process(),
 ];
 
 try {

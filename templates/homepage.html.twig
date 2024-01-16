@@ -1,5 +1,21 @@
 {% extends "layout.html.twig" %}
 
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% block javascript %}
+	{% if contactFormResult is defined %}
+		<script>
+			document.addEventListener("DOMContentLoaded", function (event) {
+if (document.getElementById("contactForm")) {
+location.href = "#contactForm"
+}
+});
+		</script>
+	{% endif %}
+{% endblock %}
+
 {% block body %}
 	<!-- Page Header-->
 	<header class="masthead" style="background-image: url('/assets/img/home-bg.jpg')">
@@ -51,42 +67,56 @@
 
 				<!-- Contact form -->
 				<div class="my-5">
-					<form id="contactForm">
+					<form id="contactForm" method="POST" action="/contact">
 						<div class="form-floating">
-							<input class="form-control" id="name" type="text" placeholder="Entrez votre nom..." required/>
+							<input type="text" class="form-control" id="name" name="name" placeholder="Entrez votre nom..." value="{{ contactFormResult.values.name ?: "" }}" required/>
 							<label for="name">Nom</label>
-							<div class="invalid-feedback" data-sb-feedback="name:required">Le nom est requis.</div>
+							{% if contactFormResult.errors.name %}
+								<div class="invalid-feedback">Le nom est requis.</div>
+							{% endif %}
 						</div>
+
 						<div class="form-floating">
-							<input class="form-control" id="email" type="email" placeholder="Entrez votre adresse e-mail..." required/>
+							<input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre adresse e-mail..." value="{{ contactFormResult.values.email ?: "" }}" required/>
 							<label for="email">Addresse e-mail</label>
-							<div class="invalid-feedback" data-sb-feedback="email:required">l'adresse e-mail est requise.</div>
-							<div class="invalid-feedback" data-sb-feedback="email:email">L'adresse n'est pas valide.</div>
+							{% if contactFormResult.errors.emailMissing %}
+								<div class="invalid-feedback">l'adresse e-mail est requise.</div>
+							{% endif %}
+							{% if contactFormResult.errors.emailInvalid %}
+								<div class="invalid-feedback">L'adresse n'est pas valide.</div>
+							{% endif %}
 						</div>
+
 						<div class="form-floating">
-							<textarea class="form-control" id="message" placeholder="Entrez votre message..." style="height: 12rem" required/></textarea>
-						<label for="message">Message</label>
-						<div class="invalid-feedback" data-sb-feedback="message:required">Le message ne peut pas être vide.</div>
-					</div>
-					<br/>
-					<!-- Submit success message-->
-					<!---->
-					<!-- This is what your users will see when the form-->
-					<!-- has successfully submitted-->
-						<div class="d-none" id="submitSuccessMessage"> <div class="text-center mb-3">
-							<div class="fw-bolder">Message envoyé</div>
+							<textarea class="form-control" id="message" name="message" placeholder="Entrez votre message..." style="height: 12rem" required>{{ contactFormResult.values.message}}</textarea>
+							<label for="message">Message</label>
+							{% if contactFormResult.errors.message %}
+								<div class="invalid-feedback" data-sb-feedback="message:required">Le message ne peut pas être vide.</div>
+							{% endif %}
 						</div>
-					</div>
-					<!-- Submit error message-->
-					<!---->
-					<!-- This is what your users will see when there is-->
-					<!-- an error submitting the form-->
-						<div class="d-none" id="submitErrorMessage"> <div class="text-center text-danger mb-3">Erreur lors de l'envoi.</div>
-					</div>
-					<!-- Submit Button-->
-					<button class="btn btn-primary text-uppercase disabled" id="submitButton" type="submit">Envoyer</button>
-				</form>
+						<br/>
+
+						<!-- Submit success message-->
+						{% if contactFormResult.success %}
+							<div id="submitSuccessMessage">
+								<div class="text-center mb-3">
+									<div class="fw-bolder">Message envoyé</div>
+								</div>
+							</div>
+						{% endif %}
+
+						<!-- Submit error message-->
+						{% if contactFormResult.failure %}
+							<div id="submitErrorMessage">
+								<div class="text-center text-danger mb-3">Erreur lors de l'envoi.</div>
+							</div>
+						{% endif %}
+
+						<!-- Submit Button-->
+						<button class="btn btn-primary text-uppercase" id="submitButton" type="submit">Envoyer</button>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>{% endblock %}
+{% endblock %}
