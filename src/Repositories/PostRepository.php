@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Repositories;
 
 use App\Core\Database\MySQLConnection;
 use App\Core\DateTime;
 use App\Core\Exceptions\Server\DB\DBException;
-use App\Models\Post;
+use App\Models\{Post, User, Category};
 
 class PostRepository
 {

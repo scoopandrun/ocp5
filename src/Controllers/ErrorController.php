@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-class Error extends Controller
+class ErrorController extends Controller
 {
     public function __construct(protected \Throwable $e)
     {
