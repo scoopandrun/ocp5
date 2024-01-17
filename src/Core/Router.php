@@ -26,6 +26,7 @@ class Router
     {
         if (!$uri) {
             $uri = $_SERVER["REQUEST_URI"] ?? "/";
+            $uri = preg_replace("/\?.*/", "", $uri);
         }
 
         $routeMatched = false;
