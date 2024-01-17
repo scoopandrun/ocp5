@@ -8,6 +8,7 @@ GenericException:
         AccessException:
         AdminException:
     NotFoundException:
+    MethodNotAllowedException:
 
   ServerException:
     DBException:

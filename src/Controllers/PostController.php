@@ -14,7 +14,7 @@ class PostController extends Controller
 
     public function showAll()
     {
-        $repository = new PostRepository;
+        $repository = new PostRepository();
 
         /** @var int $postCount Total number of posts. */
         $postCount = $repository->getPostCount();
@@ -44,7 +44,7 @@ class PostController extends Controller
 
     public function showOne(int $postId)
     {
-        $repository = new PostRepository;
+        $repository = new PostRepository();
 
         $post = $repository->getPost($postId);
 
