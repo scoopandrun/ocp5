@@ -17,32 +17,43 @@ class PostRepository
     }
 
     /**
-     * Fetch the 3 latest blog posts.
+     * Fetch the blog posts summaries.
+     * 
+     * @param int $pageNumber     Page number.
+     * @param int $pageSize       Number of blog posts to show on a page.
+     * @param bool $publishedOnly Optional. Fetch only published posts. Default = `true`.
      * 
      * @return array<array-key, \App\Models\Post> 
      */
-    public function getLatestPostsSummary()
+    public function getPostsSummaries(int $pageNumber, int $pageSize, bool $publishedOnly = true): array
     {
         $db = $this->connection;
 
-        // Fetch all the blog posts
-        $req = $db->query(
+        $publishedOnlySql = $publishedOnly ? "WHERE p.published = 1" : "";
+
+        $req = $db->prepare(
             "SELECT
                 p.id,
                 p.createdAt,
                 u.id as authorId,
                 u.name as authorName,
-                c.id as catId,
-                c.name as catName,
+                c.id as categoryId,
+                c.name as categoryName,
                 p.title,
                 p.leadParagraph
             FROM posts p
             LEFT JOIN users u ON u.id = p.author
             LEFT JOIN categories c ON c.id = p.category
-            WHERE p.published = 1
+            $publishedOnlySql
             ORDER BY p.createdAt DESC
-            LIMIT 0, 3"
+            LIMIT :limit
+            OFFSET :offset"
         );
+
+        $req->bindValue(":limit", $pageSize, \PDO::PARAM_INT);
+        $req->bindValue(":offset", $pageSize * ($pageNumber - 1), \PDO::PARAM_INT);
+
+        $req->execute();
 
         $postsRaw = $req->fetchAll();
 
@@ -50,19 +61,46 @@ class PostRepository
             throw new DBException("Erreur lors de la récupération des posts.");
         }
 
-        $posts = array_map(function ($post) {
-            return new Post(
-                $post["id"],
-                new DateTime($post["createdAt"]),
-                new User($post["authorId"], $post["authorName"]),
-                new Category($post["catId"], $post["catName"]),
-                $post["title"],
-                $post["leadParagraph"],
-            );
+        $posts = array_map(function ($postRaw) {
+            $author = (new User)
+                ->setId($postRaw["authorId"])
+                ->setName($postRaw["authorName"]);
+
+            $category = (new Category)
+                ->setId($postRaw["categoryId"])
+                ->setName($postRaw["categoryName"]);
+
+            $post = (new Post)
+                ->setId($postRaw["id"])
+                ->setCreatedAt(new DateTime($postRaw["createdAt"]))
+                ->setAuthor($author)
+                ->setCategory($category)
+                ->setTitle($postRaw["title"])
+                ->setLeadParagraph($postRaw["leadParagraph"]);
+
+            return $post;
         }, $postsRaw);
 
         $req->closeCursor();
 
         return $posts;
+    }
+
+    /**
+     * Get the amount of blog posts in the database.
+     * 
+     * @param bool $published Optional. Count only published posts. Default = `true`.
+     */
+    public function getPostCount(bool $published = true): int
+    {
+        $db = $this->connection;
+
+        $whereClause = $published ? "WHERE published = 1" : "";
+
+        $req = $db->query("SELECT COUNT(*) FROM posts $whereClause");
+
+        $count = $req->fetch(\PDO::FETCH_COLUMN);
+
+        return $count;
     }
 }
