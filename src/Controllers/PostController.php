@@ -41,4 +41,17 @@ class PostController extends Controller
             ]
         );
     }
+
+    public function showOne(int $postId)
+    {
+        $repository = new PostRepository;
+
+        $post = $repository->getPost($postId);
+
+        if (!$post) {
+            throw new NotFoundException("Le post demandé n'existe pas");
+        }
+
+        $this->twig->display("post-single.html.twig", compact("post"));
+    }
 }

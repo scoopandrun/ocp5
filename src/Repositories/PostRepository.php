@@ -17,6 +17,64 @@ class PostRepository
     }
 
     /**
+     * Fetch a single blog post based on its ID.
+     * 
+     * @param int $id             ID of the blog post.
+     * @param bool $publishedOnly Optional. Fetch only if the post is published. Default = `true`.
+     */
+    public function getPost(int $id, bool $publishedOnly = true): Post | null
+    {
+        $db = $this->connection;
+
+        $publishedOnlySql = $publishedOnly ? "AND p.published = 1" : "";
+
+        $req = $db->prepare(
+            "SELECT
+                p.createdAt,
+                u.id as authorId,
+                u.name as authorName,
+                c.id as categoryId,
+                c.name as categoryName,
+                p.title,
+                p.leadParagraph,
+                p.body
+            FROM posts p
+            LEFT JOIN users u ON u.id = p.author
+            LEFT JOIN categories c ON c.id = p.category
+            WHERE
+                p.id = :id
+                $publishedOnlySql"
+        );
+
+        $req->execute(compact("id"));
+
+        $postRaw = $req->fetch();
+
+        if (!$postRaw) {
+            return null;
+        }
+
+        $author = (new User)
+            ->setId($postRaw["authorId"])
+            ->setName($postRaw["authorName"]);
+
+        $category = (new Category)
+            ->setId($postRaw["categoryId"])
+            ->setName($postRaw["categoryName"]);
+
+        $post = (new Post)
+            ->setId($id)
+            ->setCreatedAt(new DateTime($postRaw["createdAt"]))
+            ->setAuthor($author)
+            ->setCategory($category)
+            ->setTitle($postRaw["title"])
+            ->setLeadParagraph($postRaw["leadParagraph"])
+            ->setBody($postRaw["body"]);
+
+        return $post;
+    }
+
+    /**
      * Fetch the blog posts summaries.
      * 
      * @param int $pageNumber     Page number.
