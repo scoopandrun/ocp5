@@ -1,0 +1,13 @@
+<!-- Post preview-->
+<div class="post-preview">
+	<a href="/posts/{{ post.id }}">
+		<h2 class="post-title">{{ post.title }}</h2>
+		<h3 class="post-subtitle">{{ post.leadParagraph }}</h3>
+	</a>
+	<p class="post-meta">
+		Posté par
+		<a href="#!">{{ post.author.name }}</a>
+		le
+		{{ post.createdAt|format_datetime("full", "none", locale="fr") }}
+	</p>
+</div>

@@ -13,7 +13,8 @@ class HomepageController extends Controller
 
     public function show()
     {
-        $latestPosts = (new PostRepository)->getLatestPostsSummary();
+        $postRepository = new PostRepository();
+        $latestPosts = $postRepository->getPostsSummaries(1, 1);
         $this->twig->display("homepage.html.twig", compact("latestPosts"));
     }
 }
