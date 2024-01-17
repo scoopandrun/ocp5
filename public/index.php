@@ -29,6 +29,7 @@ $routes = [
     "/" => fn () => (new HomepageController())->show(),
     "/contact" => fn () => (new ContactFormController)->process(),
     "/posts" => fn () => (new PostController)->showAll(),
+    "/posts/(\d+)" => fn (int $id) => (new PostController)->showOne($id),
 ];
 
 try {
