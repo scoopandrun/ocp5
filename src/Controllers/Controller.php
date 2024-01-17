@@ -20,6 +20,6 @@ abstract class Controller
         $this->twig = new Environment($this->loader);
         $this->twig->addExtension(new IntlExtension());
 
-        $this->request = new HTTPRequest;
+        $this->request = new HTTPRequest();
     }
 }
