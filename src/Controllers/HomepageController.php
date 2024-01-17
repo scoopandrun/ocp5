@@ -22,6 +22,9 @@ class HomepageController extends Controller
 
     public function processContactForm()
     {
+        $postRepository = new PostRepository();
+        $latestPosts = $postRepository->getPostsSummaries(1, 1);
+
         // Check that all fields are filled in
         $name = $this->request->body["name"] ?? null;
         $email = $this->request->body["email"] ?? null;
@@ -34,13 +37,13 @@ class HomepageController extends Controller
             "errors" => [
                 "name" => !$name,
                 "emailMissing" => !$email,
-                "emailInvalid" => !preg_match("/.*@.*\.[a-z]+/", $email),
+                "emailInvalid" => $email && !preg_match("/.*@.*\.[a-z]+/", $email),
                 "message" => !$message,
             ]
         ];
 
         if (in_array(true, array_values($contactFormResult["errors"]))) {
-            $this->twig->display("homepage.html.twig", compact("contactFormResult"));
+            $this->twig->display("homepage.html.twig", compact("latestPosts", "contactFormResult"));
             exit;
         }
 
@@ -91,6 +94,6 @@ class HomepageController extends Controller
             error_logger(new \Exception($mail->ErrorInfo));
         }
 
-        $this->twig->display("homepage.html.twig", compact("contactFormResult"));
+        $this->twig->display("homepage.html.twig", compact("latestPosts", "contactFormResult"));
     }
 }
