@@ -9,7 +9,7 @@ class ErrorController extends Controller
         parent::__construct();
     }
 
-    public function show()
+    public function show(): void
     {
         $this->twig->display("error.html.twig", [
             "error" => $this->e

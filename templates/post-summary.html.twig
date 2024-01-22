@@ -9,5 +9,9 @@
 		<a href="#!">{{ post.author.name }}</a>
 		le
 		{{ post.createdAt|format_datetime("full", "none", locale="fr") }}
+		{% if post.category %}
+			dans
+			{{ post.category }}
+		{% endif %}
 	</p>
 </div>
