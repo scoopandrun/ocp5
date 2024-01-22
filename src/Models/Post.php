@@ -12,8 +12,9 @@ class Post
 {
     private int $id;
     private DateTime $createdAt;
-    private User $author;
-    private Category $category;
+    private ?DateTime $updatedAt = null;
+    private ?User $author = null;
+    private ?Category $category = null;
     private string $title = "";
     private string $leadParagraph = "";
     private string $body = "";
@@ -39,9 +40,34 @@ class Post
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt)
+    public function setCreatedAt(DateTime|string $createdAt)
     {
-        $this->createdAt = $createdAt;
+        if (gettype($createdAt) === "string") {
+            $this->createdAt = new DateTime($createdAt);
+        } elseif ($createdAt::class === DateTime::class) {
+            $this->createdAt = $createdAt;
+        }
+
+        return $this;
+    }
+
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTime|string|null $updatedAt)
+    {
+        if (is_null($updatedAt)) {
+            $this->updatedAt = null;
+        } elseif (gettype($updatedAt) === "string") {
+            $this->updatedAt = new DateTime($updatedAt);
+        } elseif (gettype($updatedAt) === "object" && $updatedAt::class === DateTime::class) {
+            $this->updatedAt = $updatedAt;
+        } else {
+            $this->updatedAt = null;
+        }
+
         return $this;
     }
 
@@ -50,7 +76,7 @@ class Post
         return $this->author;
     }
 
-    public function setAuthor(User $author)
+    public function setAuthor(?User $author)
     {
         $this->author = $author;
         return $this;
@@ -61,7 +87,7 @@ class Post
         return $this->category;
     }
 
-    public function setCategory(Category $category)
+    public function setCategory(?Category $category)
     {
         $this->category = $category;
         return $this;
