@@ -12,7 +12,7 @@ class PostController extends Controller
         parent::__construct();
     }
 
-    public function showAll()
+    public function showAll(): void
     {
         $repository = new PostRepository();
 
@@ -42,11 +42,11 @@ class PostController extends Controller
         );
     }
 
-    public function showOne(int $postId)
+    public function showOne(int $postId): void
     {
-        $repository = new PostRepository();
+        $postRepository = new PostRepository();
 
-        $post = $repository->getPost($postId);
+        $post = $postRepository->getPost($postId);
 
         if (!$post) {
             throw new NotFoundException("Le post demandé n'existe pas");
