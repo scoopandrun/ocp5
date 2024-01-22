@@ -1,0 +1,97 @@
+{% extends "layout.html.twig" %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+	<link rel="stylesheet" href="/assets/css/common.css">
+{% endblock %}
+
+{% block body %}
+	<header class="masthead page-heading">
+		<div class="container position-relative px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7">
+					<div class="post-heading">
+						{% if post %}
+							<h1>Modification de post</h1>
+						{% else %}
+							<h1>Création de post</h1>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	{% if post %}
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<a href="/posts/{{ post.id }}" class="btn btn-light">Retourner au post</a>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	{% if formResult.failure %}
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<div class="invalid-feedback">Une ou plusieurs erreur se sont produites</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<main>
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<form id="postForm" method="post" action="">
+						<div class="form-floating">
+							<input type="text" id="title" name="post[title]" class="form-control" maxlength="255" placeholder="Titre" value="{{ post.title }}" required/>
+							<label for="title" class="form-label">Titre</label>
+							{% if formResult.errors.titleMissing %}
+								<div class="invalid-feedback">Le titre est requis.</div>
+							{% endif %}
+							{% if formResult.errors.titleTooLong %}
+								<div class="invalid-feedback">Le titre ne doit pas dépasser 255 caractères.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating mt-3">
+							<input type="text" id="leadParagraph" name="post[leadParagraph]" class="form-control" maxlength="255" placeholder="Chapô" value="{{ post.leadParagraph }}" aria-describedby="leadParagraphHelp"/>
+							<label for="leadParagraph" class="form-label">Chapô</label>
+							<small id="leadParagraphHelp" class="text-muted">Phrase d'introduction pour le post</small>
+							{% if formResult.errors.leadParagraphTooLong %}
+								<div class="invalid-feedback">Le chapô ne doit pas dépasser 255 caractères.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating mt-3">
+							<textarea class="form-control" id="body" name="post[body]" placeholder="Entrez le corps du post" style="height: 30rem" required>{{ post.body }}</textarea>
+							<label for="body" class="form-label">Corps du post</label>
+						</div>
+
+						<div class="form-floating mt-3">
+							<select class="form-select" id="category" name="post[category]" placeholder="Entrez le corps du post" value="{{ post.category.id }}">
+								<option value="">Aucune catégorie</option>
+								{% for category in categories %}
+									<option value="{{ category.id }}" {{ post.category.id == category.id ? "selected" : "" }}>{{ category.name }}</option>
+								{% endfor %}
+							</select>
+							<label for="category" class="form-label">Catégorie</label>
+						</div>
+
+						<div class="form-switch mt-3">
+							<input type="checkbox" id="isPublished" name="post[isPublished]" class="form-check-input" checked="{{ post.isPublished }}"/>
+							<label for="isPublished" class="form-check-label">Publier ce post</label>
+						</div>
+
+						<button class="btn btn-primary text-uppercase mt-5" id="submitButton" type="submit">Enregistrer</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</main>
+
+{% endblock %}

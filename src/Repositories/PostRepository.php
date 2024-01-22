@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Core\Database\MySQLConnection;
-use App\Core\DateTime;
 use App\Core\Exceptions\Server\DB\DBException;
 use App\Models\{Post, User, Category};
 
@@ -31,6 +30,7 @@ class PostRepository
         $req = $db->prepare(
             "SELECT
                 p.createdAt,
+                p.updatedAt,
                 u.id as authorId,
                 u.name as authorName,
                 c.id as categoryId,
@@ -54,17 +54,22 @@ class PostRepository
             return null;
         }
 
-        $author = (new User)
+        $author = !is_null($postRaw["authorId"]) ?
+            (new User)
             ->setId($postRaw["authorId"])
-            ->setName($postRaw["authorName"]);
+            ->setName($postRaw["authorName"])
+            : null;
 
-        $category = (new Category)
+        $category = !is_null($postRaw["categoryId"])
+            ? (new Category)
             ->setId($postRaw["categoryId"])
-            ->setName($postRaw["categoryName"]);
+            ->setName($postRaw["categoryName"])
+            : null;
 
         $post = (new Post)
             ->setId($id)
-            ->setCreatedAt(new DateTime($postRaw["createdAt"]))
+            ->setCreatedAt($postRaw["createdAt"])
+            ->setUpdatedAt($postRaw["updatedAt"])
             ->setAuthor($author)
             ->setCategory($category)
             ->setTitle($postRaw["title"])
@@ -93,6 +98,7 @@ class PostRepository
             "SELECT
                 p.id,
                 p.createdAt,
+                p.updatedAt,
                 u.id as authorId,
                 u.name as authorName,
                 c.id as categoryId,
@@ -120,17 +126,22 @@ class PostRepository
         }
 
         $posts = array_map(function ($postRaw) {
-            $author = (new User)
+            $author = !is_null($postRaw["authorId"]) ?
+                (new User)
                 ->setId($postRaw["authorId"])
-                ->setName($postRaw["authorName"]);
+                ->setName($postRaw["authorName"])
+                : null;
 
-            $category = (new Category)
+            $category = !is_null($postRaw["categoryId"])
+                ? (new Category)
                 ->setId($postRaw["categoryId"])
-                ->setName($postRaw["categoryName"]);
+                ->setName($postRaw["categoryName"])
+                : null;
 
             $post = (new Post)
                 ->setId($postRaw["id"])
-                ->setCreatedAt(new DateTime($postRaw["createdAt"]))
+                ->setCreatedAt($postRaw["createdAt"])
+                ->setUpdatedAt($postRaw["updatedAt"])
                 ->setAuthor($author)
                 ->setCategory($category)
                 ->setTitle($postRaw["title"])
@@ -160,5 +171,65 @@ class PostRepository
         $count = $req->fetch(\PDO::FETCH_COLUMN);
 
         return $count;
+    }
+
+    public function createPost(array $data): int
+    {
+        $db = $this->connection;
+
+        $db->beginTransaction();
+
+        $req = $db->prepare(
+            "INSERT INTO posts
+            SET
+                title = :title,
+                leadParagraph = :leadParagraph,
+                body = :body,
+                author = :author,
+                category = :category,
+                published = :published"
+        );
+
+        $req->execute([
+            "title" => $data["title"],
+            "leadParagraph" => $data["leadParagraph"],
+            "body" => $data["body"],
+            "category" => (int) ($data["category"] ?? null) ?: null,
+            "published" => (int) isset($data["isPublished"]),
+            "author" => 1, // TODO: change when user management is implemented
+        ]);
+
+        $lastInsertId = $db->lastInsertId();
+
+        $db->commit();
+
+        return (int) $lastInsertId;
+    }
+
+    public function editPost(int $id, array $data): void
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "UPDATE posts
+            SET
+                title = :title,
+                leadParagraph = :leadParagraph,
+                body = :body,
+                category = :category,
+                published = :published,
+                updatedAt = CURRENT_TIMESTAMP
+            WHERE
+                id = :id"
+        );
+
+        $req->execute([
+            "id" => $id,
+            "title" => $data["title"],
+            "leadParagraph" => $data["leadParagraph"],
+            "body" => $data["body"],
+            "category" => (int) ($data["category"] ?? null) ?: null,
+            "published" => (int) isset($data["isPublished"]),
+        ]);
     }
 }

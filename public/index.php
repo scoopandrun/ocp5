@@ -35,6 +35,14 @@ $routes = [
     "/posts/(\d+)" => [
         "GET" => fn (int $id) => (new PostController())->showOne($id),
     ],
+    "/posts/(\d+)/edit" => [
+        "GET" => fn (int $id) => (new PostController())->showEditPage($id),
+        "POST" => fn (int $id) => (new PostController())->editPost($id),
+    ],
+    "/posts/create" => [
+        "GET" => fn () => (new PostController())->showEditPage(),
+        "POST" => fn () => (new PostController())->createPost(),
+    ],
 ];
 
 try {
