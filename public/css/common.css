@@ -1,0 +1,15 @@
+header.page-heading {
+  padding-top: 6rem;
+  padding-bottom: 2rem;
+}
+
+header .post-heading .meta {
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  header.page-heading {
+    padding-top: 8rem;
+    padding-bottom: 3rem;
+  }
+}
