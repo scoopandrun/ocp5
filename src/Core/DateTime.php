@@ -11,6 +11,6 @@ class DateTime extends \DateTime implements \Stringable
 
     public function __toString(): string
     {
-        return date("Y-m-d H:i:s");
+        return date("Y-m-d H:i:s", $this->date);
     }
 }
