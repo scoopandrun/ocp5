@@ -6,7 +6,7 @@ use App\Core\DateTime;
 
 class User implements \Stringable
 {
-    private int $id;
+    private ?int $id = null;
     private string $name = "Anonyme";
     private string $email = "";
     private string $password = "";
@@ -22,7 +22,7 @@ class User implements \Stringable
         return $this->id;
     }
 
-    public function setId(int $id)
+    public function setId(?int $id)
     {
         $this->id = $id;
         return $this;
@@ -33,9 +33,9 @@ class User implements \Stringable
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(?string $name)
     {
-        $this->name = $name;
+        $this->name = $name ?? "Anonyme";
         return $this;
     }
 
