@@ -22,7 +22,7 @@ class Router
      * 
      * @param string $uri Optional. Path to be matched.
      */
-    public function match(string $uri = "")
+    public function match(string $uri = ""): void
     {
         if (!$uri) {
             $uri = $_SERVER["REQUEST_URI"] ?? "/";

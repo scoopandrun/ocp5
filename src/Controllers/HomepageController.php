@@ -13,14 +13,14 @@ class HomepageController extends Controller
         parent::__construct();
     }
 
-    public function show()
+    public function show(): void
     {
         $postRepository = new PostRepository();
         $latestPosts = $postRepository->getPostsSummaries(1, 1);
         $this->twig->display("homepage.html.twig", compact("latestPosts"));
     }
 
-    public function processContactForm()
+    public function processContactForm(): void
     {
         $postRepository = new PostRepository();
         $latestPosts = $postRepository->getPostsSummaries(1, 1);
