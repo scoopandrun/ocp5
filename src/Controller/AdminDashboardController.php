@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controller;
 
-use App\Repositories\PostRepository;
+use App\Repository\PostRepository;
 
 class AdminDashboardController extends Controller
 {

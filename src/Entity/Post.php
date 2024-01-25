@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Entity;
 
 use App\Core\DateTime;
-use App\Models\{User, Category};
+use App\Entity\{User, Category};
 
 /**
  * A blog post.

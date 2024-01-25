@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controller;
 
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;

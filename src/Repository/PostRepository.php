@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repository;
 
 use App\Core\Database\MySQLConnection;
 use App\Core\Exceptions\Server\DB\DBException;
-use App\Models\{Post, User, Category};
+use App\Entity\{Post, User, Category};
 
 class PostRepository
 {
@@ -88,7 +88,7 @@ class PostRepository
      * @param int $pageSize       Number of blog posts to show on a page.
      * @param bool $publishedOnly Optional. Fetch only published posts. Default = `true`.
      * 
-     * @return array<array-key, \App\Models\Post> 
+     * @return array<array-key, \App\Entity\Post> 
      */
     public function getPostsSummaries(int $pageNumber, int $pageSize, bool $publishedOnly = true): array
     {
