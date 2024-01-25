@@ -1,15 +1,26 @@
-{% extends "layout.html.twig" %}
+{% extends "admin/layout.html.twig" %}
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="/assets/css/form.css">
-	<link rel="stylesheet" href="/assets/css/common.css">
 {% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"href": "/admin/posts",
+		"name": "Gestion des posts",
+		"title": "Gestion des posts"
+	},
+	{
+		"name": post.id ? "Modification de post" : "Création de post"
+	},
+] %}
+
 
 {% block body %}
 	<header class="masthead page-heading">
 		<div class="container position-relative px-4 px-lg-5">
 			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
-				<div class="col-md-10 col-lg-8 col-xl-7">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-3">
 					<div class="post-heading">
 						{% if post %}
 							<h1>Modification de post</h1>
@@ -26,7 +37,7 @@
 		<div class="container px-4 px-lg-5">
 			<div class="row gx-4 gx-lg-5 justify-content-center">
 				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
-					<a href="/posts/{{ post.id }}" class="btn btn-light">Retourner au post</a>
+					<a href="/posts/{{ post.id }}" class="btn btn-light" target="_blank">Voir le post</a>
 				</div>
 			</div>
 		</div>
@@ -47,9 +58,9 @@
 			<div class="row gx-4 gx-lg-5 justify-content-center">
 				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
 					<form id="postForm" method="post" action="">
-						<div class="form-floating">
+						<div class="input-group input-group-static">
+							<label for="title">Titre</label>
 							<input type="text" id="title" name="post[title]" class="form-control" maxlength="255" placeholder="Titre" value="{{ post.title }}" required/>
-							<label for="title" class="form-label">Titre</label>
 							{% if formResult.errors.titleMissing %}
 								<div class="invalid-feedback">Le titre est requis.</div>
 							{% endif %}
@@ -58,33 +69,32 @@
 							{% endif %}
 						</div>
 
-						<div class="form-floating mt-3">
-							<input type="text" id="leadParagraph" name="post[leadParagraph]" class="form-control" maxlength="255" placeholder="Chapô" value="{{ post.leadParagraph }}" aria-describedby="leadParagraphHelp"/>
-							<label for="leadParagraph" class="form-label">Chapô</label>
-							<small id="leadParagraphHelp" class="text-muted">Phrase d'introduction pour le post</small>
+						<div class="input-group input-group-static mt-5">
+							<label for="leadParagraph">Chapô</label>
+							<input type="text" id="leadParagraph" name="post[leadParagraph]" class="form-control" maxlength="255" placeholder="Courte introduction" value="{{ post.leadParagraph }}"/>
 							{% if formResult.errors.leadParagraphTooLong %}
 								<div class="invalid-feedback">Le chapô ne doit pas dépasser 255 caractères.</div>
 							{% endif %}
 						</div>
 
-						<div class="form-floating mt-3">
+						<div class="input-group input-group-static mt-4">
+							<label for="body">Corps du post</label>
 							<textarea class="form-control" id="body" name="post[body]" placeholder="Entrez le corps du post" style="height: 30rem" required>{{ post.body }}</textarea>
-							<label for="body" class="form-label">Corps du post</label>
 						</div>
 
-						<div class="form-floating mt-3">
-							<select class="form-select" id="category" name="post[category]" placeholder="Entrez le corps du post" value="{{ post.category.id }}">
+						<div class="input-group input-group-static mt-4">
+							<label for="category">Catégorie</label>
+							<select class="form-control" id="category" name="post[category]" placeholder="Entrez le corps du post" value="{{ post.category.id }}">
 								<option value="">Aucune catégorie</option>
 								{% for category in categories %}
-									<option value="{{ category.id }}" {{ post.category.id == category.id ? "selected" : "" }}>{{ category.name }}</option>
+									<option value="{{ category.id }}" {{ post.category.id == category.id ? "selected" }}>{{ category.name }}</option>
 								{% endfor %}
 							</select>
-							<label for="category" class="form-label">Catégorie</label>
 						</div>
 
-						<div class="form-switch mt-3">
-							<input type="checkbox" id="isPublished" name="post[isPublished]" class="form-check-input" checked="{{ post.isPublished }}"/>
+						<div class="form-check form-switch mt-3">
 							<label for="isPublished" class="form-check-label">Publier ce post</label>
+							<input type="checkbox" id="isPublished" name="post[isPublished]" class="form-check-input" {{ post.isPublished ? "checked" }}/>
 						</div>
 
 						<button class="btn btn-primary text-uppercase mt-5" id="submitButton" type="submit">Enregistrer</button>

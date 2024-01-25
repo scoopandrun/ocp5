@@ -1,4 +1,4 @@
-{% extends "layout.html.twig" %}
+{% extends "front/layout.html.twig" %}
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="/assets/css/common.css">
@@ -16,10 +16,10 @@
 						<div class="meta">Posté par
 							{{ post.author }}
 							le
-							{{ post.createdAt|format_datetime("full", "none", locale="fr") }}</div>
+							{{ post.createdAt|format_date("full", locale="fr") }}</div>
 						{% if post.updatedAt %}
 							<div class="meta">Modifié le
-								{{ post.updatedAt|format_datetime("full", "none", locale="fr") }}</div>
+								{{ post.updatedAt|format_date("full", locale="fr") }}</div>
 						{% endif %}
 						{% if post.category %}
 							<div class="meta">Catégorie
@@ -34,7 +34,7 @@
 	<div class="container px-4 px-lg-5 my-3">
 		<div class="row gx-4 gx-lg-5 justify-content-center">
 			<div class="col-md-10 col-lg-8 col-xl-7">
-				<a href="/posts/{{ post.id }}/edit" class="btn btn-light">Modifier le post</a>
+				<a href="/admin/posts/{{ post.id }}" class="btn btn-light">Modifier le post</a>
 			</div>
 		</div>
 	</div>

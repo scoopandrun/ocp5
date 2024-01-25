@@ -1,0 +1,151 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block title %}
+	Blog Admin - Gestion des posts
+{% endblock %}
+
+{% block javascript %}
+	<script defer src="/assets/js/admin/post-management.js"></script>
+{% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"name": "Gestion des posts"
+	}
+] %}
+
+{% block body %}
+
+	<h1 class="mb-3">Gestion des posts</h1>
+
+	<div class="container ms-0">
+		<a href="/admin/posts/create" class="btn btn-light">Créer un post</a>
+	</div>
+
+	<div class="card">
+		<div class="table-responsive">
+			<div class="dataTable-wrapper">
+				<div class="dataTable-top">
+					<div class="dataTable-dropdown">
+						<label>
+							<select class="dataTable-selector">
+								<option value="5">5</option>
+								<option value="10" selected>10</option>
+								<option value="15">15</option>
+								<option value="20">20</option>
+								<option value="25">25</option>
+							</select>
+							posts par page</label>
+					</div>
+				</div>
+				<div class="dataTable-container">
+					<table id="datatable" class="table align-items-center mb-0 dataTable-table">
+						<thead>
+							<tr class="d-none d-md-table-row">
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre et chapô</th>
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Création/Modification</th>
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Catégorie</th>
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Etat</th>
+								<th class="text-secondary opacity-7"></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for post in posts %}
+								<tr data-post-id="{{ post.id }}">
+									<td>
+										<div class="d-flex px-2 py-1">
+											<div class="d-flex flex-column justify-content-center">
+												<h6 class="mb-0 text-xs">{{ post.title }}</h6>
+												<p class="text-xs text-secondary mb-0">{{ post.leadParagraph }}</p>
+												<div class="d-md-none mt-1">
+													{% if post.category %}
+														<p class="text-xs text-secondary mb-0">
+															Dans
+															{{ post.category }}
+														</p>
+													{% endif %}
+													<p class="text-xs text-secondary mb-0">
+														Créé le
+														{{ post.createdAt|format_date("short", locale="fr") }}
+													</p>
+													{% if post.updatedAt %}
+														<p class="text-xs text-secondary mb-0">
+															Modifié le
+															{{ post.updatedAt|format_date("short", locale="fr") }}</p>
+													{% endif %}
+													{% if post.isPublished %}
+														<span class="badge badge-sm badge-success">Publié</span>
+													{% else %}
+														<span class="badge badge-sm badge-secondary">Non publié</span>
+													{% endif %}
+												</div>
+											</div>
+										</div>
+									</td>
+									<td class="d-none d-md-table-cell">
+										<p class="text-xs font-weight-bold mb-0">{{ post.createdAt|format_date("short", locale="fr") }}</p>
+										{% if post.updatedAt %}
+											<p class="text-xs text-secondary mb-0">{{ post.updatedAt|format_date("short", locale="fr") }}</p>
+										{% endif %}
+									</td>
+									<td class="d-none d-md-table-cell">
+										<p class="text-xs mb-0">{{ post.category }}</p>
+									</td>
+									<td class="align-middle text-center text-sm d-none d-md-table-cell">
+										{% if post.isPublished %}
+											<span class="badge badge-sm badge-success">Publié</span>
+										{% else %}
+											<span class="badge badge-sm badge-secondary">Non publié</span>
+										{% endif %}
+									</td>
+									<td class="align-middle">
+										<div class="row text-center">
+											<div class="col">
+												<a href="/admin/posts/{{ post.id }}" class="text-secondary font-weight-normal text-xs" title="Modifier le post">
+													Modifier
+												</a>
+											</div>
+											<div class="col">
+												<button type="button" class="btn btn-outline-danger btn-sm mb-0" title="Supprimer le post" data-delete>
+													<span class="text">Supprimer</span>
+													<span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="dataTable-bottom">
+					<div class="dataTable-info">Affichage de 1 à 10 sur
+						{{ posts|length }}
+						posts</div>
+					<nav class="dataTable-pagination">
+						<ul class="dataTable-pagination-list">
+							<li class="pager">
+								<a href="#" data-page="1">‹</a>
+							</li>
+							<li class="active">
+								<a href="#" data-page="1">1</a>
+							</li>
+							<li class="">
+								<a href="#" data-page="2">2</a>
+							</li>
+							<li class="">
+								<a href="#" data-page="3">3</a>
+							</li>
+							<li class="pager">
+								<a href="#" data-page="2">›</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+{% endblock %}
