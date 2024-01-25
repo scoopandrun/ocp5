@@ -20,6 +20,8 @@ $dotenv->load();
 use App\Core\Router;
 use App\Controllers\HomepageController;
 use App\Controllers\PostController;
+use App\Controllers\AdminDashboardController;
+use App\Controllers\PostManagementController;
 use App\Controllers\ErrorController;
 use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
@@ -35,13 +37,20 @@ $routes = [
     "/posts/(\d+)" => [
         "GET" => fn (int $id) => (new PostController())->showOne($id),
     ],
-    "/posts/(\d+)/edit" => [
-        "GET" => fn (int $id) => (new PostController())->showEditPage($id),
-        "POST" => fn (int $id) => (new PostController())->editPost($id),
+    "/admin" => [
+        "GET" => fn () => (new AdminDashboardController())->show(),
     ],
-    "/posts/create" => [
-        "GET" => fn () => (new PostController())->showEditPage(),
-        "POST" => fn () => (new PostController())->createPost(),
+    "/admin/posts" => [
+        "GET" => fn () => (new PostManagementController())->show(),
+    ],
+    "/admin/posts/(\d+)" => [
+        "GET" => fn (int $id) => (new PostManagementController())->showEditPage($id),
+        "POST" => fn (int $id) => (new PostManagementController())->editPost($id),
+        "DELETE" => fn (int $id) => (new PostManagementController())->deletePost($id),
+    ],
+    "/admin/posts/create" => [
+        "GET" => fn () => (new PostManagementController())->showEditPage(),
+        "POST" => fn () => (new PostManagementController())->createPost(),
     ],
 ];
 

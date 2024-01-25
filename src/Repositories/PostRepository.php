@@ -35,6 +35,7 @@ class PostRepository
                 u.name as authorName,
                 c.id as categoryId,
                 c.name as categoryName,
+                p.published,
                 p.title,
                 p.leadParagraph,
                 p.body
@@ -72,6 +73,7 @@ class PostRepository
             ->setUpdatedAt($postRaw["updatedAt"])
             ->setAuthor($author)
             ->setCategory($category)
+            ->setIsPublished($postRaw["published"])
             ->setTitle($postRaw["title"])
             ->setLeadParagraph($postRaw["leadParagraph"])
             ->setBody($postRaw["body"]);
@@ -104,7 +106,8 @@ class PostRepository
                 c.id as categoryId,
                 c.name as categoryName,
                 p.title,
-                p.leadParagraph
+                p.leadParagraph,
+                p.published
             FROM posts p
             LEFT JOIN users u ON u.id = p.author
             LEFT JOIN categories c ON c.id = p.category
@@ -144,6 +147,7 @@ class PostRepository
                 ->setUpdatedAt($postRaw["updatedAt"])
                 ->setAuthor($author)
                 ->setCategory($category)
+                ->setIsPublished($postRaw["published"])
                 ->setTitle($postRaw["title"])
                 ->setLeadParagraph($postRaw["leadParagraph"]);
 
@@ -231,5 +235,16 @@ class PostRepository
             "category" => (int) ($data["category"] ?? null) ?: null,
             "published" => (int) isset($data["isPublished"]),
         ]);
+    }
+
+    public function deletePost(int $id): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare("DELETE FORM posts WHERE id = :id");
+
+        $success = $req->execute(["id" => $id]);
+
+        return $success;
     }
 }

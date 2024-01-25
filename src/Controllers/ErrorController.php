@@ -11,7 +11,7 @@ class ErrorController extends Controller
 
     public function show(): void
     {
-        $this->twig->display("error.html.twig", [
+        $this->twig->display("front/error.html.twig", [
             "error" => $this->e
         ]);
     }
