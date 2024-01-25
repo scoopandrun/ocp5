@@ -18,11 +18,11 @@ $dotenv->load();
 
 use App\Core\Router;
 use App\Core\ErrorLogger;
-use App\Controllers\HomepageController;
-use App\Controllers\PostController;
-use App\Controllers\AdminDashboardController;
-use App\Controllers\PostManagementController;
-use App\Controllers\ErrorController;
+use App\Controller\HomepageController;
+use App\Controller\PostController;
+use App\Controller\AdminDashboardController;
+use App\Controller\PostManagementController;
+use App\Controller\ErrorController;
 use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
 

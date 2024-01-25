@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controller;
 
 use App\Core\ErrorLogger;
-use App\Repositories\PostRepository;
+use App\Repository\PostRepository;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 

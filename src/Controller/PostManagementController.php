@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controller;
 
 use App\Core\Exceptions\Client\NotFoundException;
-use App\Repositories\{PostRepository, CategoryRepository};
+use App\Repository\{PostRepository, CategoryRepository};
 
 class PostManagementController extends Controller
 {

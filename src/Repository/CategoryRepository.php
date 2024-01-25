@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repository;
 
 use App\Core\Database\MySQLConnection;
 use App\Core\Exceptions\Server\DB\DBException;
-use App\Models\Category;
+use App\Entity\Category;
 
 class CategoryRepository
 {
@@ -21,7 +21,7 @@ class CategoryRepository
      * @param int $id             ID of the blog post.
      * @param bool $publishedOnly Optional. Fetch only if the post is published. Default = `true`.
      * 
-     * @return array<int, \App\Models\Category>
+     * @return array<int, \App\Entity\Category>
      */
     public function getAll(): array
     {
