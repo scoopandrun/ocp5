@@ -1,4 +1,4 @@
-{% extends "layout.html.twig" %}
+{% extends "front/layout.html.twig" %}
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="/assets/css/form.css">
@@ -36,7 +36,7 @@
 
 				{% for post in latestPosts %}
 					<!-- Post preview-->
-					{{ include("post-summary.html.twig") }}
+					{{ include("front/includes/post-summary.html.twig") }}
 					<!-- Divider-->
 					<hr class="my-4"/>
 				{% endfor %}

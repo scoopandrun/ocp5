@@ -8,7 +8,7 @@
 		Posté par
 		<a href="#!">{{ post.author.name }}</a>
 		le
-		{{ post.createdAt|format_datetime("full", "none", locale="fr") }}
+		{{ post.createdAt|format_date("full", locale="fr") }}
 		{% if post.category %}
 			dans
 			{{ post.category }}
