@@ -31,15 +31,19 @@ class PostController extends Controller
         }
 
         $posts = $repository->getPostsSummaries($pageNumber, $pageSize);
-        $this->twig->display(
-            "front/post-archive.html.twig",
-            [
-                "posts" => $posts,
-                "page" => $pageNumber,
-                "previousPage" => $pageNumber > 1,
-                "nextPage" => $postCount > ($pageNumber * $pageSize),
-            ]
-        );
+
+        $this->response
+            ->sendHTML(
+                $this->twig->render(
+                    "front/post-archive.html.twig",
+                    [
+                        "posts" => $posts,
+                        "page" => $pageNumber,
+                        "previousPage" => $pageNumber > 1,
+                        "nextPage" => $postCount > ($pageNumber * $pageSize),
+                    ]
+                )
+            );
     }
 
     public function showOne(int $postId): void
@@ -52,6 +56,12 @@ class PostController extends Controller
             throw new NotFoundException("Le post demandé n'existe pas");
         }
 
-        $this->twig->display("front/post-single.html.twig", compact("post"));
+        $this->response
+            ->sendHTML(
+                $this->twig->render(
+                    "front/post-single.html.twig",
+                    compact("post")
+                )
+            );
     }
 }

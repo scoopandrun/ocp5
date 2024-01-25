@@ -16,7 +16,13 @@ class PostManagementController extends Controller
     {
         $postRepository = new PostRepository();
         $posts = $postRepository->getPostsSummaries(1, 100, false);
-        $this->twig->display("admin/post-management.html.twig", compact("posts"));
+
+        $this->response->sendHTML(
+            $this->twig->render(
+                "admin/post-management.html.twig",
+                compact("posts")
+            )
+        );
     }
 
     public function showEditPage(?int $postId = null): void
@@ -31,7 +37,12 @@ class PostManagementController extends Controller
             throw new NotFoundException("Le post demandé n'existe pas");
         }
 
-        $this->twig->display("admin/post-edit.html.twig", compact("post", "categories"));
+        $this->response->sendHTML(
+            $this->twig->render(
+                "admin/post-edit.html.twig",
+                compact("post", "categories")
+            )
+        );
     }
 
     public function createPost(): void
@@ -56,8 +67,14 @@ class PostManagementController extends Controller
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $post = null;
-            $this->twig->display("admin/post-edit.html.twig", compact("post", "categories", "formResult"));
-            exit;
+            $this->response
+                ->setCode(400)
+                ->sendHTML(
+                    $this->twig->render(
+                        "admin/post-edit.html.twig",
+                        compact("post", "categories", "formResult")
+                    )
+                );
         }
 
         $postId = $postRepository->createPost($postData);
@@ -88,8 +105,14 @@ class PostManagementController extends Controller
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $post = $postId ? $postRepository->getPost($postId, false) : null;
-            $this->twig->display("admin/post-edit.html.twig", compact("post", "categories", "formResult"));
-            exit;
+            $this->response
+                ->setCode(400)
+                ->sendHTML(
+                    $this->twig->render(
+                        "admin/post-edit.html.twig",
+                        compact("post", "categories", "formResult")
+                    )
+                );
         }
 
         $postRepository->editPost($postId, $postData);
