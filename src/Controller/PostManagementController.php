@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Core\Exceptions\Client\NotFoundException;
-use App\Repository\{PostRepository, CategoryRepository};
+use App\Service\{PostService, CategoryService};
 
 class PostManagementController extends Controller
 {
@@ -14,8 +14,8 @@ class PostManagementController extends Controller
 
     public function show(): void
     {
-        $postRepository = new PostRepository();
-        $posts = $postRepository->getPostsSummaries(1, 100, false);
+        $postService = new PostService();
+        $posts = $postService->getPostsSummaries(1, 100, false);
 
         $this->response->sendHTML(
             $this->twig->render(
@@ -27,11 +27,11 @@ class PostManagementController extends Controller
 
     public function showEditPage(?int $postId = null): void
     {
-        $postRepository = new PostRepository();
-        $categoryRepository = new CategoryRepository();
+        $postService = new PostService();
+        $categoryService = new CategoryService();
 
-        $post = $postId ? $postRepository->getPost($postId, false) : null;
-        $categories = $categoryRepository->getAll();
+        $post = $postId ? $postService->getPost($postId, false) : null;
+        $categories = $categoryService->getAll();
 
         if ($postId && !$post) {
             throw new NotFoundException("Le post demandé n'existe pas");
@@ -47,23 +47,14 @@ class PostManagementController extends Controller
 
     public function createPost(): void
     {
-        $postRepository = new PostRepository();
-        $categoryRepository = new CategoryRepository();
+        $postService = new PostService();
+        $categoryService = new CategoryService();
 
-        $categories = $categoryRepository->getAll();
+        $categories = $categoryService->getAll();
 
         $postData = $this->request->body["post"] ?? [];
 
-        $formResult = [
-            "success" => false,
-            "failure" => false,
-            "errors" => [
-                "titleMissing" => !$postData["title"] || $postData["title"] === "",
-                "titleTooLong" => $postData["title"] && mb_strlen($postData["title"]) > 255,
-                "leadParagraphTooLong" => $postData["leadParagraph"] && mb_strlen($postData["leadParagraph"]) > 255,
-                "bodyTooLong" => $postData["body"] && strlen($postData["body"]) > pow(2, 16) + 2, // MySQL TEXT limit
-            ],
-        ];
+        $formResult = $postService->checkData($postData);
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $post = null;
@@ -77,34 +68,24 @@ class PostManagementController extends Controller
                 );
         }
 
-        $postId = $postRepository->createPost($postData);
+        $postId = $postService->createPost($postData);
 
         header("Location: /admin/posts");
     }
 
     public function editPost(int $postId): void
     {
-        $postRepository = new PostRepository();
-        $categoryRepository = new CategoryRepository();
+        $postService = new PostService();
+        $categoryService = new CategoryService();
 
-        $categories = $categoryRepository->getAll();
+        $categories = $categoryService->getAll();
 
         $postData = $this->request->body["post"] ?? [];
 
-
-        $formResult = [
-            "success" => false,
-            "failure" => false,
-            "errors" => [
-                "titleMissing" => !$postData["title"] || $postData["title"] === "",
-                "titleTooLong" => $postData["title"] && mb_strlen($postData["title"]) > 255,
-                "leadParagraphTooLong" => $postData["leadParagraph"] && mb_strlen($postData["leadParagraph"]) > 255,
-                "bodyTooLong" => $postData["body"] && strlen($postData["body"]) > pow(2, 16) + 2, // MySQL TEXT limit
-            ],
-        ];
+        $formResult = $postService->checkData($postData);
 
         if (in_array(true, array_values($formResult["errors"]))) {
-            $post = $postId ? $postRepository->getPost($postId, false) : null;
+            $post = $postId ? $postService->getPost($postId, false) : null;
             $this->response
                 ->setCode(400)
                 ->sendHTML(
@@ -115,15 +96,19 @@ class PostManagementController extends Controller
                 );
         }
 
-        $postRepository->editPost($postId, $postData);
+        $postService->editPost($postId, $postData);
 
         header("Location: /admin/posts");
     }
 
     public function deletePost(int $postId): void
     {
-        $postRepository = new PostRepository();
+        $postService = new PostService();
 
-        $success = $postRepository->deletePost($postId);
+        $success = $postService->deletePost($postId);
+
+        if ($success) {
+            $this->response->setCode(204)->send();
+        }
     }
 }

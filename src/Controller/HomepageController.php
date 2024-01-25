@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Service\ContactFormService;
-use App\Repository\PostRepository;
+use App\Service\PostService;
 
 class HomepageController extends Controller
 {
@@ -14,8 +14,8 @@ class HomepageController extends Controller
 
     public function show(): void
     {
-        $postRepository = new PostRepository();
-        $latestPosts = $postRepository->getPostsSummaries(1, 1);
+        $postService = new PostService();
+        $latestPosts = $postService->getPostsSummaries(1, 1);
         $this->response->sendHTML(
             $this->twig->render(
                 "front/homepage.html.twig",
@@ -26,8 +26,8 @@ class HomepageController extends Controller
 
     public function processContactForm(): void
     {
-        $postRepository = new PostRepository();
-        $latestPosts = $postRepository->getPostsSummaries(1, 1);
+        $postService = new PostService();
+        $latestPosts = $postService->getPostsSummaries(1, 1);
 
         $contactFormData = $this->request->body["contactForm"];
 
