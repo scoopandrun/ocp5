@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Core\ErrorLogger;
 use App\Repositories\PostRepository;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -91,7 +92,7 @@ class HomepageController extends Controller
             $contactFormResult["values"]["message"] = "";
         } catch (\Throwable $th) {
             $contactFormResult["failure"] = true;
-            error_logger(new \Exception($mail->ErrorInfo));
+            (new ErrorLogger(new \Exception($mail->ErrorInfo)))->log();
         }
 
         $this->twig->display("front/homepage.html.twig", compact("latestPosts", "contactFormResult"));

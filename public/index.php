@@ -11,13 +11,13 @@ define("ROOT", dirname(__DIR__));
 define("TEMPLATES", ROOT . "/templates");
 
 require_once(ROOT . "/vendor/autoload.php");
-require_once(ROOT . "/utils/utils.php");
 
 // Load environment variables
 $dotenv = Dotenv\Dotenv::createImmutable(ROOT, "/.env");
 $dotenv->load();
 
 use App\Core\Router;
+use App\Core\ErrorLogger;
 use App\Controllers\HomepageController;
 use App\Controllers\PostController;
 use App\Controllers\AdminDashboardController;
@@ -60,9 +60,9 @@ try {
 } catch (ClientException $e) {
     (new ErrorController($e))->show();
 } catch (ServerException $e) {
-    error_logger($e);
+    (new ErrorLogger($e))->log();
     (new ErrorController($e))->show();
 } catch (\Throwable $th) {
-    error_logger($th);
+    (new ErrorLogger($th))->log();
     (new ErrorController(new ServerException()))->show();
 }
