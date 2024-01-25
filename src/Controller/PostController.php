@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Core\Exceptions\Client\NotFoundException;
-use App\Repository\PostRepository;
+use App\Service\PostService;
 
 class PostController extends Controller
 {
@@ -14,10 +14,10 @@ class PostController extends Controller
 
     public function showAll(): void
     {
-        $repository = new PostRepository();
+        $postService = new PostService();
 
         /** @var int $postCount Total number of posts. */
-        $postCount = $repository->getPostCount();
+        $postCount = $postService->getPostCount();
 
         /** @var int $pageNumber Defaults to `1` in case of inconsistency. */
         $pageNumber = max((int) ($this->request->query["page"] ?? null), 1);
@@ -30,7 +30,7 @@ class PostController extends Controller
             $pageNumber = ceil($postCount / $pageSize);
         }
 
-        $posts = $repository->getPostsSummaries($pageNumber, $pageSize);
+        $posts = $postService->getPostsSummaries($pageNumber, $pageSize);
 
         $this->response
             ->sendHTML(
@@ -48,9 +48,9 @@ class PostController extends Controller
 
     public function showOne(int $postId): void
     {
-        $postRepository = new PostRepository();
+        $postService = new PostService();
 
-        $post = $postRepository->getPost($postId);
+        $post = $postService->getPost($postId);
 
         if (!$post) {
             throw new NotFoundException("Le post demandé n'existe pas");
