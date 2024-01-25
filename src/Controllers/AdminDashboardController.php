@@ -21,6 +21,11 @@ class AdminDashboardController extends Controller
             "postCount" => $postCount,
         ];
 
-        $this->twig->display("admin/dashboard.html.twig", compact("stats"));
+        $this->response->sendHTML(
+            $this->twig->render(
+                "admin/dashboard.html.twig",
+                compact("stats")
+            )
+        );
     }
 }

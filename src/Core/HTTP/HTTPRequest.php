@@ -39,6 +39,10 @@ class HTTPRequest
 
         $this->headers = getallheaders();
 
+        if (isset($this->headers["Accept"])) {
+            $this->headers["Accept"] = explode(",", $this->headers["Accept"]);
+        }
+
         $url = parse_url($_SERVER['REQUEST_URI']);
         $this->path = $url["path"];
         parse_str($url["query"] ?? "", $this->query);
@@ -47,5 +51,23 @@ class HTTPRequest
             !empty($_POST)
             ? $_POST
             : (array) json_decode(file_get_contents("php://input"), true);
+    }
+
+    /**
+     * Returns `true` if a request accepts an HTML response, `false` otherwise.
+     * @return bool 
+     */
+    public function acceptsHTML()
+    {
+        return in_array("text/html", $this->headers["Accept"] ?? []);
+    }
+
+    /**
+     * Returns `true` if a request accepts an HTML response, `false` otherwise.
+     * @return bool 
+     */
+    public function acceptsJSON()
+    {
+        return in_array("application/json", $this->headers["Accept"] ?? []);
     }
 }
