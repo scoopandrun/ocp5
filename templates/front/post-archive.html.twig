@@ -1,4 +1,4 @@
-{% extends "layout.html.twig" %}
+{% extends "front/layout.html.twig" %}
 
 {% block body %}
 	<!-- Page Header-->
@@ -19,7 +19,7 @@
 
 				{% for post in posts %}
 					<!-- Post preview-->
-					{{ include("post-summary.html.twig") }}
+					{{ include("front/includes/post-summary.html.twig") }}
 					<!-- Divider-->
 					<hr class="my-4"/>
 				{% endfor %}

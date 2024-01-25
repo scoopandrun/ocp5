@@ -17,7 +17,7 @@ class HomepageController extends Controller
     {
         $postRepository = new PostRepository();
         $latestPosts = $postRepository->getPostsSummaries(1, 1);
-        $this->twig->display("homepage.html.twig", compact("latestPosts"));
+        $this->twig->display("front/homepage.html.twig", compact("latestPosts"));
     }
 
     public function processContactForm(): void
@@ -43,7 +43,7 @@ class HomepageController extends Controller
         ];
 
         if (in_array(true, array_values($contactFormResult["errors"]))) {
-            $this->twig->display("homepage.html.twig", compact("latestPosts", "contactFormResult"));
+            $this->twig->display("front/homepage.html.twig", compact("latestPosts", "contactFormResult"));
             exit;
         }
 
@@ -94,6 +94,6 @@ class HomepageController extends Controller
             error_logger(new \Exception($mail->ErrorInfo));
         }
 
-        $this->twig->display("homepage.html.twig", compact("latestPosts", "contactFormResult"));
+        $this->twig->display("front/homepage.html.twig", compact("latestPosts", "contactFormResult"));
     }
 }
