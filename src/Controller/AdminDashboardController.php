@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Repository\PostRepository;
+use App\Service\PostService;
 
 class AdminDashboardController extends Controller
 {
@@ -13,9 +13,9 @@ class AdminDashboardController extends Controller
 
     public function show(): void
     {
-        $postRespository = new PostRepository();
+        $postService = new PostService();
 
-        $postCount = $postRespository->getPostCount(false);
+        $postCount = $postService->getPostCount(false);
 
         $stats = [
             "postCount" => $postCount,

@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Core\ErrorLogger;
-use App\Repository\PostRepository;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
+use App\Service\ContactFormService;
+use App\Service\PostService;
 
 class HomepageController extends Controller
 {
@@ -16,8 +14,8 @@ class HomepageController extends Controller
 
     public function show(): void
     {
-        $postRepository = new PostRepository();
-        $latestPosts = $postRepository->getPostsSummaries(1, 1);
+        $postService = new PostService();
+        $latestPosts = $postService->getPostsSummaries(1, 1);
         $this->response->sendHTML(
             $this->twig->render(
                 "front/homepage.html.twig",
@@ -28,25 +26,14 @@ class HomepageController extends Controller
 
     public function processContactForm(): void
     {
-        $postRepository = new PostRepository();
-        $latestPosts = $postRepository->getPostsSummaries(1, 1);
+        $postService = new PostService();
+        $latestPosts = $postService->getPostsSummaries(1, 1);
 
-        // Check that all fields are filled in
-        $name = $this->request->body["name"] ?? null;
-        $email = $this->request->body["email"] ?? null;
-        $message = $this->request->body["message"] ?? null;
+        $contactFormData = $this->request->body["contactForm"];
 
-        $contactFormResult = [
-            "success" => false,
-            "failure" => false,
-            "values" => compact("name", "email", "message"),
-            "errors" => [
-                "name" => !$name,
-                "emailMissing" => !$email,
-                "emailInvalid" => $email && !preg_match("/.*@.*\.[a-z]+/", $email),
-                "message" => !$message,
-            ]
-        ];
+        $contactFormService = new ContactFormService($contactFormData);
+
+        $contactFormResult = $contactFormService->checkContactForm();
 
         if (in_array(true, array_values($contactFormResult["errors"]))) {
             $this->response
@@ -59,51 +46,13 @@ class HomepageController extends Controller
                 );
         }
 
-        $mail = new PHPMailer(true);
+        $emailSent = $contactFormService->sendEmail();
 
-        $htmlMessage = str_replace(["\n", "\r\n"], "<br/>", $message);
-
-        $emailBody = <<<HTML
-            <div>De : <b>$name &lt;$email&gt;</b></div>
-            <hr />
-            <div>Message :</div>
-            <div>$htmlMessage</div>
-            HTML;
-
-        $emailAltBody = <<<TEXT
-            De : name ($email)
-            Message :
-            $message
-            TEXT;
-
-        try {
-            //Server settings
-            // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
-            $mail->isSMTP();                                            //Send using SMTP
-            $mail->Host       = $_ENV["SMTP_HOST"];                     //Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-            $mail->Username   = $_ENV["SMTP_USER"];                     //SMTP username
-            $mail->Password   = $_ENV["SMTP_PASS"];                     //SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
-            $mail->Port       = $_ENV["SMTP_PORT"];                     //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-
-            //Recipients
-            $mail->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"]);
-            $mail->addAddress($_ENV["CONTACT_FORM_EMAIL"]);     //Add a recipient
-
-            //Content
-            $mail->isHTML(true);                                  //Set email format to HTML
-            $mail->Subject = "[OCP5] Message de $name ($email)";
-            $mail->Body    = $emailBody;
-            $mail->AltBody = $emailAltBody;
-
-            $mail->send();
-
+        if ($emailSent) {
             $contactFormResult["success"] = true;
             $contactFormResult["values"]["message"] = "";
-        } catch (\Throwable $th) {
+        } else {
             $contactFormResult["failure"] = true;
-            (new ErrorLogger(new \Exception($mail->ErrorInfo)))->log();
         }
 
         $this->response->sendHTML(
