@@ -241,7 +241,7 @@ class PostRepository
     {
         $db = $this->connection;
 
-        $req = $db->prepare("DELETE FORM posts WHERE id = :id");
+        $req = $db->prepare("DELETE FROM posts WHERE id = :id");
 
         $success = $req->execute(["id" => $id]);
 
