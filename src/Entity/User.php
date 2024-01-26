@@ -9,7 +9,7 @@ class User implements \Stringable
     private ?int $id = null;
     private string $name = "Anonyme";
     private string $email = "";
-    private string $password = "";
+    private ?string $password = null;
     private bool $isAdmin = false;
     private ?DateTime $createdAt = null;
 
@@ -33,9 +33,9 @@ class User implements \Stringable
         return $this->name;
     }
 
-    public function setName(?string $name)
+    public function setName(string $name)
     {
-        $this->name = $name ?? "Anonyme";
+        $this->name = $name ?: "Anonyme";
         return $this;
     }
 
@@ -55,20 +55,20 @@ class User implements \Stringable
         return $this->password;
     }
 
-    public function setPassword(string $password)
+    public function setPassword(?string $password = null)
     {
         $this->password = $password;
         return $this;
     }
 
-    public function getAdmin()
+    public function getIsAdmin()
     {
         return $this->isAdmin;
     }
 
-    public function setAdmin(bool $isAdmin)
+    public function setIsAdmin(bool|int $isAdmin)
     {
-        $this->isAdmin = $isAdmin;
+        $this->isAdmin = (bool) $isAdmin;
         return $this;
     }
 
@@ -77,9 +77,18 @@ class User implements \Stringable
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt)
+    public function setCreatedAt(DateTime|string|null $createdAt)
     {
-        $this->createdAt = $createdAt;
+        if (is_null($createdAt)) {
+            $this->createdAt = null;
+        } elseif (gettype($createdAt) === "string") {
+            $this->createdAt = new DateTime($createdAt);
+        } elseif (gettype($createdAt) === "object" && $createdAt::class === DateTime::class) {
+            $this->createdAt = $createdAt;
+        } else {
+            $this->createdAt = null;
+        }
+
         return $this;
     }
 
