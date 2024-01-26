@@ -14,7 +14,7 @@
 						<h1>{{ post.title }}</h1>
 						<h2 class="subheading">{{ post.leadParagraph }}</h2>
 						<div class="meta">Posté par
-							{{ post.author }}
+							{{ post.author ?? "Anonyme" }}
 							le
 							{{ post.createdAt|format_date("full", locale="fr") }}</div>
 						{% if post.updatedAt %}
