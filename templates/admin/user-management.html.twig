@@ -1,0 +1,123 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block title %}
+	Blog Admin - Gestion des utilisateurs
+{% endblock %}
+
+{% block javascript %}
+	<script defer src="/assets/js/admin/user-management.js"></script>
+{% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"name": "Gestion des utilisateurs"
+	}
+] %}
+
+{% block body %}
+
+	<h1 class="mb-3">Gestion des utilisateurs</h1>
+
+	<div class="card">
+		<div class="table-responsive">
+			<div class="dataTable-wrapper">
+				<div class="dataTable-top">
+					<div class="dataTable-dropdown">
+						<label>
+							<select class="dataTable-selector">
+								<option value="5">5</option>
+								<option value="10" selected>10</option>
+								<option value="15">15</option>
+								<option value="20">20</option>
+								<option value="25">25</option>
+							</select>
+							utilisateurs par page</label>
+					</div>
+				</div>
+				<div class="dataTable-container">
+					<table id="datatable" class="table align-items-center mb-0 dataTable-table">
+						<thead>
+							<tr class="d-none d-md-table-row">
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom</th>
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">E-mail</th>
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Inscription</th>
+								<th class="text-secondary opacity-7"></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for user in users %}
+								<tr data-user-id="{{ user.id }}">
+									<td>
+										<div class="d-flex px-2 py-1">
+											<div class="d-flex flex-column justify-content-center">
+												<h6 class="mb-0 text-xs">{{ user.name }}</h6>
+												{% if user.isAdmin %}
+													<span class="badge badge-sm badge-success">Admin</span>
+												{% endif %}
+												<div class="d-md-none mt-1">
+													<p class="text-xs text-secondary mb-0">{{ user.email }}</p>
+													<p class="text-xs text-secondary mb-0">
+														Inscrit(e) le
+														{{ user.createdAt|format_date("short", locale="fr") }}
+													</p>
+												</div>
+											</div>
+										</div>
+									</td>
+									<td class="d-none d-md-table-cell">
+										<p class="text-xs mb-0">{{ user.email }}</p>
+									</td>
+									<td class="d-none d-md-table-cell">
+										<p class="text-xs mb-0">{{ user.createdAt|format_date("short", locale="fr") }}</p>
+									</td>
+									<td class="align-middle">
+										<div class="row text-center">
+											<div class="col">
+												<a href="/admin/users/{{ user.id }}" class="text-secondary font-weight-normal text-xs" title="Modifier l'utilisateur'">
+													Modifier
+												</a>
+											</div>
+											<div class="col">
+												<button type="button" class="btn btn-outline-danger btn-sm mb-0" title="Supprimer l'utilisateur'" data-delete>
+													<span class="text">Supprimer</span>
+													<span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="dataTable-bottom">
+					<div class="dataTable-info">Affichage de 1 à 10 sur
+						{{ users|length }}
+						utilisateurs</div>
+					<nav class="dataTable-pagination">
+						<ul class="dataTable-pagination-list">
+							<li class="pager">
+								<a href="#" data-page="1">‹</a>
+							</li>
+							<li class="active">
+								<a href="#" data-page="1">1</a>
+							</li>
+							<li class="">
+								<a href="#" data-page="2">2</a>
+							</li>
+							<li class="">
+								<a href="#" data-page="3">3</a>
+							</li>
+							<li class="pager">
+								<a href="#" data-page="2">›</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+{% endblock %}

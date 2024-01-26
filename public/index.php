@@ -22,11 +22,13 @@ use App\Controller\HomepageController;
 use App\Controller\PostController;
 use App\Controller\AdminDashboardController;
 use App\Controller\PostManagementController;
+use App\Controller\UserManagementController;
 use App\Controller\ErrorController;
 use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
 
 $routes = [
+    // Front office
     "/" => [
         "GET" => fn () => (new HomepageController())->show(),
         "POST" => fn () => (new HomepageController())->processContactForm(),
@@ -37,6 +39,7 @@ $routes = [
     "/posts/(\d+)" => [
         "GET" => fn (int $id) => (new PostController())->showOne($id),
     ],
+    // Back office
     "/admin" => [
         "GET" => fn () => (new AdminDashboardController())->show(),
     ],
@@ -51,6 +54,14 @@ $routes = [
     "/admin/posts/create" => [
         "GET" => fn () => (new PostManagementController())->showEditPage(),
         "POST" => fn () => (new PostManagementController())->createPost(),
+    ],
+    "/admin/users" => [
+        "GET" => fn () => (new UserManagementController())->show(),
+    ],
+    "/admin/users/(\d+)" => [
+        "GET" => fn (int $id) => (new UserManagementController())->showEditPage($id),
+        "POST" => fn (int $id) => (new UserManagementController())->editUser($id),
+        "DELETE" => fn (int $id) => (new UserManagementController())->deleteUser($id),
     ],
 ];
 
