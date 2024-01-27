@@ -31,13 +31,15 @@
 		</div>
 	</header>
 
-	<div class="container px-4 px-lg-5 my-3">
-		<div class="row gx-4 gx-lg-5 justify-content-center">
-			<div class="col-md-10 col-lg-8 col-xl-7">
-				<a href="/admin/posts/{{ post.id }}" class="btn btn-light">Modifier le post</a>
+	{% if user.isAdmin %}
+		<div class="container px-4 px-lg-5 my-3">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7">
+					<a href="/admin/posts/{{ post.id }}" class="btn btn-light">Modifier le post</a>
+				</div>
 			</div>
 		</div>
-	</div>
+	{% endif %}
 
 	<!-- Main Content-->
 	<article class="mb-4">

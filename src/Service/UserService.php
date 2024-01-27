@@ -28,7 +28,7 @@ class UserService
         return $user;
     }
 
-    public function checkData(array $data): array
+    public function checkUserFormData(array $data): array
     {
         $formResult = [
             "success" => false,
@@ -69,11 +69,82 @@ class UserService
     }
 
     /**
+     * Check a user's credentials based on its ID.
+     * 
+     * @param string $email    E-mail from the sign-in form.
+     * @param string $password Password from the sign-in form.
+     * 
+     * @return int|false The user ID if the credentials are correct, `false` if the email OR password are incorrect.
+     */
+    public function checkCredentials(string $email, string $password): int|false
+    {
+        $user = $this->userRepository->getUserCredentials($email);
+
+        if (!$user) {
+            return false;
+        }
+
+        $passwordIsCorrect = password_verify($password, $user->getPassword());
+
+        if (!$passwordIsCorrect) {
+            return false;
+        }
+
+        return $user->getId();
+    }
+
+    /**
      * Get the amount of users in the database.
      */
     public function getUserCount(): int
     {
         return $this->userRepository->getUserCount();
+    }
+
+    /**
+     * Log the user in with credentials.
+     * 
+     * @param array $credentials Array with "email" and "password" keys.
+     * @return int|null `true` if login OK, `false` otherwise.
+     */
+    public function login(array $credentials): bool
+    {
+        $email = $credentials["email"] ?? null;
+        $password = $credentials["password"] ?? null;
+
+        if (!$email || !$password) {
+            return false;
+        }
+
+        $userId = $this->checkCredentials($email, $password);
+
+        if (!$userId) {
+            return false;
+        }
+
+        $_SESSION["userId"] = $userId;
+
+        return true;
+    }
+
+    /**
+     * Log a user out.
+     */
+    public function logout(): void
+    {
+        $cookieParams = session_get_cookie_params();
+
+        // Clear session cookie
+        setcookie(
+            $_ENV["SESSION_COOKIE_NAME"],
+            "",
+            [
+                "expires" => time() - 1,
+                "path" => $cookieParams["path"],
+                "httponly" => $cookieParams["httponly"],
+            ]
+        );
+        session_unset();
     }
 
     public function editUser(User $user): void

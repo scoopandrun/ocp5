@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Service\PostService;
 use App\Service\UserService;
 
-class AdminDashboardController extends Controller
+class DashboardController extends AdminController
 {
     public function __construct()
     {
