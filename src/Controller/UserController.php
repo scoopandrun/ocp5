@@ -25,44 +25,9 @@ class UserController extends Controller
         );
     }
 
-    public function editAccountInfo()
+    public function redirectToAccountPage()
     {
-        $user = $this->request->user;
-
-        if (!$user) {
-            throw new UnauthorizedException();
-        }
-
-        $userService = new UserService();
-
-        $userData = $this->request->body["user"] ?? [];
-
-        $formResult = $userService->checkUserFormData($userData, $user);
-
-        if (in_array(true, array_values($formResult["errors"]))) {
-            $this->response
-                ->setCode(400)
-                ->sendHTML(
-                    $this->twig->render(
-                        "front/user.html.twig",
-                        compact("user", "formResult")
-                    )
-                );
-        }
-
-        $userData["id"] = $user->getId();
-        $userData["admin"] = $user->getIsAdmin();
-        $userData["password"] = $userData["new-password"] ?? "";
-        $user = $userService->makeUserObject($userData);
-
-        $success = $userService->editUser($user);
-
-        $formResult["success"] = $success;
-        $formResult["failure"] = !$success;
-
-        $this->response->sendHTML(
-            $this->twig->render("front/user.html.twig", compact("user", "formResult"))
-        );
+        $this->response->redirect("/user");
     }
 
     public function showLoginPage()
@@ -120,5 +85,106 @@ class UserController extends Controller
         $userService->logout();
 
         $this->response->redirect("/");
+    }
+
+    public function editAccountInfo()
+    {
+        $user = $this->request->user;
+
+        if (!$user) {
+            throw new UnauthorizedException();
+        }
+
+        $userService = new UserService();
+
+        $userData = $this->request->body["user"] ?? [];
+
+        $formResult = $userService->checkUserFormData($userData, $user);
+
+        if (in_array(true, array_values($formResult["errors"]))) {
+            $this->response
+                ->setCode(400)
+                ->sendHTML(
+                    $this->twig->render(
+                        "front/user.html.twig",
+                        compact("user", "formResult")
+                    )
+                );
+        }
+
+        $userData["id"] = $user->getId();
+        $userData["admin"] = $user->getIsAdmin();
+        $userData["password"] = $userData["new-password"] ?? "";
+        $user = $userService->makeUserObject($userData);
+
+        $success = $userService->editUser($user);
+
+        $formResult["success"] = $success;
+        $formResult["failure"] = !$success;
+
+        $this->response->sendHTML(
+            $this->twig->render("front/user.html.twig", compact("user", "formResult"))
+        );
+    }
+
+    public function showDeleteConfirmation()
+    {
+        $this->response
+            ->sendHTML(
+                $this->twig->render(
+                    "front/user.html.twig",
+                    ["showDeleteConfirmation" => true]
+                )
+            );
+    }
+
+    public function deleteAccount()
+    {
+        $user = $this->request->user;
+
+        if (!$user) {
+            throw new UnauthorizedException();
+        }
+
+        $userService = new UserService();
+
+        $success = $userService->deleteUser($user->getId());
+
+        if (!$success) {
+            $this->response->setCode(500);
+
+            $errorMessage = "Erreur lors de la suppression";
+
+            // HTML
+            if ($this->request->acceptsHTML()) {
+                $this->response
+                    ->sendHTML(
+                        $this->twig->render(
+                            "front/user.html.twig",
+                            [
+                                "deleteFailure" => [
+                                    "message" => $errorMessage
+                                ]
+                            ]
+                        )
+                    );
+            }
+
+            // JSON
+            if ($this->request->acceptsJSON()) {
+                $this->response
+                    ->sendJSON(
+                        json_encode(["message" => $errorMessage])
+                    );
+            }
+
+            // Default
+            $this->response->sendText($errorMessage);
+        }
+
+        if ($success) {
+            $userService->logout();
+            $this->response->redirect("/", 303);
+        }
     }
 }

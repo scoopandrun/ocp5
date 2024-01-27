@@ -51,6 +51,11 @@ $routes = [
     "/user" => [
         "GET" => fn () => (new UserController())->showAccountPage(),
         "POST" => fn () => (new UserController())->editAccountInfo(),
+        "DELETE" => fn () => (new UserController())->deleteAccount(),
+    ],
+    "/user/delete" => [
+        "GET" => fn () => (new UserController())->showDeleteConfirmation(),
+        "POST" => fn () => (new UserController())->deleteAccount(),
     ],
     "/login" => [
         "GET" => fn () => (new UserController())->showLoginPage(),
