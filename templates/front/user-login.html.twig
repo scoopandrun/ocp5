@@ -27,27 +27,24 @@
 					<form id="loginForm" method="POST" action="">
 
 						<div class="form-floating">
-							<input type="email" class="form-control" id="email" name="loginForm[email]" placeholder="E-mail"/>
+							<input type="email" class="form-control" id="email" name="loginForm[email]" placeholder="E-mail" required/>
 							<label for="email">E-mail</label>
-							{% if loginFormResult.errors.emailMissing %}
-								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
-							{% endif %}
 						</div>
 
 						<div class="form-floating">
-							<input type="password" class="form-control" id="password" name="loginForm[password]" placeholder="Mot de passe"/>
+							<input type="password" class="form-control" id="password" name="loginForm[password]" placeholder="Mot de passe" required/>
 							<label for="password">Mot de passe</label>
 						</div>
 
 						<!-- Submit error message-->
-						{% if loginFormResult.failure %}
+						{% if formResult.failure %}
 							<div id="submitErrorMessage">
 								<div class="text-center text-danger mb-3">L'identifiant et/ou le mot de passe est invalide.</div>
 							</div>
 						{% endif %}
 
 						<!-- Submit Button-->
-						<button class="btn btn-primary text-uppercase" id="submitButton" type="submit">Se connecter</button>
+						<button class="btn btn-primary text-uppercase mt-4" id="submitButton" type="submit">Se connecter</button>
 					</form>
 				</div>
 			</div>
