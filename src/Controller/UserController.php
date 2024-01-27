@@ -97,15 +97,15 @@ class UserController extends Controller
             $this->response
                 ->setCode(401)
                 ->sendHTML(
-                $this->twig->render(
-                    "front/user-login.html.twig",
-                    [
-                        "loginFormResult" => [
-                            "failure" => true,
-                        ],
-                    ]
-                )
-            );
+                    $this->twig->render(
+                        "front/user-login.html.twig",
+                        [
+                            "formResult" => [
+                                "failure" => true,
+                            ],
+                        ]
+                    )
+                );
         }
 
         // Redirect to the previous page or the homepage if no referer
