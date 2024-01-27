@@ -269,6 +269,25 @@ class HTTPResponse
     }
 
     /**
+     * Redirect the user to the target URI.
+     * 
+     * The script exits after the redirect.
+     * 
+     * @param string $targetURI Target of the redirection.
+     * @param int    $code      Optional. HTTP status code. Default = 302.
+     */
+    public function redirect(string $targetURI, int $code = 302): void
+    {
+        $this
+            ->setCode($code)
+            ->addHeader("Location", $targetURI)
+            ->setBody(null)
+            ->setCompression(false)
+            ->setExit(true)
+            ->send();
+    }
+
+    /**
      * Activate or deactivate compression for the HTTP response.  
      * 
      * By default the compression is set to `TRUE`.

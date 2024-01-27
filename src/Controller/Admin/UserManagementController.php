@@ -68,7 +68,7 @@ class UserManagementController extends AdminController
 
         $userService->editUser($user);
 
-        header("Location: /admin/users");
+        $this->response->redirect("/admin/users");
     }
 
     public function deleteUser(int $userId): void
