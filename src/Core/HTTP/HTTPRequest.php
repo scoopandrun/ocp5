@@ -2,6 +2,9 @@
 
 namespace App\Core\HTTP;
 
+use App\Entity\User;
+use App\Service\UserService;
+
 /**
  * HTTP request simple wrapper to give
  * easy access to common request properties.
@@ -31,7 +34,12 @@ class HTTPRequest
     /**
      * Request body.
      */
-    public array $body = [];
+    public readonly array $body;
+
+    /**
+     * User performing the request.
+     */
+    public readonly ?User $user;
 
     public function __construct()
     {
@@ -51,6 +59,14 @@ class HTTPRequest
             !empty($_POST)
             ? $_POST
             : (array) json_decode(file_get_contents("php://input"), true);
+
+
+
+        if (isset($_SESSION["userId"])) {
+            $this->user = (new UserService())->getUser($_SESSION["userId"]);
+        } else {
+            $this->user = null;
+        }
     }
 
     /**

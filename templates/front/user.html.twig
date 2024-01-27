@@ -1,0 +1,70 @@
+{% extends "front/layout.html.twig" %}
+
+{% block title %}
+	Blog -
+	{{ user.name }}
+{% endblock %}
+
+{% block body %}
+	<!-- Page Header-->
+	<header class="masthead" style="background-image: url('/assets/img/home-bg.jpg')">
+		<div class="container position-relative px-4 px-lg-5 site-heading">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7">
+					<h1>Compte utilisateur</h1>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- Main Content-->
+	<div class="container px-4 px-lg-5">
+		<div class="row gx-4 gx-lg-5 justify-content-center">
+			<div
+				class="col-md-10 col-lg-8 col-xl-7">
+
+				<!-- Sign-in form -->
+				<div class="my-5">
+					<form id="userForm" method="POST" action="">
+
+						<div class="form-floating">
+							<input type="text" class="form-control" id="name" name="user[name]" placeholder="Nom" value="{{ user.name }}"/>
+							<label for="name">Nom</label>
+							{% if userFormResult.errors.nameMissing %}
+								<div class="invalid-feedback">Le nom est requis.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating">
+							<input type="email" class="form-control" id="email" name="user[email]" placeholder="E-mail" value="{{ user.email }}"/>
+							<label for="email">E-mail</label>
+							{% if userFormResult.errors.emailMissing %}
+								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
+							{% endif %}
+							{% if userFormResult.errors.emailInvalid %}
+								<div class="invalid-feedback">L'adresse e-mail est invalide.</div>
+							{% endif %}
+							{% if userFormResult.errors.emailTaken %}
+								<div class="invalid-feedback">L'adresse e-mail est déjà utilisée par un autre compte.</div>
+							{% endif %}
+						</div>
+
+						<!-- Submit error message-->
+						{% if userFormResult.failure %}
+							<div id="submitErrorMessage">
+								<div class="text-center text-danger mb-3">Une ou plusieur</div>
+							</div>
+						{% endif %}
+
+						<!-- Submit Button-->
+						<button class="btn btn-primary text-uppercase" id="submitButton" type="submit">Enregistrer</button>
+					</form>
+				</div>
+
+				<div class="my-5 text-center">
+					<a href="/logout" class="btn btn-primary text-uppercase">Se déconnecter</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

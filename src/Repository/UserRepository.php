@@ -101,6 +101,52 @@ class UserRepository
         return $users;
     }
 
+    /**
+     * Fetch a user's credentials based on its ID.
+     * 
+     * @param int $id ID of the user.
+     */
+    public function getUserCredentials(string $email): User|null
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "SELECT
+                u.id,
+                u.password
+            FROM users u
+            WHERE u.email = :email"
+        );
+
+        $req->execute(compact("email"));
+
+        $userRaw = $req->fetch();
+
+        if (!$userRaw) {
+            return null;
+        }
+
+        $userService = new UserService();
+
+        $user = $userService->makeUserObject($userRaw);
+
+        return $user;
+    }
+
+    /**
+     * Get the amount of users in the database.
+     */
+    public function getUserCount(): int
+    {
+        $db = $this->connection;
+
+        $req = $db->query("SELECT COUNT(*) FROM users");
+
+        $count = $req->fetch(\PDO::FETCH_COLUMN);
+
+        return $count;
+    }
+
     public function editUser(User $user): void
     {
         $db = $this->connection;

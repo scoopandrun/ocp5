@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\{PostService, CategoryService};
 
-class PostManagementController extends Controller
+class PostManagementController extends AdminController
 {
     public function __construct()
     {

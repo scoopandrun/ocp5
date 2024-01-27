@@ -22,8 +22,12 @@ abstract class Controller
 
     public function __construct()
     {
+        $this->request = new HTTPRequest();
+        $this->response = new HTTPResponse();
+
         $this->loader = new FilesystemLoader(TEMPLATES);
         $this->twig = new Environment($this->loader);
+        $this->twig->addGlobal("user", $this->request->user);
         $this->twig->addExtension(new IntlExtension());
         $this->twig->addExtension(new MarkdownExtension());
         $this->twig->addRuntimeLoader(
@@ -37,8 +41,5 @@ abstract class Controller
                 }
             }
         );
-
-        $this->request = new HTTPRequest();
-        $this->response = new HTTPResponse();
     }
 }
