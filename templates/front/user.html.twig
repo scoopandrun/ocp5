@@ -5,6 +5,10 @@
 	{{ user.name }}
 {% endblock %}
 
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
 {% block body %}
 	<!-- Page Header-->
 	<header class="masthead" style="background-image: url('/assets/img/home-bg.jpg')">
@@ -44,8 +48,40 @@
 							{% if formResult.errors.emailInvalid %}
 								<div class="invalid-feedback">L'adresse e-mail est invalide.</div>
 							{% endif %}
-							{% if formResult.errors.emailTaken %}
+							{% if formResult.errors.emailAlreadyTaken %}
 								<div class="invalid-feedback">L'adresse e-mail est déjà utilisée par un autre compte.</div>
+							{% endif %}
+						</div>
+
+						<div class="mt-5 fs-5">
+							<p class="m-0">Changement de mot de passe</p>
+							<p class="m-0">(laisser vide pour ne pas le modifier)</p>
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="current-password" name="user[current-password]" placeholder="Mot de passe" autocomplete="current-password"/>
+							<label for="current-password">Mot de passe actuel</label>
+							{% if formResult.errors.currentPasswordMissing %}
+								<div class="invalid-feedback">Le mot de passe actuel est requis.</div>
+							{% endif %}
+							{% if formResult.errors.currentPasswordInvalid %}
+								<div class="invalid-feedback">Le mot de passe actuel est invalide.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="new-password" name="user[new-password]" placeholder="Mot de passe" autocomplete="new-password"/>
+							<label for="new-password">Nouveau mot de passe</label>
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="password-confirm" name="user[password-confirm]" placeholder="Retapez le mot de passe" autocomplete="new-password"/>
+							<label for="password-confirm">Retapez le mot de passe</label>
+							{% if formResult.errors.passwordConfirmMissing %}
+								<div class="invalid-feedback">Le nouveau mot doit être retapé dans ce champ.</div>
+							{% endif %}
+							{% if formResult.errors.passwordMismatch %}
+								<div class="invalid-feedback">Le mot de passe n'a pas été corectement retapé.</div>
 							{% endif %}
 						</div>
 

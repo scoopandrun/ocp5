@@ -134,6 +134,34 @@ class UserRepository
     }
 
     /**
+     * Check if an email address is already used in the database.
+     * 
+     * @param string $email Email address to be checked.
+     * 
+     * @return bool `false` is the email address is not used, `true` otherwise.
+     */
+    public function checkEmailTaken(string $email, ?int $id = null): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "SELECT COUNT(*)
+            FROM users
+            WHERE email = :email
+            AND NOT id <=> :id"
+        );
+
+        $req->execute([
+            "email" => $email,
+            "id" => $id,
+        ]);
+
+        $emailIsTaken = (bool) $req->fetch(\PDO::FETCH_COLUMN);
+
+        return $emailIsTaken;
+    }
+
+    /**
      * Get the amount of users in the database.
      */
     public function getUserCount(): int

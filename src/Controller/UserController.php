@@ -37,14 +37,14 @@ class UserController extends Controller
 
         $userData = $this->request->body["user"] ?? [];
 
-        $formResult = $userService->checkUserFormData($userData);
+        $formResult = $userService->checkUserFormData($userData, $user);
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $this->response
                 ->setCode(400)
                 ->sendHTML(
                     $this->twig->render(
-                        "/user.html.twig",
+                        "front/user.html.twig",
                         compact("user", "formResult")
                     )
                 );
@@ -52,6 +52,7 @@ class UserController extends Controller
 
         $userData["id"] = $user->getId();
         $userData["admin"] = $user->getIsAdmin();
+        $userData["password"] = $userData["new-password"] ?? "";
         $user = $userService->makeUserObject($userData);
 
         $success = $userService->editUser($user);

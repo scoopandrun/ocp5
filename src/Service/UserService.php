@@ -28,17 +28,28 @@ class UserService
         return $user;
     }
 
-    public function checkUserFormData(array $data): array
+    public function checkUserFormData(array $data, ?User $user = null): array
     {
+        $name = $data["name"] ?? "";
+        $email = $data["email"] ?? "";
+        $currentPassword = $data["current-password"] ?? "";
+        $newPassword = $data["new-password"] ?? "";
+        $passwordConfirm = $data["password-confirm"] ?? "";
+
         $formResult = [
             "success" => false,
             "failure" => false,
             "errors" => [
-                "nameMissing" => !$data["name"] || $data["name"] === "",
-                "nameTooLong" => $data["name"] && mb_strlen($data["name"]) > 255,
-                "emailMissing" => !$data["email"] || $data["email"] === "",
-                "emailInvalid" => $data["email"] && !preg_match("/.*@.*\.[a-z]+/", $data["email"]),
-                "emailAlreadyTaken" => $this->userRepository->checkEmailTaken($data["email"]),
+                "nameMissing" => !$name,
+                "nameTooLong" => mb_strlen($name) > 255,
+                "emailMissing" => !$email,
+                "emailInvalid" => !preg_match("/.*@.*\.[a-z]+/", $email),
+                "emailAlreadyTaken" => $this->userRepository->checkEmailTaken($email, $user?->getId()),
+                "currentPasswordMissing" => $newPassword && !$currentPassword,
+                "currentPasswordInvalid" => $currentPassword
+                    && $this->checkCredentials($user?->getEmail(), $currentPassword) === false,
+                "passwordConfirmMissing" => $newPassword && !$passwordConfirm,
+                "passwordMismatch" => $newPassword !== $passwordConfirm,
             ],
         ];
 
@@ -71,13 +82,17 @@ class UserService
     /**
      * Check a user's credentials based on its ID.
      * 
-     * @param string $email    E-mail from the sign-in form.
-     * @param string $password Password from the sign-in form.
+     * @param string|null $email    E-mail from the sign-in form.
+     * @param string|null $password Password from the sign-in form.
      * 
      * @return int|false The user ID if the credentials are correct, `false` if the email OR password are incorrect.
      */
-    public function checkCredentials(string $email, string $password): int|false
+    public function checkCredentials(?string $email = null, ?string $password = null): int|false
     {
+        if (!$email || !$password) {
+            return false;
+        }
+
         $user = $this->userRepository->getUserCredentials($email);
 
         if (!$user) {
