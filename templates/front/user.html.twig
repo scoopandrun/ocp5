@@ -28,7 +28,7 @@
 					<form id="userForm" method="POST" action="">
 
 						<div class="form-floating">
-							<input type="text" class="form-control" id="name" name="user[name]" placeholder="Nom" value="{{ user.name }}"/>
+							<input type="text" class="form-control" id="name" name="user[name]" placeholder="Nom" value="{{ user.name }}" autocomplete="name" required/>
 							<label for="name">Nom</label>
 							{% if formResult.errors.nameMissing %}
 								<div class="invalid-feedback">Le nom est requis.</div>
@@ -36,7 +36,7 @@
 						</div>
 
 						<div class="form-floating">
-							<input type="email" class="form-control" id="email" name="user[email]" placeholder="E-mail" value="{{ user.email }}"/>
+							<input type="email" class="form-control" id="email" name="user[email]" placeholder="E-mail" value="{{ user.email }}" autocomplete="email" required/>
 							<label for="email">E-mail</label>
 							{% if formResult.errors.emailMissing %}
 								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
