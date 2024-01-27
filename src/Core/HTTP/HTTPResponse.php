@@ -237,6 +237,8 @@ class HTTPResponse
     /**
      * Send the JSON response.
      * 
+     * The body must already be JSON-encoded.
+     * 
      * This method is a shortcut to:  
      * ```php
      * $response->setType("text")->setBody($json)->send()
