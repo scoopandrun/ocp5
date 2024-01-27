@@ -50,7 +50,7 @@
 				<div class="my-5">
 					<form id="contactForm" method="POST" action="#contactForm">
 						<div class="form-floating">
-							<input type="text" class="form-control" id="name" name="contactForm[name]" placeholder="Entrez votre nom..." value="{{ contactFormResult.values.name ?? user.name }}" required/>
+							<input type="text" class="form-control" id="name" name="contactForm[name]" placeholder="Entrez votre nom..." value="{{ contactFormResult.values.name ?? user.name }}" autocomplete="name" required/>
 							<label for="name">Nom</label>
 							{% if contactFormResult.errors.name %}
 								<div class="invalid-feedback">Le nom est requis.</div>
@@ -58,7 +58,7 @@
 						</div>
 
 						<div class="form-floating">
-							<input type="email" class="form-control" id="email" name="contactForm[email]" placeholder="Entrez votre adresse e-mail..." value="{{ contactFormResult.values.email ?? user.email }}" required/>
+							<input type="email" class="form-control" id="email" name="contactForm[email]" placeholder="Entrez votre adresse e-mail..." value="{{ contactFormResult.values.email ?? user.email }}" autocomplete="email" required/>
 							<label for="email">Adresse e-mail</label>
 							{% if contactFormResult.errors.emailMissing %}
 								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
