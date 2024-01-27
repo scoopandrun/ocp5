@@ -66,6 +66,11 @@ class UserController extends Controller
 
     public function showLoginPage()
     {
+        // If the user is already connected, redirect to homepage
+        if ($this->request->user) {
+            $this->response->redirect("/");
+        }
+
         $_SESSION["referer"] = $_SERVER["HTTP_REFERER"] ?? null;
 
         $this->response->sendHTML(
@@ -89,7 +94,9 @@ class UserController extends Controller
         $loginOK = $userService->login($credentials);
 
         if (!$loginOK) {
-            $this->response->sendHTML(
+            $this->response
+                ->setCode(401)
+                ->sendHTML(
                 $this->twig->render(
                     "front/user-login.html.twig",
                     [
@@ -102,7 +109,7 @@ class UserController extends Controller
         }
 
         // Redirect to the previous page or the homepage if no referer
-        header("Location: " . $_SESSION["referer"] ?? "/");
+        $this->response->redirect($_SESSION["referer"] ?? "/");
     }
 
     public function logout()
@@ -111,6 +118,6 @@ class UserController extends Controller
 
         $userService->logout();
 
-        header("Location: /");
+        $this->response->redirect("/");
     }
 }

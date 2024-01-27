@@ -70,7 +70,7 @@ class PostManagementController extends AdminController
 
         $postId = $postService->createPost($postData);
 
-        header("Location: /admin/posts");
+        $this->response->redirect("/admin/posts");
     }
 
     public function editPost(int $postId): void
@@ -98,7 +98,7 @@ class PostManagementController extends AdminController
 
         $postService->editPost($postId, $postData);
 
-        header("Location: /admin/posts");
+        $this->response->redirect("/admin/posts");
     }
 
     public function deletePost(int $postId): void
