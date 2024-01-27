@@ -27,6 +27,7 @@ class UserRepository
 
         $req = $db->prepare(
             "SELECT
+                u.id,
                 u.name,
                 u.email,
                 u.password,
