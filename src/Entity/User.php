@@ -57,7 +57,18 @@ class User implements \Stringable
 
     public function setPassword(?string $password = null)
     {
-        $this->password = $password;
+        if (!$password) {
+            $this->password = null;
+        } else {
+            $passwordIsHashed = password_get_info($password)["algo"] > 0;
+
+            if (!$passwordIsHashed) {
+                $this->password = password_hash($password, PASSWORD_DEFAULT);
+            } else {
+                $this->password = $password;
+            }
+        }
+
         return $this;
     }
 
