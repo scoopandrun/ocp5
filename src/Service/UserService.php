@@ -84,7 +84,7 @@ class UserService
             return false;
         }
 
-        $passwordIsCorrect = password_verify($password, $user->getPassword());
+        $passwordIsCorrect = password_verify($password, $user->getPassword() ?? "");
 
         if (!$passwordIsCorrect) {
             return false;
@@ -147,9 +147,13 @@ class UserService
         session_unset();
     }
 
-    public function editUser(User $user): void
+
+    /**
+     * @return bool `true` on success, `false` on failure.
+     */
+    public function editUser(User $user): bool
     {
-        $this->userRepository->editUser($user);
+        return $this->userRepository->editUser($user);
     }
 
     public function deleteUser(int $id): bool

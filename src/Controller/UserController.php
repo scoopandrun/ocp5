@@ -17,7 +17,7 @@ class UserController extends Controller
         $user = $this->request->user;
 
         if (!$user) {
-            header("Location: /login");
+            throw new UnauthorizedException();
         }
 
         $this->response->sendHTML(
@@ -29,7 +29,7 @@ class UserController extends Controller
     {
         $user = $this->request->user;
 
-        if (!$user?->getId()) {
+        if (!$user) {
             throw new UnauthorizedException();
         }
 
@@ -54,9 +54,14 @@ class UserController extends Controller
         $userData["admin"] = $user->getIsAdmin();
         $user = $userService->makeUserObject($userData);
 
-        $userService->editUser($user);
+        $success = $userService->editUser($user);
 
-        header("Location: /user");
+        $formResult["success"] = $success;
+        $formResult["failure"] = !$success;
+
+        $this->response->sendHTML(
+            $this->twig->render("front/user.html.twig", compact("user", "formResult"))
+        );
     }
 
     public function showLoginPage()

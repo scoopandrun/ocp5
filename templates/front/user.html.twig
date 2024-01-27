@@ -30,7 +30,7 @@
 						<div class="form-floating">
 							<input type="text" class="form-control" id="name" name="user[name]" placeholder="Nom" value="{{ user.name }}"/>
 							<label for="name">Nom</label>
-							{% if userFormResult.errors.nameMissing %}
+							{% if formResult.errors.nameMissing %}
 								<div class="invalid-feedback">Le nom est requis.</div>
 							{% endif %}
 						</div>
@@ -38,26 +38,38 @@
 						<div class="form-floating">
 							<input type="email" class="form-control" id="email" name="user[email]" placeholder="E-mail" value="{{ user.email }}"/>
 							<label for="email">E-mail</label>
-							{% if userFormResult.errors.emailMissing %}
+							{% if formResult.errors.emailMissing %}
 								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
 							{% endif %}
-							{% if userFormResult.errors.emailInvalid %}
+							{% if formResult.errors.emailInvalid %}
 								<div class="invalid-feedback">L'adresse e-mail est invalide.</div>
 							{% endif %}
-							{% if userFormResult.errors.emailTaken %}
+							{% if formResult.errors.emailTaken %}
 								<div class="invalid-feedback">L'adresse e-mail est déjà utilisée par un autre compte.</div>
 							{% endif %}
 						</div>
 
+						<!-- Submit success message-->
+						{% if formResult.success %}
+							<div id="submitSuccessMessage">
+								<div class="text-center mb-3">
+									<div class="fw-bolder">Modifications enregistrées</div>
+								</div>
+							</div>
+						{% endif %}
+
 						<!-- Submit error message-->
-						{% if userFormResult.failure %}
+						{% if formResult.failure %}
 							<div id="submitErrorMessage">
-								<div class="text-center text-danger mb-3">Une ou plusieur</div>
+								<div class="text-center text-danger mb-3">
+									Une erreur est survenue.<br/>
+									Les modifications n'ont pas été enregistrées.
+								</div>
 							</div>
 						{% endif %}
 
 						<!-- Submit Button-->
-						<button class="btn btn-primary text-uppercase" id="submitButton" type="submit">Enregistrer</button>
+						<button class="btn btn-primary text-uppercase mt-4" id="submitButton" type="submit">Enregistrer</button>
 					</form>
 				</div>
 

@@ -147,7 +147,11 @@ class UserRepository
         return $count;
     }
 
-    public function editUser(User $user): void
+
+    /**
+     * @return bool `true` on success, `false` on failure.
+     */
+    public function editUser(User $user): bool
     {
         $db = $this->connection;
 
@@ -177,7 +181,9 @@ class UserRepository
             $data["password"] = $user->getPassword();
         }
 
-        $req->execute($data);
+        $success = $req->execute($data);
+
+        return $success;
     }
 
     public function deleteUser(int $id): bool
