@@ -12,7 +12,7 @@ class UserController extends Controller
         parent::__construct();
     }
 
-    public function showAccountPage()
+    public function showAccountPage(): void
     {
         $user = $this->request->user;
 
@@ -25,12 +25,12 @@ class UserController extends Controller
         );
     }
 
-    public function redirectToAccountPage()
+    public function redirectToAccountPage(): void
     {
         $this->response->redirect("/user");
     }
 
-    public function showLoginPage()
+    public function showLoginPage(): void
     {
         // If the user is already connected, redirect to homepage
         if ($this->request->user) {
@@ -44,7 +44,7 @@ class UserController extends Controller
         );
     }
 
-    public function showSignupPage()
+    public function showSignupPage(): void
     {
         // If the user is already connected, redirect to homepage
         if ($this->request->user) {
@@ -58,7 +58,7 @@ class UserController extends Controller
         );
     }
 
-    public function login()
+    public function login(): void
     {
         $userService = new UserService();
 
@@ -85,7 +85,7 @@ class UserController extends Controller
         $this->response->redirect($_SESSION["referer"] ?? "/");
     }
 
-    public function logout()
+    public function logout(): void
     {
         $userService = new UserService();
 
@@ -128,6 +128,8 @@ class UserController extends Controller
         // Redirect to the previous page or the homepage if no referer
         $this->response->redirect($_SESSION["referer"] ?? "/", 303);
     }
+
+    public function editAccount(): void
     {
         $user = $this->request->user;
 
@@ -137,7 +139,12 @@ class UserController extends Controller
 
         $userService = new UserService();
 
+        /** @var array */
         $userData = $this->request->body["user"] ?? [];
+
+        if (gettype($userData) !== "array") {
+            $userData = [];
+        }
 
         $formResult = $userService->checkUserFormData($userData, $user);
 
@@ -167,18 +174,18 @@ class UserController extends Controller
         );
     }
 
-    public function showDeleteConfirmation()
+    public function showDeleteAccountConfirmation(): void
     {
         $this->response
             ->sendHTML(
                 $this->twig->render(
                     "front/user.html.twig",
-                    ["showDeleteConfirmation" => true]
+                    ["showDeleteAccountConfirmation" => true]
                 )
             );
     }
 
-    public function deleteAccount()
+    public function deleteAccount(): void
     {
         $user = $this->request->user;
 
@@ -191,38 +198,13 @@ class UserController extends Controller
         $success = $userService->deleteUser($user->getId());
 
         if (!$success) {
-            $this->response->setCode(500);
-
-            $errorMessage = "Erreur lors de la suppression";
-
-            // HTML
-            if ($this->request->acceptsHTML()) {
-                $this->response
-                    ->sendHTML(
-                        $this->twig->render(
+            $this->sendResponseWithSingleMessage(
                             "front/user.html.twig",
-                            [
-                                "deleteFailure" => [
-                                    "message" => $errorMessage
-                                ]
-                            ]
-                        )
-                    );
-            }
-
-            // JSON
-            if ($this->request->acceptsJSON()) {
-                $this->response
-                    ->sendJSON(
-                        json_encode(["message" => $errorMessage])
-                    );
-            }
-
-            // Default
-            $this->response->sendText($errorMessage);
-        }
-
-        if ($success) {
+                "deleteAccountFailure",
+                "Erreur lors de la suppression du compte",
+                500
+            );
+        } else {
             $userService->logout();
             $this->response->redirect("/", 303);
         }

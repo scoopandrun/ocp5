@@ -119,14 +119,14 @@
 
 				<div class="my-5 text-center">
 					<form id="deleteAccount" action="/user/delete#deleteAccount" method="post">
-						{% if not showDeleteConfirmation %}
+						{% if not showDeleteAccountConfirmation %}
 							<a href="/user/delete#deleteAccount" class="btn btn-danger text-uppercase" id="deleteAccountButton">Supprimer le compte</a>
 						{% else %}
-							<button type="submit" class="btn btn-outline-danger">Confirmer la suppression</button>
+							<button type="submit" class="btn btn-outline-danger">Confirmer la suppression du compte</button>
 						{% endif %}
-						<div id="deleteErrorMessage" class="invalid-feedback d-none"></div>
-						{% if deleteFailure %}
-							<div class="invalid-feedback">{{ deleteFailure.message }}</div>
+						<div id="deleteAccountErrorMessage" class="invalid-feedback d-none"></div>
+						{% if deleteAccountFailure %}
+							<div class="invalid-feedback">{{ deleteAccountFailure.message }}</div>
 						{% endif %}
 					</form>
 				</div>
