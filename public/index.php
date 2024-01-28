@@ -64,6 +64,10 @@ $routes = [
     "/logout" => [
         "GET" => fn () => (new UserController())->logout(),
     ],
+    "/signup" => [
+        "GET" => fn () => (new UserController())->showSignupPage(),
+        "POST" => fn () => (new UserController())->createAccount(),
+    ],
     // Back office
     "/admin" => [
         "GET" => fn () => (new DashboardController())->show(),
