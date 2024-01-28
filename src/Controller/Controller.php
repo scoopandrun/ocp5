@@ -42,4 +42,39 @@ abstract class Controller
             }
         );
     }
+
+    protected function sendResponseWithSingleMessage(
+        string $template,
+        string $messageTitle,
+        string $message,
+        int $statusCode = 200
+    ): void {
+        $this->response->setCode($statusCode);
+
+        // HTML
+        if ($this->request->acceptsHTML()) {
+            $this->response
+                ->sendHTML(
+                    $this->twig->render(
+                        $template,
+                        [
+                            "$messageTitle" => [
+                                "message" => $message
+                            ]
+                        ]
+                    )
+                );
+        }
+
+        // JSON
+        if ($this->request->acceptsJSON()) {
+            $this->response
+                ->sendJSON(
+                    json_encode(["message" => $message])
+                );
+        }
+
+        // Text (default)
+        $this->response->sendText($message);
+    }
 }

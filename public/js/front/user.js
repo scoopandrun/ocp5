@@ -1,3 +1,7 @@
+/**
+ * Account deletion.
+ */
+
 /** @type {HTMLAnchorElement} */
 const deleteAccountButton = document.getElementById("deleteAccountButton");
 
@@ -30,9 +34,11 @@ if (deleteAccountButton) {
     } catch (error) {
       // Display error message
       /** @type {HTMLDivElement} */
-      const deleteErrorMessage = document.getElementById("deleteErrorMessage");
-      deleteErrorMessage.textContent = error.message;
-      deleteErrorMessage.classList.toggle("d-none");
+      const deleteAccountErrorMessage = document.getElementById(
+        "deleteAccountErrorMessage"
+      );
+      deleteAccountErrorMessage.textContent = error.message;
+      deleteAccountErrorMessage.classList.toggle("d-none");
 
       deleteAccountButton.removeAttribute("disabled");
     }

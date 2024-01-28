@@ -50,11 +50,11 @@ $routes = [
     ],
     "/user" => [
         "GET" => fn () => (new UserController())->showAccountPage(),
-        "POST" => fn () => (new UserController())->editAccountInfo(),
+        "POST" => fn () => (new UserController())->editAccount(),
         "DELETE" => fn () => (new UserController())->deleteAccount(),
     ],
     "/user/delete" => [
-        "GET" => fn () => (new UserController())->showDeleteConfirmation(),
+        "GET" => fn () => (new UserController())->showDeleteAccountConfirmation(),
         "POST" => fn () => (new UserController())->deleteAccount(),
     ],
     "/login" => [
