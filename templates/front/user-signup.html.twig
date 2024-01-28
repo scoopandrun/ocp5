@@ -56,7 +56,7 @@
 							<input type="password" class="form-control" id="password" name="signupForm[new-password]" placeholder="Mot de passe" autocomplete="new-password" required/>
 							<label for="password">Mot de passe</label>
 							{% if formResult.errors.newPasswordMissing %}
-								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
+								<div class="invalid-feedback">Le mot de passe est obligatoire.</div>
 							{% endif %}
 						</div>
 
@@ -64,7 +64,7 @@
 							<input type="password" class="form-control" id="password" name="signupForm[password-confirm]" placeholder="Retapez le mot de passe" autocomplete="new-password" required/>
 							<label for="password">Retapez le mot de passe</label>
 							{% if formResult.errors.passwordConfirmMissing %}
-								<div class="invalid-feedback">Le nouveau mot doit être retapé dans ce champ.</div>
+								<div class="invalid-feedback">Le mot de passe doit être retapé dans ce champ.</div>
 							{% endif %}
 							{% if formResult.errors.passwordMismatch %}
 								<div class="invalid-feedback">Le mot de passe n'a pas été corectement retapé.</div>
@@ -74,7 +74,7 @@
 						<!-- Submit error message-->
 						{% if formResult.failure %}
 							<div id="submitErrorMessage">
-								<div class="text-center text-danger mb-3">L'identifiant et/ou le mot de passe est invalide.</div>
+								<div class="text-center text-danger mb-3">Une erreur est survenue.</div>
 							</div>
 						{% endif %}
 
