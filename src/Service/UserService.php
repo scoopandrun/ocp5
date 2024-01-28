@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Service\EmailService;
+use Hidehalo\Nanoid\Client as Nanoid;
 
 class UserService
 {
@@ -21,6 +22,8 @@ class UserService
             ->setId($userData["id"] ?? null)
             ->setName($userData["name"] ?? "")
             ->setEmail($userData["email"] ?? "")
+            ->setEmailVerificationToken($userData["emailVerificationToken"] ?? "")
+            ->setEmailVerified($userData["emailVerified"] ?? false)
             ->setPassword($userData["password"] ?? null)
             ->setIsAdmin($userData["admin"] ?? false)
             ->setCreatedAt($userData["createdAt"] ?? null);
@@ -181,7 +184,7 @@ class UserService
         }
 
         // Note: wait after the DB change is successful to send the verification e-mail
-        $emailSent = $this->sendEmailVerificationEmail($user->getEmail());
+        $emailSent = $this->sendVerificationEmail($user->getEmail());
 
         return $userId;
     }
@@ -189,13 +192,99 @@ class UserService
     /**
      * @return bool `true` on success, `false` on failure.
      */
-    public function editUser(User $user): bool
+    public function editUser(User $userEdited, User $originalUser): bool
     {
-        return $this->userRepository->editUser($user);
+        $emailChanged = $userEdited->getEmail() !== $originalUser->getEmail();
+
+        if ($emailChanged) {
+            $userEdited->setEmailVerified(false);
+        }
+
+        $dbSuccess = $this->userRepository->editUser($userEdited);
+
+        if (!$dbSuccess) {
+            return false;
+        }
+
+        // Note: wait after the DB change is successful to send the verification e-mail
+        if ($emailChanged) {
+            $emailSent = $this->sendVerificationEmail($userEdited->getEmail());
+        }
+
+        return $dbSuccess;
     }
 
+    /**
+     * @return bool `true` on success, `false` on failure.
+     */
     public function deleteUser(int $id): bool
     {
         return $this->userRepository->deleteUser($id);
     }
+
+    private function generateEmailVerificationToken(): string
+    {
+        return (new Nanoid())->generateId(21);
     }
+
+    /**
+     * Send an e-mail to verify the user's e-mail address.
+     * 
+     * @param string $email E-mail address to be verified.
+     * 
+     * @return bool `true` on success, `false` on failure.
+     */
+    public function sendVerificationEmail(string $email): bool
+    {
+        $emailService = new EmailService();
+
+        $emailVerificationToken = $this->generateEmailVerificationToken();
+
+        $this->userRepository->setEmailVerificationToken($email, $emailVerificationToken);
+
+        $emailBody = <<<HTML
+            Bonjour,
+
+            Cet e-mail automatique a été envoyé depuis le blog de Nicolas DENIS.
+            
+            Merci de vérifier votre adresse email en cliquant sur le lien ci-dessous :
+
+            http://ocp5.local/user/verifyEmail/$emailVerificationToken
+
+            Merci
+            HTML;
+
+        $emailService
+            ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
+            ->addTo($email)
+            ->setSubject("[OCP5] E-mail de vérification")
+            ->setHTML(false)
+            ->setBody($emailBody);
+
+        return $emailService->send();
+    }
+
+    /**
+     * Set an email as verified.
+     * 
+     * @param string $token 
+     * 
+     * @return bool `true` if the token is valid, `false` if the token is invalid
+     */
+    public function verifyEmail(string $token): bool
+    {
+        return $this->userRepository->verifyEmail($token);
+    }
+
+    /**
+     * @return bool `true` on success, `false` on failure.
+     */
+    public function sendPasswordResetEmail(): bool
+    {
+        $emailService = new EmailService();
+
+        // TODO: send email after account password reset request
+
+        return true;
+    }
+}

@@ -30,6 +30,8 @@ class UserRepository
                 u.id,
                 u.name,
                 u.email,
+                u.emailVerificationToken,
+                u.emailVerified,
                 u.password,
                 u.admin,
                 u.createdAt
@@ -70,6 +72,7 @@ class UserRepository
                 u.name,
                 u.email,
                 u.admin,
+                u.emailVerified,
                 u.createdAt
             FROM users u
             ORDER BY u.createdAt DESC, id
@@ -186,12 +189,14 @@ class UserRepository
             SET
                 name = :name,
                 email = :email,
+                emailVerificationToken = :emailVerificationToken,
                 password = :password"
         );
 
         $req->execute([
             "name" => $user->getName(),
             "email" => $user->getEmail(),
+            "emailVerificationToken" => $user->getEmailVerificationToken(),
             "password" => $user->getPassword(),
         ]);
 
@@ -218,6 +223,7 @@ class UserRepository
             SET
                 name = :name,
                 email = :email,
+                emailVerified = :emailVerified,
                 $passwordSql
                 admin = :admin
             WHERE
@@ -228,6 +234,7 @@ class UserRepository
             "id" => $user->getId(),
             "name" => $user->getName(),
             "email" => $user->getEmail(),
+            "emailVerified" => (int) $user->getEmailVerified(),
             "admin" => (int) $user->getIsAdmin(),
         ];
 
@@ -249,5 +256,44 @@ class UserRepository
         $success = $req->execute(["id" => $id]);
 
         return $success;
+    }
+
+    public function setEmailVerificationToken(string $email, string $token): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "UPDATE users
+            SET emailVerificationToken = :token
+            WHERE email = :email"
+        );
+
+        $success = $req->execute(compact("email", "token"));
+
+        return $success;
+    }
+
+    /**
+     * Set an email as verified.
+     * 
+     * @param string $emailVerificationToken 
+     * 
+     * @return bool `true` if the token is valid, `false` if the token is invalid
+     */
+    public function verifyEmail(string $emailVerificationToken): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "UPDATE users
+            SET emailVerified = 1
+            WHERE emailVerificationToken = :token"
+        );
+
+        $req->execute(["token" => $emailVerificationToken]);
+
+        $rowsAffected = $req->rowCount();
+
+        return (bool) $rowsAffected;
     }
 }
