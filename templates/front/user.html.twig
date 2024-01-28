@@ -46,6 +46,20 @@
 						<div class="form-floating">
 							<input type="email" class="form-control" id="email" name="user[email]" placeholder="E-mail" value="{{ user.email }}" autocomplete="email" required/>
 							<label for="email">E-mail</label>
+							{% if user.emailVerified %}
+								<small class="text-success">Email vérifié</small>
+							{% else %}
+								<small>Email non vérifié (<a href="/user/sendVerificationEmail#userForm" id="sendVerificationEmail">renvoyer un email de vérification</a>)</small>
+							{% endif %}
+
+							<div id="verificationEmailErrorMessage" class="invalid-feedback d-none"></div>
+							{% if verificationEmailError %}
+								<div class="invalid-feedback">{{ verificationEmailError.message }}</div>
+							{% endif %}
+							{% if verificationEmailSuccess %}
+								<div class="fw-bold">{{ verificationEmailSuccess.message }}</div>
+							{% endif %}
+
 							{% if formResult.errors.emailMissing %}
 								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
 							{% endif %}

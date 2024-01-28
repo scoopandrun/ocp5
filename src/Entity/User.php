@@ -9,6 +9,8 @@ class User implements \Stringable
     private ?int $id = null;
     private string $name = "Anonyme";
     private string $email = "";
+    private ?string $emailVerificationToken = null;
+    private bool $emailVerified = false;
     private ?string $password = null;
     private bool $isAdmin = false;
     private ?DateTime $createdAt = null;
@@ -47,6 +49,28 @@ class User implements \Stringable
     public function setEmail(string $email)
     {
         $this->email = $email;
+        return $this;
+    }
+
+    public function getEmailVerificationToken()
+    {
+        return $this->emailVerificationToken;
+    }
+
+    public function setEmailVerificationToken(string|null $emailVerificationToken)
+    {
+        $this->emailVerificationToken = $emailVerificationToken;
+        return $this;
+    }
+
+    public function getEmailVerified()
+    {
+        return $this->emailVerified;
+    }
+
+    public function setEmailVerified(bool|int $emailVerified)
+    {
+        $this->emailVerified = (bool) $emailVerified;
         return $this;
     }
 

@@ -44,3 +44,52 @@ if (deleteAccountButton) {
     }
   });
 }
+
+/**
+ * Verification e-mail.
+ */
+
+/** @type {HTMLAnchorElement} */
+const sendVerificationEmailLink = document.getElementById(
+  "sendVerificationEmail"
+);
+
+if (sendVerificationEmailLink) {
+  sendVerificationEmailLink.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    /** @type {HTMLDivElement} */
+    const verificationEmailErrorMessage = document.getElementById(
+      "verificationEmailErrorMessage"
+    );
+
+    verificationEmailErrorMessage.classList.add("d-none");
+    sendVerificationEmailLink.textContent = "envoi en cours...";
+    sendVerificationEmailLink.removeAttribute("href");
+
+    const url = "/user/sendVerificationEmail";
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const message = (await response.json()).message;
+        throw new Error(message);
+      }
+
+      sendVerificationEmailLink.textContent = (await response.json()).message;
+    } catch (error) {
+      // Display error message
+      verificationEmailErrorMessage.textContent = error.message;
+      verificationEmailErrorMessage.classList.remove("d-none");
+
+      sendVerificationEmailLink.textContent =
+        "renvoyer un email de vérification";
+      sendVerificationEmailLink.setAttribute("href", url);
+    }
+  });
+}

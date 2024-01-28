@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\UserService;
 use App\Core\Exceptions\Client\Auth\UnauthorizedException;
+use App\Core\Exceptions\Client\ClientException;
 
 class UserController extends Controller
 {
@@ -162,15 +163,21 @@ class UserController extends Controller
         $userData["id"] = $user->getId();
         $userData["admin"] = $user->getIsAdmin();
         $userData["password"] = $userData["new-password"] ?? "";
-        $user = $userService->makeUserObject($userData);
+        $userEdited = $userService->makeUserObject($userData);
 
-        $success = $userService->editUser($user);
+        $success = $userService->editUser($userEdited, $user);
 
         $formResult["success"] = $success;
         $formResult["failure"] = !$success;
 
         $this->response->sendHTML(
-            $this->twig->render("front/user.html.twig", compact("user", "formResult"))
+            $this->twig->render(
+                "front/user.html.twig",
+                [
+                    "user" => $success ? $userEdited : $user,
+                    "formResult" => $formResult,
+                ]
+            )
         );
     }
 
@@ -199,7 +206,7 @@ class UserController extends Controller
 
         if (!$success) {
             $this->sendResponseWithSingleMessage(
-                            "front/user.html.twig",
+                "front/user.html.twig",
                 "deleteAccountFailure",
                 "Erreur lors de la suppression du compte",
                 500
@@ -208,5 +215,57 @@ class UserController extends Controller
             $userService->logout();
             $this->response->redirect("/", 303);
         }
+    }
+
+    public function sendVerificationEmail(): void
+    {
+        $user = $this->request->user;
+
+        if (!$user) {
+            throw new UnauthorizedException();
+        }
+
+        if ($user->getEmailVerified()) {
+            $this->sendResponseWithSingleMessage(
+                "front/user.html.twig",
+                "verificationEmailError",
+                "L'adresse e-mail est déjà vérifiée.",
+                400
+            );
+        }
+
+        $userService = new UserService();
+
+        $emailSent = $userService->sendVerificationEmail($user->getEmail());
+
+        if (!$emailSent) {
+            $this->sendResponseWithSingleMessage(
+                "front/user.html.twig",
+                "verificationEmailError",
+                "Une erreur est survenue. L'email n'a pas été envoyé.",
+                500
+            );
+        } else {
+            $this->sendResponseWithSingleMessage(
+                "front/user.html.twig",
+                "verificationEmailSuccess",
+                "L'email a été envoyé."
+            );
+        }
+    }
+
+    public function verifyEmail(string $token)
+    {
+        $userService = new UserService();
+
+        $success = $userService->verifyEmail($token);
+
+        if (!$success) {
+            throw new ClientException("Le jeton de vérification n'est pas valide");
+        }
+
+        $this->response->sendHTML(
+            $this->twig->render("front/user-email-verified.html.twig")
+        );
     }
 }

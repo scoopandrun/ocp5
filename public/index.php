@@ -57,6 +57,12 @@ $routes = [
         "GET" => fn () => (new UserController())->showDeleteAccountConfirmation(),
         "POST" => fn () => (new UserController())->deleteAccount(),
     ],
+    "/user/sendVerificationEmail" => [
+        "GET" => fn () => (new UserController())->sendVerificationEmail(),
+    ],
+    "/user/verifyEmail/([\w-]{21})" => [
+        "GET" => fn (string $token) => (new UserController())->verifyEmail($token),
+    ],
     "/login" => [
         "GET" => fn () => (new UserController())->showLoginPage(),
         "POST" => fn () => (new UserController())->login(),
