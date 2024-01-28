@@ -28,8 +28,11 @@ class UserService
         return $user;
     }
 
-    public function checkUserFormData(array $data, ?User $user = null): array
-    {
+    public function checkUserFormData(
+        array $data,
+        ?User $user = null,
+        bool $newAccount = false,
+    ): array {
         $name = $data["name"] ?? "";
         $email = $data["email"] ?? "";
         $currentPassword = $data["current-password"] ?? "";
@@ -39,15 +42,19 @@ class UserService
         $formResult = [
             "success" => false,
             "failure" => false,
+            "values" => compact("name", "email"),
             "errors" => [
                 "nameMissing" => !$name,
                 "nameTooLong" => mb_strlen($name) > 255,
                 "emailMissing" => !$email,
                 "emailInvalid" => !preg_match("/.*@.*\.[a-z]+/", $email),
                 "emailAlreadyTaken" => $this->userRepository->checkEmailTaken($email, $user?->getId()),
-                "currentPasswordMissing" => $newPassword && !$currentPassword,
-                "currentPasswordInvalid" => $currentPassword
+                "currentPasswordMissing" => !$newAccount && $newPassword && !$currentPassword,
+                "currentPasswordInvalid" =>
+                !$newAccount
+                    && $currentPassword
                     && $this->checkCredentials($user?->getEmail(), $currentPassword) === false,
+                "newPasswordMissing" => $newAccount && !$newPassword,
                 "passwordConfirmMissing" => $newPassword && !$passwordConfirm,
                 "passwordMismatch" => $newPassword !== $passwordConfirm,
             ],
@@ -162,6 +169,22 @@ class UserService
         session_unset();
     }
 
+    /**
+     * @return int The user id of the newly created user.
+     */
+    public function createUser(User $user): int
+    {
+        $userId = $this->userRepository->createUser($user);
+
+        if (!$userId) {
+            return false;
+        }
+
+        // Note: wait after the DB change is successful to send the verification e-mail
+        $emailSent = $this->sendEmailVerificationEmail($user->getEmail());
+
+        return $userId;
+    }
 
     /**
      * @return bool `true` on success, `false` on failure.

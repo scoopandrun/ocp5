@@ -175,6 +175,32 @@ class UserRepository
         return $count;
     }
 
+    public function createUser(User $user): int
+    {
+        $db = $this->connection;
+
+        $db->beginTransaction();
+
+        $req = $db->prepare(
+            "INSERT INTO users
+            SET
+                name = :name,
+                email = :email,
+                password = :password"
+        );
+
+        $req->execute([
+            "name" => $user->getName(),
+            "email" => $user->getEmail(),
+            "password" => $user->getPassword(),
+        ]);
+
+        $lastInsertId = $db->lastInsertId();
+
+        $db->commit();
+
+        return (int) $lastInsertId;
+    }
 
     /**
      * @return bool `true` on success, `false` on failure.
