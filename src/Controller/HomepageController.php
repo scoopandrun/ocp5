@@ -44,6 +44,7 @@ class HomepageController extends Controller
                         compact("latestPosts", "contactFormResult")
                     )
                 );
+            return;
         }
 
         $emailSent = $contactFormService->sendEmail();

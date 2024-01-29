@@ -67,6 +67,7 @@ class PostManagementController extends AdminController
                         compact("post", "categories", "formResult")
                     )
                 );
+            return;
         }
 
         $postData["author"] = $this->request->user->getId();
@@ -97,6 +98,7 @@ class PostManagementController extends AdminController
                         compact("post", "categories", "formResult")
                     )
                 );
+            return;
         }
 
         $postService->editPost($postId, $postData);

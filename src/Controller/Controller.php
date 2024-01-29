@@ -65,6 +65,7 @@ abstract class Controller
                         ]
                     )
                 );
+            return;
         }
 
         // JSON
@@ -73,6 +74,7 @@ abstract class Controller
                 ->sendJSON(
                     json_encode(["message" => $message])
                 );
+            return;
         }
 
         // Text (default)
