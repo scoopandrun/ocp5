@@ -14,7 +14,6 @@ class HTTPResponse
     private ?string $body = null;
     private bool $compression = true;
     private string $type = 'text/html; charset=UTF-8';
-    private bool $exit = true;
     private bool $isSent = false;
 
     public function __construct(?int $code = null)
@@ -46,17 +45,6 @@ class HTTPResponse
         }
 
         $this->isSent = true;
-
-        // Script exit
-        if ($this->exit) {
-            if ($this->code >= 400) {
-                $exitCode = $this->code;
-            } else {
-                $exitCode = 0;
-            }
-
-            exit($exitCode);
-        }
     }
 
     /**
@@ -258,8 +246,6 @@ class HTTPResponse
     /**
      * Redirect the user to the target URI.
      * 
-     * The script exits after the redirect.
-     * 
      * @param string $targetURI Target of the redirection.
      * @param int    $code      Optional. HTTP status code. Default = 302.
      */
@@ -270,7 +256,6 @@ class HTTPResponse
             ->addHeader("Location", $targetURI)
             ->setBody(null)
             ->setCompression(false)
-            ->setExit(true)
             ->send();
     }
 
@@ -289,23 +274,6 @@ class HTTPResponse
 
         return $this;
     }
-
-    /**
-     * Set if the script must exit after sending the HTTP reponse.
-     * 
-     * Default is `TRUE`.
-     * 
-     * @param bool $exit 
-     * 
-     * @return HTTPResponse
-     */
-    public function setExit(bool $exit = true): HTTPResponse
-    {
-        $this->exit = $exit;
-
-        return $this;
-    }
-
 
     /**
      * Compress the HTTP response body.
@@ -452,9 +420,6 @@ class HTTPResponse
     private function applyStatusCode(): void
     {
         match ($this->code) {
-            100 => $this->set100Continue(),
-            101 => $this->set101SwitchingProtocols(),
-            103 => $this->set103EarlyHints(),
             200 => $this->set200OK(),
             201 => $this->set201Created(),
             202 => $this->set202Accepted(),
@@ -516,44 +481,7 @@ class HTTPResponse
 
     /** === 1XX - INFORMATION === */
 
-    /**
-     * Response 100 (Continue).
-     * 
-     * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/100
-     */
-    private function set100Continue(): void
-    {
-        $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 100 Continue";
-    }
-
-    /**
-     * Response 101 (Switching Protocols).
-     * 
-     * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/101
-     */
-    private function set101SwitchingProtocols(): void
-    {
-        if ($_SERVER["SERVER_PROTOCOL"] === "HTTP/1.1") {
-            $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 101 Switching Protocols";
-            // self::$response["Connection"] = "upgrade";
-            // self::$response["headers"]["Upgrade"] = null; // Inclure le nouveau protocole dans ce header
-
-        } else {
-            $this->set200OK("");
-        }
-    }
-
-    /**
-     * Response 103 (Early Hints).
-     * 
-     * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/103
-     */
-    private function set103EarlyHints(): void
-    {
-        $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 103 Early Hints";
-        // $this->headers["Link"] = null; // En-tête Link à compléter par l'utilisateur
-
-    }
+    // Not implemented
 
 
     /** === 2XX - SUCCESS */
@@ -714,8 +642,6 @@ class HTTPResponse
     private function set401Unauthorized(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 401 Unauthorized";
-        // $this->headers["WWW-Authenticate"] = null; // En-tête WWW-Athenticate à renseigner par l'utilisateur
-
     }
 
     /**

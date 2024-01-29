@@ -23,7 +23,7 @@ class ErrorLogger
     /**
      * Log an error.
      */
-    public function log()
+    public function log(): void
     {
         register_shutdown_function([$this, "emergencyShutdown"]);
 
@@ -106,7 +106,7 @@ class ErrorLogger
      * Emergency error logger in case of a catastrophic exception
      * (eg: out of memory).
      */
-    private function emergencyShutdown()
+    private function emergencyShutdown(): void
     {
         // Free the emergency memory
         $this->emergencyMemory = null;
