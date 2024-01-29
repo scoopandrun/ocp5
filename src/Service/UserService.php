@@ -276,15 +276,129 @@ class UserService
         return $this->userRepository->verifyEmail($token);
     }
 
+    public function checkPasswordResetEmailFormData(array $formData): array
+    {
+        $email = $formData["email"] ?? "";
+
+        $emailIsString = gettype($email) === "string";
+
+        $emailMissing = !$email || !$emailIsString;
+        $emailInvalid = $emailIsString && !preg_match("/.*@.*\.[a-z]+/", $email);
+
+        $errorMessage = $emailMissing
+            ? "L'adresse e-mail est requise."
+            : (
+                $emailInvalid
+                ? "L'adresse e-mail est invalide."
+                : ""
+            );
+
+        $formResult = [
+            "error" => $errorMessage,
+        ];
+
+        return $formResult;
+    }
+
     /**
      * @return bool `true` on success, `false` on failure.
      */
-    public function sendPasswordResetEmail(): bool
+    public function sendPasswordResetEmail(array $formData): bool
     {
+        /** @var string */
+        $email = $formData["email"];
+
         $emailService = new EmailService();
 
-        // TODO: send email after account password reset request
+        $passwordResetToken = $this->generateToken();
 
-        return true;
+        $tokenIsSet = $this->userRepository->setPasswordResetToken($email, $passwordResetToken);
+
+        // If an error uccroed during token setting, return false
+        if ($tokenIsSet === false) {
+            return false;
+        }
+
+        // If no error occured but the e-mail in unknown to the database
+        // return true without sending the e-mail (=> obfuscation)
+        if ($tokenIsSet === 0) {
+            return true;
+        }
+
+        // If a token really has been set, send the e-mail
+
+        $emailBody = <<<EMAIL
+            Bonjour,
+
+            Cet e-mail automatique a été envoyé depuis le blog de Nicolas DENIS.
+            
+            Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien ci-dessous :
+
+            http://ocp5.local/passwordReset/$passwordResetToken
+
+            Si vous n'avez pas demandé la réinitialisation de votre mot de passe,
+            veuillez ignorer ce message.
+
+            Merci
+            EMAIL;
+
+        $emailService
+            ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
+            ->addTo($email)
+            ->setSubject("[OCP5] Réinitialisation de mot de passe")
+            ->setHTML(false)
+            ->setBody($emailBody);
+
+        return $emailService->send();
+    }
+
+    public function verifyPasswordResetToken(string $token): bool
+    {
+        return $this->userRepository->checkIfPasswordResetTokenIsRegistered($token);
+    }
+
+
+    public function checkPasswordResetFormData(array $formData): array
+    {
+        $newPassword = $formData["new-password"] ?? "";
+        $passwordConfirm = $formData["password-confirm"] ?? "";
+
+        $newPasswordIsString = gettype($newPassword) === "string";
+        $passwordConfirmIsString = gettype($passwordConfirm) === "string";
+
+        $newPasswordMissing = !$newPassword || !$newPasswordIsString;
+        $passwordConfirmMissing = !$passwordConfirm || !$passwordConfirmIsString;
+        $passwordMismatch = $newPassword !== $passwordConfirm;
+
+        $errorMessage = "";
+
+        switch (true) {
+            case $newPasswordMissing:
+                $errorMessage = "Le mot de passe est obligatoire.";
+                break;
+
+            case $passwordConfirmMissing:
+                $errorMessage = "Le mot de passe doit être retapé.";
+
+            case $passwordMismatch:
+                $errorMessage = "Le mot de passe n'a pas été correctement retapé.";
+                break;
+
+            default:
+                break;
+        }
+
+        $formResult = [
+            "error" => $errorMessage,
+        ];
+
+        return $formResult;
+    }
+
+    public function resetPassword(string $token, string $password): bool
+    {
+        $hashedPassword = (new User())->setPassword($password)->getPassword();
+
+        return $this->userRepository->resetPassword($token, $hashedPassword);
     }
 }

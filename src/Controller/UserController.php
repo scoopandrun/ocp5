@@ -40,6 +40,11 @@ class UserController extends Controller
 
         $_SESSION["referer"] = $_SERVER["HTTP_REFERER"] ?? null;
 
+        // Do not set the referer if it is the password reset page
+        if (str_contains($_SESSION["referer"] ?? "", "passwordReset")) {
+            $_SESSION["referer"] = null;
+        }
+
         $this->response->sendHTML(
             $this->twig->render("front/user-login.html.twig")
         );
@@ -53,6 +58,11 @@ class UserController extends Controller
         }
 
         $_SESSION["referer"] = $_SERVER["HTTP_REFERER"] ?? null;
+
+        // Do not set the referer if it is the password reset page
+        if (str_contains($_SESSION["referer"] ?? "", "passwordReset")) {
+            $_SESSION["referer"] = null;
+        }
 
         $this->response->sendHTML(
             $this->twig->render("front/user-signup.html.twig")
@@ -267,5 +277,119 @@ class UserController extends Controller
         $this->response->sendHTML(
             $this->twig->render("front/user-email-verified.html.twig")
         );
+    }
+
+    public function showPaswordResetAskEmailPage(): void
+    {
+        $this->response->sendHTML(
+            $this->twig->render("front/user-reset-password-1-ask-email.html.twig")
+        );
+    }
+
+    public function sendPasswordResetEmail(): void
+    {
+        $userService = new UserService();
+
+        /** @var array */
+        $formData = $this->request->body["passwordResetEmailForm"] ?? [];
+
+        if (gettype($formData) !== "array") {
+            $formData = [];
+        }
+
+        $formResult = $userService->checkPasswordResetEmailFormData($formData);
+
+        if ($formResult["error"]) {
+            $this->sendResponseWithSingleMessage(
+                "front/user-reset-password-1-ask-email.html.twig",
+                "passwordResetEmailError",
+                $formResult["error"],
+                400
+            );
+        }
+
+        $emailSent = $userService->sendPasswordResetEmail($formData);
+
+        if (!$emailSent) {
+            $this->sendResponseWithSingleMessage(
+                "front/user-reset-password-1-ask-email.html.twig",
+                "passwordResetEmailError",
+                "Une erreur est survenue. L'email n'a pas été envoyé.",
+                500
+            );
+        } else {
+            $this->sendResponseWithSingleMessage(
+                "front/user-reset-password-1-ask-email.html.twig",
+                "passwordResetEmailSuccess",
+                "Si cette adresse est associée à un compte,
+                vous recevrez un e-mail de réinitialisation de mot de passe."
+            );
+        }
+    }
+
+    public function showPaswordResetChangePasswordPage(string $token): void
+    {
+        $userService = new UserService();
+
+        $tokenIsValid = $userService->verifyPasswordResetToken($token);
+
+        if (!$tokenIsValid) {
+            throw new ClientException("Le jeton n'est pas valide");
+        }
+
+        $this->response->sendHTML(
+            $this->twig->render(
+                "front/user-reset-password-2-change-password.html.twig"
+            )
+        );
+    }
+
+    public function resetPassword(string $token): void
+    {
+        $userService = new UserService();
+
+        $tokenIsValid = $userService->verifyPasswordResetToken($token);
+
+        if (!$tokenIsValid) {
+            throw new ClientException("Le jeton n'est pas valide");
+        }
+
+        /** @var array */
+        $formData = $this->request->body["passwordResetForm"] ?? [];
+
+        if (gettype($formData) !== "array") {
+            $formData = [];
+        }
+
+        $formResult = $userService->checkPasswordResetFormData($formData);
+
+        if ($formResult["error"]) {
+            $this->sendResponseWithSingleMessage(
+                "front/user-reset-password-2-change-password.html.twig",
+                "passwordResetError",
+                $formResult["error"],
+                400
+            );
+        }
+
+        /** @var string */
+        $newPassword = $formData["new-password"];
+
+        $passwordHasBeenReset = $userService->resetPassword($token, $newPassword);
+
+        if (!$passwordHasBeenReset) {
+            $this->sendResponseWithSingleMessage(
+                "front/user-reset-password-2-change-password.html.twig",
+                "passwordResetError",
+                "Une erreur est survenue. Le mot de passe n'a pas été changé.",
+                500
+            );
+        } else {
+            $this->sendResponseWithSingleMessage(
+                "front/user-reset-password-2-change-password.html.twig",
+                "passwordResetSuccess",
+                "Le mot de passe a été correctement changé."
+            );
+        }
     }
 }

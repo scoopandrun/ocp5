@@ -79,6 +79,11 @@ class User implements \Stringable
         return $this->password;
     }
 
+    /**
+     * @param null|string $password Hashed or clear password.  
+     *                              If the password is not hashed,
+     *                              the function will hash it.
+     */
     public function setPassword(?string $password = null)
     {
         if (!$password) {
