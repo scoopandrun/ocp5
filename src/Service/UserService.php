@@ -173,9 +173,9 @@ class UserService
     }
 
     /**
-     * @return int The user id of the newly created user.
+     * @return int|false The user id of the newly created user, `false` in case of error.
      */
-    public function createUser(User $user): int
+    public function createUser(User $user): int|false
     {
         $userId = $this->userRepository->createUser($user);
 

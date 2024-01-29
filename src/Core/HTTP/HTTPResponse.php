@@ -49,29 +49,14 @@ class HTTPResponse
 
         // Script exit
         if ($this->exit) {
-            exit;
+            if ($this->code >= 400) {
+                $exitCode = $this->code;
+            } else {
+                $exitCode = 0;
+            }
+
+            exit($exitCode);
         }
-    }
-
-    /**
-     * Debug HTTP response.
-     * 
-     * @return never
-     */
-    public function debug()
-    {
-        echo "<pre>";
-        print_r([
-            "code" => $this->code,
-            "headers" => $this->headers,
-            "body" => $this->body,
-            "compression" => $this->compression,
-            "type" => $this->type,
-            "exit" => $this->exit
-        ]);
-        echo "</pre>";
-
-        exit;
     }
 
     /**
@@ -424,11 +409,6 @@ class HTTPResponse
             case 'br':
                 // Brotli
                 // Not implemented (requires compilation of the module for PHP and Apache)
-                // TODO: Implement Brotli
-                // https://github.com/kjdev/php-ext-brotli
-                // https://blog.anthony-jacob.com/compiler-le-module-brotli-apache-et-lextension-brotli-php-pour-ubuntu-18-04/
-
-                // $this->body = brotli_compress($this->body);
                 break;
 
             case 'identity':
@@ -449,10 +429,8 @@ class HTTPResponse
     private function applyHeaders(): void
     {
         // Default headers
-        // header("Date: " . gmdate("D, d M Y H:i:s T")); // GMT time, deactivated because added by default by the web server
         header("Cache-control: no-cache");
 
-        // ! FIXME : Se conformer à la RFC 7230 https://datatracker.ietf.org/doc/html/rfc7230#section-3.3.2
         if (!($this->code < 200 || $this->code === 204)) {
             header("Content-Length: " . strlen($this->body ?? ""));
         }
@@ -461,7 +439,6 @@ class HTTPResponse
         if ($this->body) {
             header("Content-Type: {$this->type}");
         }
-
 
         // Additional headers
         foreach ($this->headers as $name => $value) {
@@ -475,60 +452,60 @@ class HTTPResponse
     private function applyStatusCode(): void
     {
         match ($this->code) {
-            100 => $this->_100_Continue(),
-            101 => $this->_101_SwitchingProtocols(),
-            103 => $this->_103_EarlyHints(),
-            200 => $this->_200_OK(),
-            201 => $this->_201_Created(),
-            202 => $this->_202_Accepted(),
-            203 => $this->_203_NonAuthoritativeInformation(),
-            204 => $this->_204_NoContent(),
-            205 => $this->_205_ResetContent(),
-            206 => $this->_206_PartialContent(),
-            301 => $this->_301_MovedPermanently(),
-            302 => $this->_302_Found(),
-            303 => $this->_303_SeeOther(),
-            304 => $this->_304_NotModified(),
-            307 => $this->_307_TemporaryRedirect(),
-            308 => $this->_308_PermanentRedirect(),
-            400 => $this->_400_BadRequest(),
-            401 => $this->_401_Unauthorized(),
-            402 => $this->_402_PaymentRequired(),
-            403 => $this->_403_Forbidden(),
-            404 => $this->_404_NotFound(),
-            405 => $this->_405_MethodNotAllowed(),
-            406 => $this->_406_NotAcceptable(),
-            407 => $this->_407_ProxyAuthenticationRequired(),
-            408 => $this->_408_RequestTimeout(),
-            409 => $this->_409_Conflict(),
-            410 => $this->_410_Gone(),
-            411 => $this->_411_LengthRequired(),
-            412 => $this->_412_PreconditionFailed(),
-            413 => $this->_413_PayloadTooLarge(),
-            414 => $this->_414_URITooLong(),
-            415 => $this->_415_UnsupportedMediaType(),
-            416 => $this->_416_RangeNotSatisfiable(),
-            417 => $this->_417_ExpectationFailed(),
-            418 => $this->_418_Imateapot(),
-            422 => $this->_422_UnprocessableEntity(),
-            425 => $this->_425_TooEarly(),
-            426 => $this->_426_UpgradeRequired(),
-            428 => $this->_428_PreconditionRequired(),
-            429 => $this->_429_TooManyRequests(),
-            431 => $this->_431_RequestHeaderFieldsTooLarge(),
-            451 => $this->_451_UnavailableForLegalReasons(),
-            500 => $this->_500_InternalServerError(),
-            501 => $this->_501_NotImplemented(),
-            502 => $this->_502_BadGateway(),
-            503 => $this->_503_ServiceUnavailable(),
-            504 => $this->_504_GatewayTimeout(),
-            505 => $this->_505_HTTPVersionNotSupported(),
-            506 => $this->_506_VariantAlsoNegotiates(),
-            507 => $this->_507_InsufficientStorage(),
-            508 => $this->_508_LoopDetected(),
-            510 => $this->_510_NotExtended(),
-            511 => $this->_511_NetworkAuthenticationRequired(),
-            default => $this->_500_InternalServerError()
+            100 => $this->set100Continue(),
+            101 => $this->set101SwitchingProtocols(),
+            103 => $this->set103EarlyHints(),
+            200 => $this->set200OK(),
+            201 => $this->set201Created(),
+            202 => $this->set202Accepted(),
+            203 => $this->set203NonAuthoritativeInformation(),
+            204 => $this->set204NoContent(),
+            205 => $this->set205ResetContent(),
+            206 => $this->set206PartialContent(),
+            301 => $this->set301MovedPermanently(),
+            302 => $this->set302Found(),
+            303 => $this->set303SeeOther(),
+            304 => $this->set304NotModified(),
+            307 => $this->set307TemporaryRedirect(),
+            308 => $this->set308PermanentRedirect(),
+            400 => $this->set400BadRequest(),
+            401 => $this->set401Unauthorized(),
+            402 => $this->set402PaymentRequired(),
+            403 => $this->set403Forbidden(),
+            404 => $this->set404NotFound(),
+            405 => $this->set405MethodNotAllowed(),
+            406 => $this->set406NotAcceptable(),
+            407 => $this->set407ProxyAuthenticationRequired(),
+            408 => $this->set408RequestTimeout(),
+            409 => $this->set409Conflict(),
+            410 => $this->set410Gone(),
+            411 => $this->set411LengthRequired(),
+            412 => $this->set412PreconditionFailed(),
+            413 => $this->set413PayloadTooLarge(),
+            414 => $this->set414URITooLong(),
+            415 => $this->set415UnsupportedMediaType(),
+            416 => $this->set416RangeNotSatisfiable(),
+            417 => $this->set417ExpectationFailed(),
+            418 => $this->set418Imateapot(),
+            422 => $this->set422UnprocessableEntity(),
+            425 => $this->set425TooEarly(),
+            426 => $this->set426UpgradeRequired(),
+            428 => $this->set428PreconditionRequired(),
+            429 => $this->set429TooManyRequests(),
+            431 => $this->set431RequestHeaderFieldsTooLarge(),
+            451 => $this->set451UnavailableForLegalReasons(),
+            500 => $this->set500InternalServerError(),
+            501 => $this->set501NotImplemented(),
+            502 => $this->set502BadGateway(),
+            503 => $this->set503ServiceUnavailable(),
+            504 => $this->set504GatewayTimeout(),
+            505 => $this->set505HTTPVersionNotSupported(),
+            506 => $this->set506VariantAlsoNegotiates(),
+            507 => $this->set507InsufficientStorage(),
+            508 => $this->set508LoopDetected(),
+            510 => $this->set510NotExtended(),
+            511 => $this->set511NetworkAuthenticationRequired(),
+            default => $this->set500InternalServerError()
         };
     }
 
@@ -544,7 +521,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/100
      */
-    private function _100_Continue(): void
+    private function set100Continue(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 100 Continue";
     }
@@ -554,7 +531,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/101
      */
-    private function _101_SwitchingProtocols(): void
+    private function set101SwitchingProtocols(): void
     {
         if ($_SERVER["SERVER_PROTOCOL"] === "HTTP/1.1") {
             $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 101 Switching Protocols";
@@ -562,7 +539,7 @@ class HTTPResponse
             // self::$response["headers"]["Upgrade"] = null; // Inclure le nouveau protocole dans ce header
 
         } else {
-            $this->_200_OK("");
+            $this->set200OK("");
         }
     }
 
@@ -571,7 +548,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/103
      */
-    private function _103_EarlyHints(): void
+    private function set103EarlyHints(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 103 Early Hints";
         // $this->headers["Link"] = null; // En-tête Link à compléter par l'utilisateur
@@ -586,7 +563,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200
      */
-    private function _200_OK(): void
+    private function set200OK(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 200 OK";
     }
@@ -596,7 +573,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/201
      */
-    private function _201_Created(): void
+    private function set201Created(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 201 Created";
     }
@@ -606,7 +583,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/202
      */
-    private function _202_Accepted(): void
+    private function set202Accepted(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 202 Accepted";
     }
@@ -616,7 +593,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/203
      */
-    private function _203_NonAuthoritativeInformation(): void
+    private function set203NonAuthoritativeInformation(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 203 Non-Authoritative Information";
     }
@@ -626,7 +603,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/204
      */
-    private function _204_NoContent(): void
+    private function set204NoContent(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 204 No Content";
     }
@@ -636,7 +613,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/205
      */
-    private function _205_ResetContent(): void
+    private function set205ResetContent(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 205 Reset Content";
     }
@@ -646,7 +623,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/206
      */
-    private function _206_PartialContent(): void
+    private function set206PartialContent(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 206 Partial Content";
     }
@@ -659,7 +636,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301
      */
-    private function _301_MovedPermanently(): void
+    private function set301MovedPermanently(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 301 Moved Permanently";
     }
@@ -669,7 +646,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/302
      */
-    private function _302_Found(): void
+    private function set302Found(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 302 Found";
     }
@@ -679,7 +656,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/303
      */
-    private function _303_SeeOther(): void
+    private function set303SeeOther(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 303 See Other";
     }
@@ -689,7 +666,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304
      */
-    private function _304_NotModified(): void
+    private function set304NotModified(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 304 Not Modified";
         // Headers à envoyer : Cache-Control, Content-Location, ETag, Expires, and Vary
@@ -701,7 +678,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/307
      */
-    private function _307_TemporaryRedirect(): void
+    private function set307TemporaryRedirect(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 307 Temporary Redirect";
     }
@@ -711,7 +688,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/308
      */
-    private function _308_PermanentRedirect(): void
+    private function set308PermanentRedirect(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 308 Permanent Redirect";
     }
@@ -724,7 +701,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
      */
-    private function _400_BadRequest(): void
+    private function set400BadRequest(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 400 Bad Request";
     }
@@ -734,7 +711,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
      */
-    private function _401_Unauthorized(): void
+    private function set401Unauthorized(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 401 Unauthorized";
         // $this->headers["WWW-Authenticate"] = null; // En-tête WWW-Athenticate à renseigner par l'utilisateur
@@ -746,7 +723,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/402
      */
-    private function _402_PaymentRequired(): void
+    private function set402PaymentRequired(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 402 Payment Required";
     }
@@ -756,7 +733,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
      */
-    private function _403_Forbidden(): void
+    private function set403Forbidden(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 403 Forbidden";
     }
@@ -766,7 +743,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404
      */
-    private function _404_NotFound(): void
+    private function set404NotFound(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 404 Not Found";
     }
@@ -776,7 +753,7 @@ class HTTPResponse
      * 
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405
      */
-    private function _405_MethodNotAllowed(): void
+    private function set405MethodNotAllowed(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 405 Method Not Allowed";
     }
@@ -788,7 +765,7 @@ class HTTPResponse
      *  
      * @return array Contenu de la réponse HTTP
      */
-    private function _406_NotAcceptable(): void
+    private function set406NotAcceptable(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 406 Not Acceptable";
     }
@@ -798,7 +775,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/407
      */
-    private function _407_ProxyAuthenticationRequired(): void
+    private function set407ProxyAuthenticationRequired(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 407 Proxy Authentication Required";
     }
@@ -808,7 +785,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408
      */
-    private function _408_RequestTimeout(): void
+    private function set408RequestTimeout(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 408 Request Timeout";
     }
@@ -818,7 +795,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/409
      */
-    private function _409_Conflict(): void
+    private function set409Conflict(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 409 Conflict";
     }
@@ -828,7 +805,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/410
      */
-    private function _410_Gone(): void
+    private function set410Gone(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 410 Gone";
     }
@@ -838,7 +815,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/411
      */
-    private function _411_LengthRequired(): void
+    private function set411LengthRequired(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 411 Length Required";
     }
@@ -848,7 +825,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/412
      */
-    private function _412_PreconditionFailed(): void
+    private function set412PreconditionFailed(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 412 Precondition Failed";
     }
@@ -858,7 +835,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/413
      */
-    private function _413_PayloadTooLarge(): void
+    private function set413PayloadTooLarge(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 413 Payload Too Large";
     }
@@ -868,7 +845,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/414
      */
-    private function _414_URITooLong(): void
+    private function set414URITooLong(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 414 URI Too Long";
     }
@@ -878,7 +855,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/415
      */
-    private function _415_UnsupportedMediaType(): void
+    private function set415UnsupportedMediaType(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 415 Unsupported Media Type";
     }
@@ -888,7 +865,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/416
      */
-    private function _416_RangeNotSatisfiable(): void
+    private function set416RangeNotSatisfiable(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 416 Range Not Satisfiable";
     }
@@ -898,7 +875,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/417
      */
-    private function _417_ExpectationFailed(): void
+    private function set417ExpectationFailed(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 417 Expectation Failed";
     }
@@ -908,7 +885,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418
      */
-    private function _418_Imateapot(): void
+    private function set418Imateapot(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 418 I'm a teapot";
     }
@@ -918,7 +895,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
      */
-    private function _422_UnprocessableEntity(): void
+    private function set422UnprocessableEntity(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 422 Unprocessable Entity";
     }
@@ -928,7 +905,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/425
      */
-    private function _425_TooEarly(): void
+    private function set425TooEarly(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 425 Too Early";
     }
@@ -938,7 +915,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/426
      */
-    private function _426_UpgradeRequired(): void
+    private function set426UpgradeRequired(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 426 Upgrade Required";
     }
@@ -948,7 +925,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/428
      */
-    private function _428_PreconditionRequired(): void
+    private function set428PreconditionRequired(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 428 Precondition Required";
     }
@@ -958,7 +935,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
      */
-    private function _429_TooManyRequests(): void
+    private function set429TooManyRequests(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 429 Too Many Requests";
     }
@@ -968,7 +945,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/431
      */
-    private function _431_RequestHeaderFieldsTooLarge(): void
+    private function set431RequestHeaderFieldsTooLarge(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 431 Request Header Fields Too Large";
     }
@@ -978,7 +955,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/451
      */
-    private function _451_UnavailableForLegalReasons(): void
+    private function set451UnavailableForLegalReasons(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 451 Unavailable For Legal Reasons";
     }
@@ -991,7 +968,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
      */
-    private function _500_InternalServerError(): void
+    private function set500InternalServerError(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 500 Internal Server Error";
     }
@@ -1001,7 +978,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501
      */
-    private function _501_NotImplemented(): void
+    private function set501NotImplemented(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 501 Not Implemented";
     }
@@ -1011,7 +988,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502
      */
-    private function _502_BadGateway(): void
+    private function set502BadGateway(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 502 Bad Gateway";
     }
@@ -1021,7 +998,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503
      */
-    private function _503_ServiceUnavailable(): void
+    private function set503ServiceUnavailable(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 503 Service Unavailable";
     }
@@ -1031,7 +1008,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/504
      */
-    private function _504_GatewayTimeout(): void
+    private function set504GatewayTimeout(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 504 Gateway Timeout";
     }
@@ -1041,7 +1018,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/505
      */
-    private function _505_HTTPVersionNotSupported(): void
+    private function set505HTTPVersionNotSupported(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 505 HTTP Version Not Supported";
     }
@@ -1051,7 +1028,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/506
      */
-    private function _506_VariantAlsoNegotiates(): void
+    private function set506VariantAlsoNegotiates(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 506 Variant Also Negotiates";
     }
@@ -1061,7 +1038,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/507
      */
-    private function _507_InsufficientStorage(): void
+    private function set507InsufficientStorage(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 507 Insufficient Storage";
     }
@@ -1071,7 +1048,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/508
      */
-    private function _508_LoopDetected(): void
+    private function set508LoopDetected(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 508 Loop Detected";
     }
@@ -1081,7 +1058,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/510
      */
-    private function _510_NotExtended(): void
+    private function set510NotExtended(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 510 Not Extended";
     }
@@ -1091,7 +1068,7 @@ class HTTPResponse
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/511
      */
-    private function _511_NetworkAuthenticationRequired(): void
+    private function set511NetworkAuthenticationRequired(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 511 Network Authentication Required";
     }

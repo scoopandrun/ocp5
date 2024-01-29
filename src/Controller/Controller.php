@@ -11,6 +11,7 @@ use Twig\Extra\Markdown\MarkdownRuntime;
 use Twig\Extra\Markdown\MarkdownExtension;
 use App\Core\HTTP\HTTPRequest;
 use App\Core\HTTP\HTTPResponse;
+use App\Core\Constants;
 
 abstract class Controller
 {
@@ -25,7 +26,7 @@ abstract class Controller
         $this->request = new HTTPRequest();
         $this->response = new HTTPResponse();
 
-        $this->loader = new FilesystemLoader(TEMPLATES);
+        $this->loader = new FilesystemLoader(Constants::$TEMPLATES);
         $this->twig = new Environment($this->loader);
         $this->twig->addGlobal("user", $this->request->user);
         $this->twig->addExtension(new IntlExtension());
@@ -33,7 +34,7 @@ abstract class Controller
         $this->twig->addRuntimeLoader(
             new class implements RuntimeLoaderInterface
             {
-                public function load($class)
+                public function load(string $class)
                 {
                     if (MarkdownRuntime::class === $class) {
                         return new MarkdownRuntime(new DefaultMarkdown());
