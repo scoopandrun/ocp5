@@ -18,10 +18,10 @@ class ErrorController extends Controller
         // HTML response
         if ($this->request->acceptsHTML()) {
             $this->response
-                ->setHTML($this->twig->render("front/error.html.twig", [
+                ->sendHTML($this->twig->render("front/error.html.twig", [
                     "error" => $this->e
-                ]))
-                ->send();
+                ]));
+            return;
         }
 
         // JSON response
@@ -30,12 +30,11 @@ class ErrorController extends Controller
                 "message" => $this->e->getMessage(),
             ]);
 
-            $this->response
-                ->setJSON($json)
-                ->send();
+            $this->response->sendJSON($json);
+            return;
         }
 
         // Default response
-        $this->response->setText($this->e->getMessage())->send();
+        $this->response->sendText($this->e->getMessage());
     }
 }

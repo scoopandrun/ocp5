@@ -11,23 +11,23 @@ class Category
     {
     }
 
-    public function getId()
+    public function getId(): int|null
     {
         return $this->id;
     }
 
-    public function setId(?int $id)
+    public function setId(?int $id): static
     {
         $this->id = $id;
         return $this;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName(?string $name)
+    public function setName(?string $name): static
     {
         $this->name = $name ?? "Aucune catégorie";
         return $this;

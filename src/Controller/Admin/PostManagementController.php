@@ -52,6 +52,7 @@ class PostManagementController extends AdminController
 
         $categories = $categoryService->getAll();
 
+        /** @var array */
         $postData = $this->request->body["post"] ?? [];
 
         $formResult = $postService->checkData($postData);
@@ -66,7 +67,10 @@ class PostManagementController extends AdminController
                         compact("post", "categories", "formResult")
                     )
                 );
+            return;
         }
+
+        $postData["author"] = $this->request->user->getId();
 
         $postId = $postService->createPost($postData);
 
@@ -94,6 +98,7 @@ class PostManagementController extends AdminController
                         compact("post", "categories", "formResult")
                     )
                 );
+            return;
         }
 
         $postService->editPost($postId, $postData);
