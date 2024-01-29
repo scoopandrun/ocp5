@@ -1,0 +1,150 @@
+{% extends "front/layout.html.twig" %}
+
+{% block title %}
+	Blog -
+	{{ user.name }}
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% block javascript %}
+	<script defer src="/assets/js/front/user.js"></script>
+{% endblock %}
+
+{% block body %}
+	<!-- Page Header-->
+	<header class="masthead" style="background-image: url('/assets/img/home-bg.jpg')">
+		<div class="container position-relative px-4 px-lg-5 site-heading">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7">
+					<h1>Compte utilisateur</h1>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- Main Content-->
+	<div class="container px-4 px-lg-5">
+		<div class="row gx-4 gx-lg-5 justify-content-center">
+			<div
+				class="col-md-10 col-lg-8 col-xl-7">
+
+				<!-- Sign-in form -->
+				<div class="my-5">
+					<form id="userForm" method="POST" action="">
+
+						<div class="form-floating">
+							<input type="text" class="form-control" id="name" name="user[name]" placeholder="Nom" value="{{ user.name }}" autocomplete="name" required/>
+							<label for="name">Nom</label>
+							{% if formResult.errors.nameMissing %}
+								<div class="invalid-feedback">Le nom est requis.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating">
+							<input type="email" class="form-control" id="email" name="user[email]" placeholder="E-mail" value="{{ user.email }}" autocomplete="email" required/>
+							<label for="email">E-mail</label>
+							{% if user.emailVerified %}
+								<small class="text-success">Email vérifié</small>
+							{% else %}
+								<small>Email non vérifié (<a href="/user/sendVerificationEmail#userForm" id="sendVerificationEmail">renvoyer un email de vérification</a>)</small>
+							{% endif %}
+
+							<div id="verificationEmailErrorMessage" class="invalid-feedback d-none"></div>
+							{% if verificationEmailError %}
+								<div class="invalid-feedback">{{ verificationEmailError.message }}</div>
+							{% endif %}
+							{% if verificationEmailSuccess %}
+								<div class="fw-bold">{{ verificationEmailSuccess.message }}</div>
+							{% endif %}
+
+							{% if formResult.errors.emailMissing %}
+								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
+							{% endif %}
+							{% if formResult.errors.emailInvalid %}
+								<div class="invalid-feedback">L'adresse e-mail est invalide.</div>
+							{% endif %}
+							{% if formResult.errors.emailAlreadyTaken %}
+								<div class="invalid-feedback">L'adresse e-mail est déjà utilisée par un autre compte.</div>
+							{% endif %}
+						</div>
+
+						<div class="mt-5 fs-5">
+							<p class="m-0">Changement de mot de passe</p>
+							<p class="m-0">(laisser vide pour ne pas le modifier)</p>
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="current-password" name="user[current-password]" placeholder="Mot de passe" autocomplete="current-password"/>
+							<label for="current-password">Mot de passe actuel</label>
+							{% if formResult.errors.currentPasswordMissing %}
+								<div class="invalid-feedback">Le mot de passe actuel est requis.</div>
+							{% endif %}
+							{% if formResult.errors.currentPasswordInvalid %}
+								<div class="invalid-feedback">Le mot de passe actuel est invalide.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="new-password" name="user[new-password]" placeholder="Mot de passe" autocomplete="new-password"/>
+							<label for="new-password">Nouveau mot de passe</label>
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="password-confirm" name="user[password-confirm]" placeholder="Retapez le mot de passe" autocomplete="new-password"/>
+							<label for="password-confirm">Retapez le mot de passe</label>
+							{% if formResult.errors.passwordConfirmMissing %}
+								<div class="invalid-feedback">Le nouveau mot doit être retapé dans ce champ.</div>
+							{% endif %}
+							{% if formResult.errors.passwordMismatch %}
+								<div class="invalid-feedback">Le mot de passe n'a pas été corectement retapé.</div>
+							{% endif %}
+						</div>
+
+						<!-- Submit success message-->
+						{% if formResult.success %}
+							<div id="submitSuccessMessage">
+								<div class="text-center mb-3">
+									<div class="fw-bolder">Modifications enregistrées</div>
+								</div>
+							</div>
+						{% endif %}
+
+						<!-- Submit error message-->
+						{% if formResult.failure %}
+							<div id="submitErrorMessage">
+								<div class="text-center text-danger mb-3">
+									Une erreur est survenue.<br/>
+									Les modifications n'ont pas été enregistrées.
+								</div>
+							</div>
+						{% endif %}
+
+						<!-- Submit Button-->
+						<button class="btn btn-primary text-uppercase mt-4" id="submitButton" type="submit">Enregistrer</button>
+					</form>
+				</div>
+
+				<div class="my-5 text-center">
+					<a href="/logout" class="btn btn-primary text-uppercase">Se déconnecter</a>
+				</div>
+
+				<div class="my-5 text-center">
+					<form id="deleteAccount" action="/user/delete#deleteAccount" method="post">
+						{% if not showDeleteAccountConfirmation %}
+							<a href="/user/delete#deleteAccount" class="btn btn-danger text-uppercase" id="deleteAccountButton">Supprimer le compte</a>
+						{% else %}
+							<button type="submit" class="btn btn-outline-danger">Confirmer la suppression du compte</button>
+						{% endif %}
+						<div id="deleteAccountErrorMessage" class="invalid-feedback d-none"></div>
+						{% if deleteAccountFailure %}
+							<div class="invalid-feedback">{{ deleteAccountFailure.message }}</div>
+						{% endif %}
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

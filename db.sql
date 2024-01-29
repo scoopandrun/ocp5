@@ -15,9 +15,12 @@ USE `ocp5`;
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `email` VARCHAR(255),
-  `password` VARCHAR(255),
   `name` VARCHAR(255),
+  `email` VARCHAR(255),
+  `emailVerificationToken` CHAR(21) DEFAULT NULL,
+  `emailVerified` TINYINT (1) DEFAULT 0,
+  `password` VARCHAR(255),
+  `passwordResetToken` CHAR(21) DEFAULT NULL,
   `admin` TINYINT (1) DEFAULT 0,
   `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

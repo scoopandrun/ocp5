@@ -15,8 +15,9 @@ class EmailService
     private array $cc = [];
     private array $bcc = [];
     private string $subject = "";
-    private string $htmlBody;
-    private string $textBody;
+    private string $htmlBody = "";
+    private string $textBody = "";
+    private bool $isHTML = true;
 
     public function __construct()
     {
@@ -32,7 +33,7 @@ class EmailService
     {
         try {
             //Server settings
-            // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+            // $this->mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
             $this->mail->isSMTP();                                         //Send using SMTP
             $this->mail->Host       = $_ENV["SMTP_HOST"];                  //Set the SMTP server to send through
             $this->mail->SMTPAuth   = true;                                //Enable SMTP authentication
@@ -60,7 +61,7 @@ class EmailService
             }
 
             //Content
-            $this->mail->isHTML(true);                                  //Set email format to HTML
+            $this->mail->isHTML($this->isHTML);                                  //Set email format to HTML
             $this->mail->Subject = $this->subject;
             $this->mail->Body    = $this->htmlBody;
             if ($this->textBody) {
@@ -71,7 +72,12 @@ class EmailService
 
             return true;
         } catch (\Throwable $th) {
-            (new ErrorLogger(new \Exception($this->mail->ErrorInfo)))->log();
+            (new ErrorLogger($th))->log();
+
+            if ($this->mail->ErrorInfo) {
+                (new ErrorLogger(new \Exception($this->mail->ErrorInfo)))->log();
+            }
+
             return false;
         }
     }
@@ -122,6 +128,13 @@ class EmailService
         if ($plain) {
             $this->textBody = $plain;
         }
+
+        return $this;
+    }
+
+    public function setHTML(bool $isHTML)
+    {
+        $this->isHTML = $isHTML;
 
         return $this;
     }

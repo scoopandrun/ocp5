@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\{PostService, CategoryService};
 
-class PostManagementController extends Controller
+class PostManagementController extends AdminController
 {
     public function __construct()
     {
@@ -70,7 +70,7 @@ class PostManagementController extends Controller
 
         $postId = $postService->createPost($postData);
 
-        header("Location: /admin/posts");
+        $this->response->redirect("/admin/posts");
     }
 
     public function editPost(int $postId): void
@@ -98,7 +98,7 @@ class PostManagementController extends Controller
 
         $postService->editPost($postId, $postData);
 
-        header("Location: /admin/posts");
+        $this->response->redirect("/admin/posts");
     }
 
     public function deletePost(int $postId): void

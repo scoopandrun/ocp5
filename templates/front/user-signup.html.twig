@@ -1,0 +1,92 @@
+{% extends "front/layout.html.twig" %}
+
+{% block title %}
+	Blog - Création de compte
+{% endblock %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% block body %}
+	<!-- Page Header-->
+	<header class="masthead" style="background-image: url('/assets/img/home-bg.jpg')">
+		<div class="container position-relative px-4 px-lg-5 site-heading">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7">
+					<h1>Créer un compte</h1>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- Main Content-->
+	<div class="container px-4 px-lg-5">
+		<div class="row gx-4 gx-lg-5 justify-content-center">
+			<div
+				class="col-md-10 col-lg-8 col-xl-7">
+
+				<!-- Sign-up form -->
+				<div class="my-5">
+					<form id="signupForm" method="POST" action="">
+
+						<div class="form-floating">
+							<input type="text" class="form-control" id="name" name="signupForm[name]" placeholder="Entrez votre nom..." value="{{ formResult.values.name }}" maxlength="50" autocomplete="name" required/>
+							<label for="name">Nom</label>
+							{% if formResult.errors.name %}
+								<div class="invalid-feedback">Le nom est requis.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating">
+							<input type="email" class="form-control" id="email" name="signupForm[email]" placeholder="E-mail" value="{{ formResult.values.email }}" required/>
+							<label for="email">E-mail</label>
+							{% if formResult.errors.emailMissing %}
+								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
+							{% endif %}
+							{% if formResult.errors.emailInvalid %}
+								<div class="invalid-feedback">L'adresse e-mail est invalide.</div>
+							{% endif %}
+							{% if formResult.errors.emailAlreadyTaken %}
+								<div class="invalid-feedback">L'adresse e-mail est déjà utilisée par un autre compte.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="password" name="signupForm[new-password]" placeholder="Mot de passe" autocomplete="new-password" required/>
+							<label for="password">Mot de passe</label>
+							{% if formResult.errors.newPasswordMissing %}
+								<div class="invalid-feedback">Le mot de passe est obligatoire.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-floating">
+							<input type="password" class="form-control" id="password" name="signupForm[password-confirm]" placeholder="Retapez le mot de passe" autocomplete="new-password" required/>
+							<label for="password">Retapez le mot de passe</label>
+							{% if formResult.errors.passwordConfirmMissing %}
+								<div class="invalid-feedback">Le mot de passe doit être retapé dans ce champ.</div>
+							{% endif %}
+							{% if formResult.errors.passwordMismatch %}
+								<div class="invalid-feedback">Le mot de passe n'a pas été correctement retapé.</div>
+							{% endif %}
+						</div>
+
+						<!-- Submit error message-->
+						{% if formResult.failure %}
+							<div id="submitErrorMessage">
+								<div class="text-center text-danger mb-3">Une erreur est survenue.</div>
+							</div>
+						{% endif %}
+
+						<!-- Submit Button-->
+						<button class="btn btn-primary text-uppercase mt-4" id="submitButton" type="submit">Créer le compte</button>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="row gx-4 gx-lg-5 text-center mb-4">
+			<a href="/signup">Vous avez déjà un compte ? Identifiez-vous ici.</a>
+		</div>
+	</div>
+{% endblock %}
