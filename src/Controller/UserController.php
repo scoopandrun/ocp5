@@ -254,7 +254,7 @@ class UserController extends Controller
         }
     }
 
-    public function verifyEmail(string $token)
+    public function verifyEmail(string $token): void
     {
         $userService = new UserService();
 
