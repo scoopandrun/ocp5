@@ -24,6 +24,7 @@ session_start([
     "cookie_httponly" => true,
 ]);
 
+use App\Core\Constants;
 use App\Core\Router;
 use App\Core\ErrorLogger;
 use App\Controller\HomepageController;
@@ -35,6 +36,9 @@ use App\Controller\Admin\UserManagementController;
 use App\Controller\ErrorController;
 use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
+
+Constants::setRoot(ROOT);
+Constants::setTemplates(TEMPLATES);
 
 $routes = [
     // Front office
