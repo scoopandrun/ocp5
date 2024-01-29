@@ -1,0 +1,16 @@
+{
+  "short_name": "Nicolas DENIS",
+  "name": "Blog de Nicolas DENIS",
+  "icons": [
+    {
+      "src": "/assets/favicon.ico",
+      "sizes": "72x72"
+    }
+  ],
+  "id": "/",
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "display": "browser",
+  "scope": "/",
+  "description": "Site de présentation de Nicolas DENIS"
+}
