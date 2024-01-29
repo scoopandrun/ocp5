@@ -6,7 +6,7 @@
 	</a>
 	<p class="post-meta">
 		Posté par
-		<a href="#!">{{ post.author.name }}</a>
+		{{ post.author.name ?? "Anonyme" }}
 		le
 		{{ post.createdAt|format_date("full", locale="fr") }}
 		{% if post.category %}

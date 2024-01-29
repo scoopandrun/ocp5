@@ -9,7 +9,9 @@ class User implements \Stringable
     private ?int $id = null;
     private string $name = "Anonyme";
     private string $email = "";
-    private string $password = "";
+    private ?string $emailVerificationToken = null;
+    private bool $emailVerified = false;
+    private ?string $password = null;
     private bool $isAdmin = false;
     private ?DateTime $createdAt = null;
 
@@ -33,9 +35,9 @@ class User implements \Stringable
         return $this->name;
     }
 
-    public function setName(?string $name)
+    public function setName(string $name)
     {
-        $this->name = $name ?? "Anonyme";
+        $this->name = $name ?: "Anonyme";
         return $this;
     }
 
@@ -50,25 +52,63 @@ class User implements \Stringable
         return $this;
     }
 
+    public function getEmailVerificationToken()
+    {
+        return $this->emailVerificationToken;
+    }
+
+    public function setEmailVerificationToken(string|null $emailVerificationToken)
+    {
+        $this->emailVerificationToken = $emailVerificationToken;
+        return $this;
+    }
+
+    public function getEmailVerified()
+    {
+        return $this->emailVerified;
+    }
+
+    public function setEmailVerified(bool|int $emailVerified)
+    {
+        $this->emailVerified = (bool) $emailVerified;
+        return $this;
+    }
+
     public function getPassword()
     {
         return $this->password;
     }
 
-    public function setPassword(string $password)
+    /**
+     * @param null|string $password Hashed or clear password.  
+     *                              If the password is not hashed,
+     *                              the function will hash it.
+     */
+    public function setPassword(?string $password = null)
     {
-        $this->password = $password;
+        if (!$password) {
+            $this->password = null;
+        } else {
+            $passwordIsHashed = password_get_info($password)["algo"] > 0;
+
+            if (!$passwordIsHashed) {
+                $this->password = password_hash($password, PASSWORD_DEFAULT);
+            } else {
+                $this->password = $password;
+            }
+        }
+
         return $this;
     }
 
-    public function getAdmin()
+    public function getIsAdmin()
     {
         return $this->isAdmin;
     }
 
-    public function setAdmin(bool $isAdmin)
+    public function setIsAdmin(bool|int $isAdmin)
     {
-        $this->isAdmin = $isAdmin;
+        $this->isAdmin = (bool) $isAdmin;
         return $this;
     }
 
@@ -77,9 +117,18 @@ class User implements \Stringable
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt)
+    public function setCreatedAt(DateTime|string|null $createdAt)
     {
-        $this->createdAt = $createdAt;
+        if (is_null($createdAt)) {
+            $this->createdAt = null;
+        } elseif (gettype($createdAt) === "string") {
+            $this->createdAt = new DateTime($createdAt);
+        } elseif (gettype($createdAt) === "object" && $createdAt::class === DateTime::class) {
+            $this->createdAt = $createdAt;
+        } else {
+            $this->createdAt = null;
+        }
+
         return $this;
     }
 

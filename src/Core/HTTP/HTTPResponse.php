@@ -237,6 +237,8 @@ class HTTPResponse
     /**
      * Send the JSON response.
      * 
+     * The body must already be JSON-encoded.
+     * 
      * This method is a shortcut to:  
      * ```php
      * $response->setType("text")->setBody($json)->send()
@@ -266,6 +268,25 @@ class HTTPResponse
         $this->setType("text");
         $this->setBody($text);
         $this->send();
+    }
+
+    /**
+     * Redirect the user to the target URI.
+     * 
+     * The script exits after the redirect.
+     * 
+     * @param string $targetURI Target of the redirection.
+     * @param int    $code      Optional. HTTP status code. Default = 302.
+     */
+    public function redirect(string $targetURI, int $code = 302): void
+    {
+        $this
+            ->setCode($code)
+            ->addHeader("Location", $targetURI)
+            ->setBody(null)
+            ->setCompression(false)
+            ->setExit(true)
+            ->send();
     }
 
     /**

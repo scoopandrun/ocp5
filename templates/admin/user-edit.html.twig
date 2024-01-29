@@ -1,0 +1,81 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"href": "/admin/users",
+		"name": "Gestion des utilisateurs",
+		"title": "Gestion des utilisateurs"
+	},
+	{
+		"name": "Modification d'utilisateur"
+	},
+] %}
+
+
+{% block body %}
+	<header class="masthead page-heading">
+		<div class="container position-relative px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-3">
+					<div class="post-heading">
+						<h1>Modification d'utilisateur</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	{% if formResult.failure %}
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<div class="invalid-feedback">Une ou plusieurs erreur se sont produites</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<main>
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<form id="postForm" method="post" action="">
+						<div class="input-group input-group-static">
+							<label for="name">Nom</label>
+							<input type="text" id="name" name="user[name]" class="form-control" maxlength="255" placeholder="Nom" value="{{ user.name }}" required/>
+							{% if formResult.errors.nameMissing %}
+								<div class="invalid-feedback">Le nom est requis.</div>
+							{% endif %}
+							{% if formResult.errors.nameTooLong %}
+								<div class="invalid-feedback">Le nom ne doit pas dépasser 255 caractères.</div>
+							{% endif %}
+						</div>
+
+						<div class="input-group input-group-static mt-5">
+							<label for="email">E-mail</label>
+							<input type="email" id="email" name="user[email]" class="form-control" maxlength="255" placeholder="Adresse e-mail" value="{{ user.email }}" required/>
+							{% if formResult.errors.emailMissing %}
+								<div class="invalid-feedback">L'adresse e-mail est requise.</div>
+							{% endif %}
+							{% if formResult.errors.emailInvalid %}
+								<div class="invalid-feedback">L'adresse e-mail est invalide.</div>
+							{% endif %}
+						</div>
+
+						<div class="form-check form-switch mt-3">
+							<label for="admin" class="form-check-label">Administrateur/trice</label>
+							<input type="checkbox" id="admin" name="user[admin]" class="form-check-input" {{ user.isAdmin ? "checked" }}/>
+						</div>
+
+						<button class="btn btn-primary text-uppercase mt-5" id="submitButton" type="submit">Enregistrer</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</main>
+
+{% endblock %}
