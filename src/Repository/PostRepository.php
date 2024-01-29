@@ -200,7 +200,7 @@ class PostRepository
             "body" => $data["body"],
             "category" => (int) ($data["category"] ?? null) ?: null,
             "published" => (int) isset($data["isPublished"]),
-            "author" => 1, // TODO: change when user management is implemented
+            "author" => $data["author"],
         ]);
 
         $lastInsertId = $db->lastInsertId();

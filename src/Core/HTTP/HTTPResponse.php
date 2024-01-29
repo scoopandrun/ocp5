@@ -452,9 +452,6 @@ class HTTPResponse
     private function applyStatusCode(): void
     {
         match ($this->code) {
-            100 => $this->set100Continue(),
-            101 => $this->set101SwitchingProtocols(),
-            103 => $this->set103EarlyHints(),
             200 => $this->set200OK(),
             201 => $this->set201Created(),
             202 => $this->set202Accepted(),
@@ -516,44 +513,7 @@ class HTTPResponse
 
     /** === 1XX - INFORMATION === */
 
-    /**
-     * Response 100 (Continue).
-     * 
-     * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/100
-     */
-    private function set100Continue(): void
-    {
-        $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 100 Continue";
-    }
-
-    /**
-     * Response 101 (Switching Protocols).
-     * 
-     * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/101
-     */
-    private function set101SwitchingProtocols(): void
-    {
-        if ($_SERVER["SERVER_PROTOCOL"] === "HTTP/1.1") {
-            $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 101 Switching Protocols";
-            // self::$response["Connection"] = "upgrade";
-            // self::$response["headers"]["Upgrade"] = null; // Inclure le nouveau protocole dans ce header
-
-        } else {
-            $this->set200OK("");
-        }
-    }
-
-    /**
-     * Response 103 (Early Hints).
-     * 
-     * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/103
-     */
-    private function set103EarlyHints(): void
-    {
-        $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 103 Early Hints";
-        // $this->headers["Link"] = null; // En-tête Link à compléter par l'utilisateur
-
-    }
+    // Not implemented
 
 
     /** === 2XX - SUCCESS */
@@ -714,8 +674,6 @@ class HTTPResponse
     private function set401Unauthorized(): void
     {
         $this->headers[] = $_SERVER["SERVER_PROTOCOL"] . " 401 Unauthorized";
-        // $this->headers["WWW-Authenticate"] = null; // En-tête WWW-Athenticate à renseigner par l'utilisateur
-
     }
 
     /**

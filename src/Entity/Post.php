@@ -24,23 +24,23 @@ class Post
     {
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setId(int $id)
+    public function setId(int $id): static
     {
         $this->id = $id;
         return $this;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime|string $createdAt)
+    public function setCreatedAt(DateTime|string $createdAt): static
     {
         if (gettype($createdAt) === "string") {
             $this->createdAt = new DateTime($createdAt);
@@ -51,12 +51,12 @@ class Post
         return $this;
     }
 
-    public function getUpdatedAt()
+    public function getUpdatedAt(): DateTime|null
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(DateTime|string|null $updatedAt)
+    public function setUpdatedAt(DateTime|string|null $updatedAt): static
     {
         if (is_null($updatedAt)) {
             $this->updatedAt = null;
@@ -71,67 +71,67 @@ class Post
         return $this;
     }
 
-    public function getAuthor()
+    public function getAuthor(): User|null
     {
         return $this->author;
     }
 
-    public function setAuthor(?User $author)
+    public function setAuthor(?User $author): static
     {
         $this->author = $author;
         return $this;
     }
 
-    public function getCategory()
+    public function getCategory(): Category|null
     {
         return $this->category;
     }
 
-    public function setCategory(?Category $category)
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
         return $this;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title)
+    public function setTitle(string $title): static
     {
         $this->title = $title;
         return $this;
     }
 
-    public function getLeadParagraph()
+    public function getLeadParagraph(): string
     {
         return $this->leadParagraph;
     }
 
-    public function setLeadParagraph(string $leadParagraph)
+    public function setLeadParagraph(string $leadParagraph): static
     {
         $this->leadParagraph = $leadParagraph;
         return $this;
     }
 
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }
 
-    public function setBody(string $body)
+    public function setBody(string $body): static
     {
         $this->body = $body;
         return $this;
     }
 
-    public function getIsPublished()
+    public function getIsPublished(): bool
     {
         return $this->isPublished;
     }
 
-    public function setIsPublished(bool|int $isPublished)
+    public function setIsPublished(bool|int $isPublished): static
     {
         $this->isPublished = (bool) $isPublished;
         return $this;

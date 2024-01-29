@@ -132,7 +132,7 @@ class EmailService
         return $this;
     }
 
-    public function setHTML(bool $isHTML)
+    public function setHTML(bool $isHTML): static
     {
         $this->isHTML = $isHTML;
 
