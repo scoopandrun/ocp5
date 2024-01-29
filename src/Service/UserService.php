@@ -222,7 +222,7 @@ class UserService
         return $this->userRepository->deleteUser($id);
     }
 
-    private function generateEmailVerificationToken(): string
+    private function generateToken(): string
     {
         return (new Nanoid())->generateId(21);
     }
@@ -238,7 +238,7 @@ class UserService
     {
         $emailService = new EmailService();
 
-        $emailVerificationToken = $this->generateEmailVerificationToken();
+        $emailVerificationToken = $this->generateToken();
 
         $this->userRepository->setEmailVerificationToken($email, $emailVerificationToken);
 
