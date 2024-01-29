@@ -36,6 +36,7 @@ class UserController extends Controller
         // If the user is already connected, redirect to homepage
         if ($this->request->user) {
             $this->response->redirect("/");
+            return;
         }
 
         $_SESSION["referer"] = $_SERVER["HTTP_REFERER"] ?? null;
@@ -55,6 +56,7 @@ class UserController extends Controller
         // If the user is already connected, redirect to homepage
         if ($this->request->user) {
             $this->response->redirect("/");
+            return;
         }
 
         $_SESSION["referer"] = $_SERVER["HTTP_REFERER"] ?? null;
@@ -90,6 +92,7 @@ class UserController extends Controller
                         ]
                     )
                 );
+            return;
         }
 
         // Redirect to the previous page or the homepage if no referer
@@ -127,6 +130,7 @@ class UserController extends Controller
                         compact("formResult")
                     )
                 );
+            return;
         }
 
         $userData["password"] = $userData["new-password"];
@@ -168,6 +172,7 @@ class UserController extends Controller
                         compact("user", "formResult")
                     )
                 );
+            return;
         }
 
         $userData["id"] = $user->getId();
@@ -242,6 +247,7 @@ class UserController extends Controller
                 "L'adresse e-mail est déjà vérifiée.",
                 400
             );
+            return;
         }
 
         $userService = new UserService();
@@ -306,6 +312,7 @@ class UserController extends Controller
                 $formResult["error"],
                 400
             );
+            return;
         }
 
         $emailSent = $userService->sendPasswordResetEmail($formData);
@@ -370,6 +377,7 @@ class UserController extends Controller
                 $formResult["error"],
                 400
             );
+            return;
         }
 
         /** @var string */

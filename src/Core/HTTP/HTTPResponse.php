@@ -14,7 +14,6 @@ class HTTPResponse
     private ?string $body = null;
     private bool $compression = true;
     private string $type = 'text/html; charset=UTF-8';
-    private bool $exit = true;
     private bool $isSent = false;
 
     public function __construct(?int $code = null)
@@ -46,17 +45,6 @@ class HTTPResponse
         }
 
         $this->isSent = true;
-
-        // Script exit
-        if ($this->exit) {
-            if ($this->code >= 400) {
-                $exitCode = $this->code;
-            } else {
-                $exitCode = 0;
-            }
-
-            exit($exitCode);
-        }
     }
 
     /**
@@ -258,8 +246,6 @@ class HTTPResponse
     /**
      * Redirect the user to the target URI.
      * 
-     * The script exits after the redirect.
-     * 
      * @param string $targetURI Target of the redirection.
      * @param int    $code      Optional. HTTP status code. Default = 302.
      */
@@ -270,7 +256,6 @@ class HTTPResponse
             ->addHeader("Location", $targetURI)
             ->setBody(null)
             ->setCompression(false)
-            ->setExit(true)
             ->send();
     }
 
@@ -289,23 +274,6 @@ class HTTPResponse
 
         return $this;
     }
-
-    /**
-     * Set if the script must exit after sending the HTTP reponse.
-     * 
-     * Default is `TRUE`.
-     * 
-     * @param bool $exit 
-     * 
-     * @return HTTPResponse
-     */
-    public function setExit(bool $exit = true): HTTPResponse
-    {
-        $this->exit = $exit;
-
-        return $this;
-    }
-
 
     /**
      * Compress the HTTP response body.

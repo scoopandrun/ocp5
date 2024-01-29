@@ -61,12 +61,14 @@ class UserManagementController extends AdminController
                         compact("user", "formResult")
                     )
                 );
+            return;
         }
 
         $userData["id"] = $userId;
-        $user = $userService->makeUserObject($userData);
+        $userOriginal = $userService->getUser($userId);
+        $userEdited = $userService->makeUserObject($userData);
 
-        $userService->editUser($user);
+        $userService->editUser($userEdited, $userOriginal);
 
         $this->response->redirect("/admin/users");
     }
