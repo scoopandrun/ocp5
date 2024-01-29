@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `emailVerificationToken` CHAR(21) DEFAULT NULL,
   `emailVerified` TINYINT (1) DEFAULT 0,
   `password` VARCHAR(255),
+  `passwordResetToken` CHAR(21) DEFAULT NULL,
   `admin` TINYINT (1) DEFAULT 0,
   `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

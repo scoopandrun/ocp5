@@ -74,6 +74,14 @@ $routes = [
         "GET" => fn () => (new UserController())->showSignupPage(),
         "POST" => fn () => (new UserController())->createAccount(),
     ],
+    "/passwordReset" => [
+        "GET" => fn () => (new UserController())->showPaswordResetAskEmailPage(),
+        "POST" => fn () => (new UserController())->sendPasswordResetEmail(),
+    ],
+    "/passwordReset/([\w-]{21})" => [
+        "GET" => fn (string $token) => (new UserController())->showPaswordResetChangePasswordPage($token),
+        "POST" => fn (string $token) => (new UserController())->resetPassword($token),
+    ],
     // Back office
     "/admin" => [
         "GET" => fn () => (new DashboardController())->show(),

@@ -286,11 +286,87 @@ class UserRepository
 
         $req = $db->prepare(
             "UPDATE users
-            SET emailVerified = 1
+            SET
+                emailVerified = 1,
+                emailVerificationToken = NULL
             WHERE emailVerificationToken = :token"
         );
 
         $req->execute(["token" => $emailVerificationToken]);
+
+        $rowsAffected = $req->rowCount();
+
+        return (bool) $rowsAffected;
+    }
+
+    /**
+     * 
+     * @param string $email 
+     * @param string $token 
+     * @return int|false `1` if a token has been set (valid e-mail),  
+     *                   `0` if no token has been set (unknown e-mail),  
+     *                   `false` in case of an error.
+     */
+    public function setPasswordResetToken(string $email, string $token): int|false
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "UPDATE users
+            SET passwordResetToken = :token
+            WHERE email = :email"
+        );
+
+        $success = $req->execute(compact("email", "token"));
+
+        if (!$success) {
+            return false;
+        }
+
+        $rowsAffected = $req->rowCount();
+
+        return $rowsAffected;
+    }
+
+    /**
+     * @param string $token Password verification token.
+     * 
+     * @return bool `true` if the token is valid, `false` otherwise.
+     */
+    public function checkIfPasswordResetTokenIsRegistered(string $token): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "SELECT COUNT(*)
+            FROM users
+            WHERE passwordResetToken = :token"
+        );
+
+        $req->execute(compact("token"));
+
+        $tokenIsValid = (bool) $req->fetch(\PDO::FETCH_COLUMN);
+
+        return $tokenIsValid;
+    }
+
+    public function resetPassword(string $token, string $password): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "UPDATE users
+            SET
+                password = :password,
+                passwordResetToken = NULL
+            WHERE passwordResetToken = :token"
+        );
+
+        $success = $req->execute(compact("password", "token"));
+
+        if (!$success) {
+            return false;
+        }
 
         $rowsAffected = $req->rowCount();
 
