@@ -19,62 +19,62 @@ class User implements \Stringable
     {
     }
 
-    public function getId()
+    public function getId(): int|null
     {
         return $this->id;
     }
 
-    public function setId(?int $id)
+    public function setId(?int $id): static
     {
         $this->id = $id;
         return $this;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): static
     {
         $this->name = $name ?: "Anonyme";
         return $this;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email)
+    public function setEmail(string $email): static
     {
         $this->email = $email;
         return $this;
     }
 
-    public function getEmailVerificationToken()
+    public function getEmailVerificationToken(): string|null
     {
         return $this->emailVerificationToken;
     }
 
-    public function setEmailVerificationToken(string|null $emailVerificationToken)
+    public function setEmailVerificationToken(string|null $emailVerificationToken): static
     {
         $this->emailVerificationToken = $emailVerificationToken;
         return $this;
     }
 
-    public function getEmailVerified()
+    public function getEmailVerified(): bool
     {
         return $this->emailVerified;
     }
 
-    public function setEmailVerified(bool|int $emailVerified)
+    public function setEmailVerified(bool|int $emailVerified): static
     {
         $this->emailVerified = (bool) $emailVerified;
         return $this;
     }
 
-    public function getPassword()
+    public function getPassword(): string|null
     {
         return $this->password;
     }
@@ -84,7 +84,7 @@ class User implements \Stringable
      *                              If the password is not hashed,
      *                              the function will hash it.
      */
-    public function setPassword(?string $password = null)
+    public function setPassword(?string $password = null): static
     {
         if (!$password) {
             $this->password = null;
@@ -101,23 +101,23 @@ class User implements \Stringable
         return $this;
     }
 
-    public function getIsAdmin()
+    public function getIsAdmin(): bool
     {
         return $this->isAdmin;
     }
 
-    public function setIsAdmin(bool|int $isAdmin)
+    public function setIsAdmin(bool|int $isAdmin): static
     {
         $this->isAdmin = (bool) $isAdmin;
         return $this;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): DateTime|null
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTime|string|null $createdAt)
+    public function setCreatedAt(DateTime|string|null $createdAt): static
     {
         if (is_null($createdAt)) {
             $this->createdAt = null;
