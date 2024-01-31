@@ -1,0 +1,14 @@
+<li class="list-group-item" id="comment-{{ comment.id }}">
+	<div>
+		{{ comment.author }}, le
+		{{ comment.createdAt|format_date("short", locale="fr") }}
+	</div>
+
+	<div class="fw-bold">
+		{{ comment.title }}
+	</div>
+
+	<div>
+		{{ comment.body }}
+	</div>
+</li>

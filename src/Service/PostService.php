@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\PostRepository;
 use App\Entity\Post;
+use App\Service\CommentService;
 
 class PostService
 {
@@ -17,12 +18,20 @@ class PostService
     /**
      * Get a single blog post based on its ID.
      * 
-     * @param int $id             ID of the blog post.
+     * @param int  $id            ID of the blog post.
      * @param bool $publishedOnly Optional. Fetch only if the post is published. Default = `true`.
      */
-    public function getPost(int $id, bool $publishedOnly = true): Post | null
+    public function getPost(int $id, bool $publishedOnly = true, bool $withComments = true): Post | null
     {
-        return $this->postRepository->getPost($id, $publishedOnly);
+        $post = $this->postRepository->getPost($id, $publishedOnly);
+
+        if ($post && $withComments) {
+            $commentService = new CommentService();
+            $comments = $commentService->getPostComments($id);
+            $post->setComments($comments);
+        }
+
+        return $post;
     }
 
     /**

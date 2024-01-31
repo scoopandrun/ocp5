@@ -1,0 +1,64 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"href": "/admin/comments",
+		"name": "Gestion des commentaires",
+		"title": "Gestion des commentaires"
+	},
+	{
+		"name": "Revue de commentaire"
+	},
+] %}
+
+
+{% block body %}
+	<header class="masthead page-heading">
+		<div class="container position-relative px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-3">
+					<div class="post-heading">
+						<h1>Revue de commentaire</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<main>
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<form id="commentForm" method="post" action="">
+						<div class="input-group input-group-static">
+							<label for="title">Titre</label>
+							<input type="text" id="title" name="post[title]" class="form-control" maxlength="255" placeholder="Titre" value="{{ comment.title }}" required/>
+							{% if formResult.errors.titleMissing %}
+								<div class="invalid-feedback">Le titre est requis.</div>
+							{% endif %}
+							{% if formResult.errors.titleTooLong %}
+								<div class="invalid-feedback">Le titre ne doit pas dépasser 255 caractères.</div>
+							{% endif %}
+						</div>
+
+						<div class="input-group input-group-static mt-4">
+							<label for="body">Corps du commentaire</label>
+							<textarea class="form-control" id="body" name="post[body]" placeholder="Entrez le corps du post" style="height: 10rem" required>{{ comment.body }}</textarea>
+						</div>
+
+						<div class="form-check form-switch mt-3">
+							<label for="isApproved" class="form-check-label">Approuver ce commentaire</label>
+							<input type="checkbox" id="isApproved" name="post[isApproved]" class="form-check-input" {{ post.isApproved ? "checked" }}/>
+						</div>
+
+						<button class="btn btn-primary text-uppercase mt-5" id="submitButton" type="submit">Enregistrer</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</main>
+{% endblock %}

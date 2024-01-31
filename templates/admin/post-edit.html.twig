@@ -97,6 +97,11 @@
 							<input type="checkbox" id="isPublished" name="post[isPublished]" class="form-check-input" {{ post.isPublished ? "checked" }}/>
 						</div>
 
+						<div class="form-check form-switch mt-3">
+							<label for="commentsAllowed" class="form-check-label">Autoriser les commentaires</label>
+							<input type="checkbox" id="commentsAllowed" name="post[commentsAllowed]" class="form-check-input" {{ post.commentsAllowed ? "checked" }}/>
+						</div>
+
 						<button class="btn btn-primary text-uppercase mt-5" id="submitButton" type="submit">Enregistrer</button>
 					</div>
 				</div>

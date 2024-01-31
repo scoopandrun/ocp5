@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
   `author` INT,
   `category` INT,
   `published` TINYINT (1) DEFAULT 1,
+  `commentsAllowed` TINYINT(1) DEFAULT 1,
   `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` DATETIME DEFAULT NULL,
   PRIMARY KEY (`id`),

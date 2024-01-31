@@ -29,9 +29,11 @@ use App\Core\Router;
 use App\Core\ErrorLogger;
 use App\Controller\HomepageController;
 use App\Controller\PostController;
+use App\Controller\CommentController;
 use App\Controller\UserController;
 use App\Controller\Admin\DashboardController;
 use App\Controller\Admin\PostManagementController;
+use App\Controller\Admin\CommentManagementController;
 use App\Controller\Admin\UserManagementController;
 use App\Controller\ErrorController;
 use App\Core\Exceptions\Client\ClientException;
@@ -51,6 +53,10 @@ $routes = [
     ],
     "/posts/(\d+)" => [
         "GET" => fn (int $id) => (new PostController())->showOne($id),
+    ],
+    "/posts/(\d+)/createComment" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "POST" => fn (int $postId) => (new CommentController())->createComment($postId),
     ],
     "/user" => [
         "GET" => fn () => (new UserController())->showAccountPage(),
@@ -102,6 +108,14 @@ $routes = [
     "/admin/posts/create" => [
         "GET" => fn () => (new PostManagementController())->showEditPage(),
         "POST" => fn () => (new PostManagementController())->createPost(),
+    ],
+    "/admin/comments" => [
+        "GET" => fn () => (new CommentManagementController())->show(),
+    ],
+    "/admin/comments/(\d+)" => [
+        "GET" => fn (int $id) => (new CommentManagementController())->showReviewPage($id),
+        "POST" => fn (int $id) => (new CommentManagementController())->editComment($id),
+        "DELETE" => fn (int $id) => (new CommentManagementController())->deleteComment($id),
     ],
     "/admin/users" => [
         "GET" => fn () => (new UserManagementController())->show(),

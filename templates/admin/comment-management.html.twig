@@ -1,0 +1,90 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"name": "Gestion des commentaires"
+	}
+] %}
+
+
+{% block body %}
+	<h1 class="mb-3">Gestion des commentaires</h1>
+
+	<div class="card">
+		<div class="table-responsive">
+			<div class="dataTable-wrapper">
+				<div class="dataTable-container">
+					<table id="datatable" class="table align-items-center mb-0 dataTable-table">
+						<thead>
+							<tr class="d-none d-md-table-row">
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Date</th>
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Auteur</th>
+								<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Titre</th>
+								<th class="text-secondary opacity-7"></th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for comment in comments %}
+								<tr data-comment-id="{{ comment.id }}">
+									<td>
+										<p class="text-xs mb-0">{{ comment.createdAt|format_date("short", locale="fr") }}</p>
+										<div class="d-md-none mt-1">
+											<p class="text-xs text-secondary mb-0">
+												{{ comment.author }}
+											</p>
+											<p class="text-xs text-secondary mb-0">
+												{{ comment.title }}
+											</p>
+										</div>
+									</td>
+
+									<td class="d-none d-md-table-cell">
+										<div class="d-flex px-2 py-1">
+											<div class="d-flex flex-column justify-content-center">
+												<h6 class="mb-0 text-xs">{{ comment.author }}</h6>
+
+											</div>
+										</div>
+									</td>
+
+									<td class="d-none d-md-table-cell">
+										<div class="d-flex px-2 py-1">
+											<div class="d-flex flex-column justify-content-center">
+												<h6 class="mb-0 text-xs">{{ comment.title }}</h6>
+
+											</div>
+										</div>
+									</td>
+
+									<td class="align-middle">
+										<div class="row text-center">
+											<div class="col">
+												<a href="/admin/comments/{{ comment.id }}" class="text-secondary font-weight-normal text-xs" title="Modifier le commentaire">
+													Modifier
+												</a>
+											</div>
+											<div class="col">
+												<button type="button" class="btn btn-outline-danger btn-sm mb-0" title="Supprimer le commentaire" data-delete>
+													<span class="text">Supprimer</span>
+													<span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+												</button>
+											</div>
+										</div>
+									</td>
+
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+{% endblock %}
