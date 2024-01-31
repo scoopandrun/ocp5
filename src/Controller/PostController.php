@@ -7,11 +7,6 @@ use App\Service\PostService;
 
 class PostController extends Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function showAll(): void
     {
         $postService = new PostService();

@@ -7,11 +7,6 @@ use App\Service\PostService;
 
 class HomepageController extends Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function show(): void
     {
         $postService = new PostService();

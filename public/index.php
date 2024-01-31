@@ -86,6 +86,7 @@ $routes = [
         "GET" => fn (string $token) => (new UserController())->showPaswordResetChangePasswordPage($token),
         "POST" => fn (string $token) => (new UserController())->resetPassword($token),
     ],
+
     // Back office
     "/admin" => [
         "GET" => fn () => (new DashboardController())->show(),
