@@ -13,7 +13,6 @@ class Comment
     private ?int $id = null;
     private int $postId;
     private DateTime $createdAt;
-    private ?DateTime $updatedAt = null;
     private ?User $author = null;
     private string $title = "";
     private string $body = "";
@@ -56,26 +55,6 @@ class Comment
             $this->createdAt = new DateTime($createdAt);
         } elseif ($createdAt::class === DateTime::class) {
             $this->createdAt = $createdAt;
-        }
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): DateTime|null
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(DateTime|string|null $updatedAt): static
-    {
-        if (is_null($updatedAt)) {
-            $this->updatedAt = null;
-        } elseif (gettype($updatedAt) === "string") {
-            $this->updatedAt = new DateTime($updatedAt);
-        } elseif (gettype($updatedAt) === "object" && $updatedAt::class === DateTime::class) {
-            $this->updatedAt = $updatedAt;
-        } else {
-            $this->updatedAt = null;
         }
 
         return $this;
