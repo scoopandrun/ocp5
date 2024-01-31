@@ -82,7 +82,7 @@ class UserService
      * @param int $pageNumber     Page number.
      * @param int $pageSize       Number of users to show on a page.
      * 
-     * @return array<array-key, \App\Entity\User> 
+     * @return array<int, \App\Entity\User> 
      */
     public function getUsers(int $pageNumber, int $pageSize): array
     {

@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `createdAt` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE (`email`),
-  KEY (`email`, `password`)
+  KEY (`email`, `password`),
+  KEY (`id`, `name`)
 );
 
 CREATE TABLE IF NOT EXISTS `categories` (
