@@ -28,7 +28,6 @@ class CommentService
             ->setId($commentData["id"] ?? null)
             ->setPostId($commentData["postId"])
             ->setCreatedAt($commentData["createdAt"] ?? "now")
-            ->setUpdatedAt($commentData["updatedAt"] ?? null)
             ->setAuthor($author)
             ->setIsApproved($commentData["approved"] ?? false)
             ->setTitle($commentData["title"] ?? "")

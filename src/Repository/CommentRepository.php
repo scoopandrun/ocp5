@@ -21,7 +21,6 @@ class CommentRepository extends Repository
             "SELECT
                 c.postId,
                 c.createdAt,
-                c.updatedAt,
                 u.id as authorId,
                 u.name as authorName,
                 c.approved,
@@ -51,7 +50,6 @@ class CommentRepository extends Repository
             ->setId($id)
             ->setPostId($commentRaw["postId"])
             ->setCreatedAt($commentRaw["createdAt"])
-            ->setUpdatedAt($commentRaw["updatedAt"])
             ->setAuthor($author)
             ->setIsApproved($commentRaw["approved"])
             ->setTitle($commentRaw["title"])
@@ -82,8 +80,7 @@ class CommentRepository extends Repository
                 u.id as authorId,
                 u.name as authorName,
                 c.approved,
-                c.createdAt,
-                c.updatedAt
+                c.createdAt
             FROM comments c
             LEFT JOIN users u ON u.id = c.author
             WHERE c.postId = :postId
@@ -113,66 +110,7 @@ class CommentRepository extends Repository
                 ->setBody($commentRaw["body"])
                 ->setAuthor($author)
                 ->setIsApproved($commentRaw["approved"])
-                ->setCreatedAt($commentRaw["createdAt"])
-                ->setUpdatedAt($commentRaw["updatedAt"]);
-
-            return $comment;
-        }, $commentsRaw);
-
-        $req->closeCursor();
-
-        return $comments;
-    }
-
-    /**
-     * Fetch the comments to be approved.
-     * 
-     * @return array<int, \App\Entity\Comment> 
-     */
-    public function getCommentsToApprove(): array
-    {
-        $db = $this->connection;
-
-        $req = $db->prepare(
-            "SELECT
-                c.id,
-                c.postId,
-                c.title,
-                c.body,
-                u.id as authorId,
-                u.name as authorName,
-                c.createdAt,
-                c.updatedAt
-            FROM comments c
-            LEFT JOIN posts p ON p.id = c.postId
-            LEFT JOIN users u ON u.id = p.author
-            WHERE approved = 0
-            ORDER BY c.createdAt ASC"
-        );
-
-        $req->execute();
-
-        $commentsRaw = $req->fetchAll();
-
-        if ($commentsRaw === false) {
-            throw new DBException("Erreur lors de la récupération des commentaires.");
-        }
-
-        $comments = array_map(function ($commentRaw) {
-            $author = !is_null($commentRaw["authorId"]) ?
-                (new User)
-                ->setId($commentRaw["authorId"])
-                ->setName($commentRaw["authorName"])
-                : null;
-
-            $comment = (new Comment)
-                ->setId($commentRaw["id"])
-                ->setPostId($commentRaw["postId"])
-                ->setTitle($commentRaw["title"])
-                ->setBody($commentRaw["body"])
-                ->setAuthor($author)
-                ->setCreatedAt($commentRaw["createdAt"])
-                ->setUpdatedAt($commentRaw["updatedAt"]);
+                ->setCreatedAt($commentRaw["createdAt"]);
 
             return $comment;
         }, $commentsRaw);
@@ -248,5 +186,61 @@ class CommentRepository extends Repository
         }
 
         return (int) $lastInsertId;
+    }
+
+    /**
+     * Fetch the comments to be approved.
+     * 
+     * @return array<int, \App\Entity\Comment> 
+     */
+    public function getCommentsToApprove(): array
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "SELECT
+                c.id,
+                c.postId,
+                c.title,
+                c.body,
+                u.id as authorId,
+                u.name as authorName,
+                c.createdAt
+            FROM comments c
+            LEFT JOIN posts p ON p.id = c.postId
+            LEFT JOIN users u ON u.id = p.author
+            WHERE approved = 0
+            ORDER BY c.createdAt ASC"
+        );
+
+        $req->execute();
+
+        $commentsRaw = $req->fetchAll();
+
+        if ($commentsRaw === false) {
+            throw new DBException("Erreur lors de la récupération des commentaires.");
+        }
+
+        $comments = array_map(function ($commentRaw) {
+            $author = !is_null($commentRaw["authorId"]) ?
+                (new User)
+                ->setId($commentRaw["authorId"])
+                ->setName($commentRaw["authorName"])
+                : null;
+
+            $comment = (new Comment)
+                ->setId($commentRaw["id"])
+                ->setPostId($commentRaw["postId"])
+                ->setTitle($commentRaw["title"])
+                ->setBody($commentRaw["body"])
+                ->setAuthor($author)
+                ->setCreatedAt($commentRaw["createdAt"]);
+
+            return $comment;
+        }, $commentsRaw);
+
+        $req->closeCursor();
+
+        return $comments;
     }
 }
