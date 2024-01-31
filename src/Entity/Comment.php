@@ -3,25 +3,21 @@
 namespace App\Entity;
 
 use App\Core\DateTime;
-use App\Entity\{User, Category};
+use App\Entity\User;
 
 /**
- * A blog post.
+ * A blog post comment.
  */
-class Post
+class Comment
 {
-    private int $id;
+    private ?int $id = null;
+    private int $postId;
     private DateTime $createdAt;
     private ?DateTime $updatedAt = null;
     private ?User $author = null;
-    private ?Category $category = null;
     private string $title = "";
-    private string $leadParagraph = "";
     private string $body = "";
-    private bool $isPublished = true;
-    private bool $commentsAllowed = true;
-    /** @var array<int, \App\Entity\Comment> */
-    private array $comments = [];
+    private bool $isApproved = false;
 
     public function __construct()
     {
@@ -32,9 +28,20 @@ class Post
         return $this->id;
     }
 
-    public function setId(int $id): static
+    public function setId(?int $id): static
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function getPostId(): int
+    {
+        return $this->postId;
+    }
+
+    public function setPostId(int $postId): static
+    {
+        $this->postId = $postId;
         return $this;
     }
 
@@ -85,17 +92,6 @@ class Post
         return $this;
     }
 
-    public function getCategory(): Category|null
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?Category $category): static
-    {
-        $this->category = $category;
-        return $this;
-    }
-
     public function getTitle(): string
     {
         return $this->title;
@@ -104,17 +100,6 @@ class Post
     public function setTitle(string $title): static
     {
         $this->title = $title;
-        return $this;
-    }
-
-    public function getLeadParagraph(): string
-    {
-        return $this->leadParagraph;
-    }
-
-    public function setLeadParagraph(string $leadParagraph): static
-    {
-        $this->leadParagraph = $leadParagraph;
         return $this;
     }
 
@@ -129,42 +114,14 @@ class Post
         return $this;
     }
 
-    public function getIsPublished(): bool
+    public function getIsApproved(): bool
     {
-        return $this->isPublished;
+        return $this->isApproved;
     }
 
-    public function setIsPublished(bool|int $isPublished): static
+    public function setIsApproved(bool|int $isApproved): static
     {
-        $this->isPublished = (bool) $isPublished;
-        return $this;
-    }
-
-    public function getCommentsAllowed(): bool
-    {
-        return $this->commentsAllowed;
-    }
-
-    public function setCommentsAllowed(bool|int $commentsAllowed): static
-    {
-        $this->commentsAllowed = (bool) $commentsAllowed;
-        return $this;
-    }
-
-    /**
-     * @return array<int, \App\Entity\Comment>
-     */
-    public function getComments(): array
-    {
-        return $this->comments;
-    }
-
-    /**
-     * @param array<int, \App\Entity\Comment> $comments
-     */
-    public function setComments(array $comments): static
-    {
-        $this->comments = $comments;
+        $this->isApproved = (bool) $isApproved;
         return $this;
     }
 }
