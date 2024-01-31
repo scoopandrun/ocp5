@@ -2,19 +2,11 @@
 
 namespace App\Repository;
 
-use App\Core\Database\MySQLConnection;
 use App\Core\Exceptions\Server\DB\DBException;
 use App\Entity\Category;
 
-class CategoryRepository
+class CategoryRepository extends Repository
 {
-    private MySQLConnection $connection;
-
-    public function __construct(MySQLConnection $connection = new MySQLConnection)
-    {
-        $this->connection = $connection;
-    }
-
     /**
      * Fetch a single blog post based on its ID.
      * 

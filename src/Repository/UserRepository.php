@@ -2,20 +2,12 @@
 
 namespace App\Repository;
 
-use App\Core\Database\MySQLConnection;
 use App\Core\Exceptions\Server\DB\DBException;
 use App\Service\UserService;
 use App\Entity\User;
 
-class UserRepository
+class UserRepository extends Repository
 {
-    private MySQLConnection $connection;
-
-    public function __construct(MySQLConnection $connection = new MySQLConnection)
-    {
-        $this->connection = $connection;
-    }
-
     /**
      * Fetch a single user based on its ID.
      * 
@@ -60,7 +52,7 @@ class UserRepository
      * @param int $pageNumber     Page number.
      * @param int $pageSize       Number of users to show on a page.
      * 
-     * @return array<array-key, \App\Entity\User> 
+     * @return array<int, \App\Entity\User> 
      */
     public function getUsers(int $pageNumber, int $pageSize): array
     {
@@ -371,5 +363,37 @@ class UserRepository
         $rowsAffected = $req->rowCount();
 
         return (bool) $rowsAffected;
+    }
+
+    /**
+     * Fetch an author (= light-weight user) based on its ID.
+     * 
+     * @param int $id ID of the author.
+     */
+    public function getAuthor(int $id): User | null
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "SELECT
+                u.id,
+                u.name
+            FROM users u
+            WHERE u.id = :id"
+        );
+
+        $req->execute(compact("id"));
+
+        $authorRaw = $req->fetch();
+
+        if (!$authorRaw) {
+            return null;
+        }
+
+        $userService = new UserService();
+
+        $author = $userService->makeUserObject($authorRaw);
+
+        return $author;
     }
 }

@@ -32,7 +32,7 @@ class PostService
      * @param int $pageSize       Number of blog posts to show on a page.
      * @param bool $publishedOnly Optional. Fetch only published posts. Default = `true`.
      * 
-     * @return array<array-key, \App\Entity\Post> 
+     * @return array<int, \App\Entity\Post> 
      */
     public function getPostsSummaries(int $pageNumber, int $pageSize, bool $publishedOnly = true): array
     {
@@ -49,16 +49,16 @@ class PostService
         return $this->postRepository->getPostCount($publishedOnly);
     }
 
-    public function checkData(array $data): array
+    public function checkFormData(array $formData): array
     {
         $formResult = [
             "success" => false,
             "failure" => false,
             "errors" => [
-                "titleMissing" => !$data["title"] || $data["title"] === "",
-                "titleTooLong" => $data["title"] && mb_strlen($data["title"]) > 255,
-                "leadParagraphTooLong" => $data["leadParagraph"] && mb_strlen($data["leadParagraph"]) > 255,
-                "bodyTooLong" => $data["body"] && strlen($data["body"]) > pow(2, 16) + 2, // MySQL TEXT limit
+                "titleMissing" => !$formData["title"] || $formData["title"] === "",
+                "titleTooLong" => $formData["title"] && mb_strlen($formData["title"]) > 255,
+                "leadParagraphTooLong" => $formData["leadParagraph"] && mb_strlen($formData["leadParagraph"]) > 255,
+                "bodyTooLong" => $formData["body"] && strlen($formData["body"]) > pow(2, 16) + 2, // MySQL TEXT limit
             ],
         ];
 

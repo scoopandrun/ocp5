@@ -8,11 +8,6 @@ use App\Core\Exceptions\Client\ClientException;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function showAccountPage(): void
     {
         $user = $this->request->user;
