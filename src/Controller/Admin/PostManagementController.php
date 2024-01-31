@@ -7,11 +7,6 @@ use App\Service\{PostService, CategoryService};
 
 class PostManagementController extends AdminController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function show(): void
     {
         $postService = new PostService();
@@ -55,7 +50,7 @@ class PostManagementController extends AdminController
         /** @var array */
         $postData = $this->request->body["post"] ?? [];
 
-        $formResult = $postService->checkData($postData);
+        $formResult = $postService->checkFormData($postData);
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $post = null;
@@ -86,7 +81,7 @@ class PostManagementController extends AdminController
 
         $postData = $this->request->body["post"] ?? [];
 
-        $formResult = $postService->checkData($postData);
+        $formResult = $postService->checkFormData($postData);
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $post = $postId ? $postService->getPost($postId, false) : null;

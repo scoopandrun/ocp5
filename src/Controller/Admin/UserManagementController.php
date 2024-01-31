@@ -7,11 +7,6 @@ use App\Service\UserService;
 
 class UserManagementController extends AdminController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function show(): void
     {
         $userService = new UserService();

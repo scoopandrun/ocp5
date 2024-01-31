@@ -72,7 +72,7 @@
 							<textarea class="form-control" id="message" name="contactForm[message]" placeholder="Entrez votre message..." style="height: 12rem" required>{{ contactFormResult.values.message }}</textarea>
 							<label for="message">Message</label>
 							{% if contactFormResult.errors.message %}
-								<div class="invalid-feedback" data-sb-feedback="message:required">Le message ne peut pas être vide.</div>
+								<div class="invalid-feedback">Le message ne peut pas être vide.</div>
 							{% endif %}
 						</div>
 						<br/>

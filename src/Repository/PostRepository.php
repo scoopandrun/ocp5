@@ -2,19 +2,11 @@
 
 namespace App\Repository;
 
-use App\Core\Database\MySQLConnection;
 use App\Core\Exceptions\Server\DB\DBException;
 use App\Entity\{Post, User, Category};
 
-class PostRepository
+class PostRepository extends Repository
 {
-    private MySQLConnection $connection;
-
-    public function __construct(MySQLConnection $connection = new MySQLConnection)
-    {
-        $this->connection = $connection;
-    }
-
     /**
      * Fetch a single blog post based on its ID.
      * 
@@ -88,7 +80,7 @@ class PostRepository
      * @param int $pageSize       Number of blog posts to show on a page.
      * @param bool $publishedOnly Optional. Fetch only published posts. Default = `true`.
      * 
-     * @return array<array-key, \App\Entity\Post> 
+     * @return array<int, \App\Entity\Post> 
      */
     public function getPostsSummaries(int $pageNumber, int $pageSize, bool $publishedOnly = true): array
     {
