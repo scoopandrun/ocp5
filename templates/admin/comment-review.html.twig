@@ -33,32 +33,48 @@
 		<div class="container px-4 px-lg-5">
 			<div class="row gx-4 gx-lg-5 justify-content-center">
 				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
-					<form id="commentForm" method="post" action="">
-						<div class="input-group input-group-static">
-							<label for="title">Titre</label>
-							<input type="text" id="title" name="post[title]" class="form-control" maxlength="255" placeholder="Titre" value="{{ comment.title }}" required/>
-							{% if formResult.errors.titleMissing %}
-								<div class="invalid-feedback">Le titre est requis.</div>
-							{% endif %}
-							{% if formResult.errors.titleTooLong %}
-								<div class="invalid-feedback">Le titre ne doit pas dépasser 255 caractères.</div>
-							{% endif %}
-						</div>
 
-						<div class="input-group input-group-static mt-4">
-							<label for="body">Corps du commentaire</label>
-							<textarea class="form-control" id="body" name="post[body]" placeholder="Entrez le corps du post" style="height: 10rem" required>{{ comment.body }}</textarea>
-						</div>
-
-						<div class="form-check form-switch mt-3">
-							<label for="isApproved" class="form-check-label">Approuver ce commentaire</label>
-							<input type="checkbox" id="isApproved" name="post[isApproved]" class="form-check-input" {{ post.isApproved ? "checked" }}/>
-						</div>
-
-						<button class="btn btn-primary text-uppercase mt-5" id="submitButton" type="submit">Enregistrer</button>
+					<div class="mb-3">
+						<div class="fw-bold">Post</div>
+						<span>{{ post.title }}</span>
+						(<a href="/posts/{{ post.id }}" target="_blank">voir le post</a>)
 					</div>
+
+					<div class="mb-3">
+						<div class="fw-bold">Titre</div>
+						<span>{{ comment.title }}</span>
+					</div>
+
+					<div class="mb-3">
+						<div class="fw-bold">Corps</div>
+						<span>{{ comment.body }}</span>
+					</div>
+
+					<form id="commentReviewForm" method="post" action="">
+
+						<div class="mt-4">
+							<button class="btn btn-success text-uppercase" id="approveButton" type="submit" formaction="/admin/comments/{{ comment.id }}/approve">Approuver</button>
+							<button class="btn btn-danger text-uppercase" id="rejectButton" type="submit" formaction="/admin/comments/{{ comment.id }}/reject">Rejeter</button>
+						</div>
+
+						<div class="input-group input-group-dynamic mt-3">
+							<label for="rejectReason" class="form-label">Raison du rejet</label>
+							<input type="text" class="form-control" id="rejectReason" name="commentReview[rejectReason]">
+							{% if formResult.errors.rejectReasonMissing %}
+								<div class="invalid-feedback">La raison du rejet est obligatoire.</div>
+							{% endif %}
+						</div>
+
+						<!-- Submit error message-->
+						{% if formResult.failure %}
+							<div id="submitErrorMessage">
+								<div class="text-center text-danger mb-3">L'identifiant et/ou le mot de passe est invalide.</div>
+							</div>
+						{% endif %}
+
+					</form>
 				</div>
 			</div>
-		</form>
+		</div>
 	</main>
 {% endblock %}

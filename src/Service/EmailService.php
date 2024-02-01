@@ -9,8 +9,8 @@ use App\Core\ErrorLogger;
 class EmailService
 {
     private PHPMailer $mail;
-    private string $fromAddress;
-    private string $fromName = "";
+    private string $fromAddress = "";
+    private string $fromName =  "";
     private array $to = [];
     private array $cc = [];
     private array $bcc = [];
@@ -43,6 +43,9 @@ class EmailService
             $this->mail->Port       = $_ENV["SMTP_PORT"];                  //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
             // From
+            if (!$this->fromAddress && !$this->fromName) {
+                $this->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"]);
+            }
             $this->mail->setFrom($this->fromAddress, $this->fromName);
 
             //Recipients (To)

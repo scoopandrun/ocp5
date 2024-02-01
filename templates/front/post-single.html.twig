@@ -57,7 +57,7 @@
 	<div class="container px-4 px-lg-5 my-3">
 		<div class="row gx-4 gx-lg-5 justify-content-center">
 			<div class="col-md-10 col-lg-8 col-xl-7">
-				<h2>Commentaires</h2>
+				<h2 id="comments">Commentaires</h2>
 			</div>
 		</div>
 
@@ -78,7 +78,7 @@
 						{% if user %}
 							{% if user.emailVerified %}
 								<div class="row gx-4 gx-lg-5">
-									<form id="commentForm" action="/posts/{{ post.id }}/createComment#commentForm" method="post">
+									<form id="commentForm" action="/posts/{{ post.id }}/comments/create#commentForm" method="post">
 										<div class="form-floating">
 											<input type="text" class="form-control" id="title" name="commentForm[title]" placeholder="Entrez votre nom..." value="{{ commentFormResult.values.title }}" maxlength="255" required/>
 											<label for="title">Titre</label>

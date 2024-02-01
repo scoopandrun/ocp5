@@ -54,7 +54,10 @@ $routes = [
     "/posts/(\d+)" => [
         "GET" => fn (int $id) => (new PostController())->showOne($id),
     ],
-    "/posts/(\d+)/createComment" => [
+    "/posts/(\d+)/comments" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+    ],
+    "/posts/(\d+)/comments/create" => [
         "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
         "POST" => fn (int $postId) => (new CommentController())->createComment($postId),
     ],
@@ -114,8 +117,14 @@ $routes = [
     ],
     "/admin/comments/(\d+)" => [
         "GET" => fn (int $id) => (new CommentManagementController())->showReviewPage($id),
-        "POST" => fn (int $id) => (new CommentManagementController())->editComment($id),
-        "DELETE" => fn (int $id) => (new CommentManagementController())->deleteComment($id),
+    ],
+    "/admin/comments/(\d+)/approve" => [
+        "GET" => fn (int $id) => (new CommentManagementController())->showReviewPage($id),
+        "POST" => fn (int $id) => (new CommentManagementController())->approveComment($id),
+    ],
+    "/admin/comments/(\d+)/reject" => [
+        "GET" => fn (int $id) => (new CommentManagementController())->showReviewPage($id),
+        "POST" => fn (int $id) => (new CommentManagementController())->rejectComment($id),
     ],
     "/admin/users" => [
         "GET" => fn () => (new UserManagementController())->show(),
