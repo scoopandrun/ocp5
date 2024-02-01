@@ -102,6 +102,15 @@ class CommentService
      */
     public function createComment(Comment $comment): int
     {
+        $safeTitle = htmlspecialchars($comment->getTitle(), ENT_NOQUOTES);
+        $safeBody = htmlspecialchars($comment->getBody(), ENT_NOQUOTES);
+
+        dd($comment);
+
+        $comment
+            ->setTitle($safeTitle)
+            ->setBody($safeBody);
+
         return $this->commentRepository->createComment($comment);
     }
 
