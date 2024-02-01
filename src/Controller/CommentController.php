@@ -67,8 +67,10 @@ class CommentController extends Controller
         $commentId = $commentService->createComment($comment);
 
         $commentFormResult["success"] = true;
-        $commentFormResult["title"] = "";
-        $commentFormResult["body"] = "";
+        $commentFormResult["values"] = [
+            "title" => "",
+            "body" => "",
+        ];
 
         $this->response
             ->setCode(201)

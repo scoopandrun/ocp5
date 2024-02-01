@@ -114,4 +114,80 @@ class CommentService
     {
         return $this->commentRepository->getCommentsToApprove();
     }
+
+    public function checkCommentReviewFormData(array $formData, string $approveOrReject = "reject"): array
+    {
+        if ($approveOrReject === "approve") {
+            $errors = [];
+        }
+
+        if ($approveOrReject === "reject") {
+            $rejectReason = is_string($formData["rejectReason"] ?? null) ? $formData["rejectReason"] : "";
+
+            $errors = [
+                "rejectReasonMissing" => !$rejectReason
+            ];
+        }
+
+        $formResult = [
+            "success" => false,
+            "failure" => false,
+            "errors" => $errors
+        ];
+
+        return $formResult;
+    }
+
+    public function approveComment(int $id): bool
+    {
+        return $this->commentRepository->approveComment($id);
+    }
+
+    public function rejectComment(int $id, string $reason): bool
+    {
+        $comment = $this->getComment($id);
+
+        $postDeleted = $this->commentRepository->deleteComment($id);
+
+        if (!$postDeleted) {
+            return false;
+        }
+
+        // Send e-mail to user to explain why the comment was rejected
+        $postService = new PostService();
+        $post = $postService->getPost($comment->getPostId());
+
+        $postTitle = $post->getTitle();
+        $commentTitle = $comment->getTitle();
+        $commentBody = $comment->getBody();
+
+        $subject = "[OCP5] Commentaire rejeté";
+
+        $emailBody = <<<HTML
+            Bonjour,
+
+            Votre commentaire a été rejeté pour la raison suivante :
+
+            $reason
+
+            Post : $postTitle
+            
+            Commentaire
+            ===========
+            Titre : $commentTitle
+            Corps :
+            $commentBody
+            HTML;
+
+        $emailService = new EmailService();
+
+        $emailSent = $emailService
+            ->addTo($comment->getAuthor()->getEmail())
+            ->setSubject($subject)
+            ->setBody($emailBody)
+            ->setHTML(false)
+            ->send();
+
+        return true;
+    }
 }

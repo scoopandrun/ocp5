@@ -23,6 +23,7 @@ class CommentRepository extends Repository
                 c.createdAt,
                 u.id as authorId,
                 u.name as authorName,
+                u.email as authorEmail,
                 c.approved,
                 c.title,
                 c.body
@@ -44,6 +45,7 @@ class CommentRepository extends Repository
             (new User)
             ->setId($commentRaw["authorId"])
             ->setName($commentRaw["authorName"])
+            ->setEmail($commentRaw["authorEmail"])
             : null;
 
         $comment = (new Comment)
@@ -189,6 +191,20 @@ class CommentRepository extends Repository
     }
 
     /**
+     * @return bool `true` if the comment was deleted, `false` otherwise.
+     */
+    public function deleteComment(int $id): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare("DELETE FROM comments WHERE id = :id");
+
+        $success = $req->execute(["id" => $id]);
+
+        return $success;
+    }
+
+    /**
      * Fetch the comments to be approved.
      * 
      * @return array<int, \App\Entity\Comment> 
@@ -242,5 +258,20 @@ class CommentRepository extends Repository
         $req->closeCursor();
 
         return $comments;
+    }
+
+    public function approveComment(int $id): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "UPDATE comments
+            SET approved = 1
+            WHERE id = :id"
+        );
+
+        $success = $req->execute(compact("id"));
+
+        return $success;
     }
 }
