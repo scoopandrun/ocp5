@@ -19,6 +19,9 @@ class Post
     private string $leadParagraph = "";
     private string $body = "";
     private bool $isPublished = true;
+    private bool $commentsAllowed = true;
+    /** @var array<int, \App\Entity\Comment> */
+    private array $comments = [];
 
     public function __construct()
     {
@@ -134,6 +137,34 @@ class Post
     public function setIsPublished(bool|int $isPublished): static
     {
         $this->isPublished = (bool) $isPublished;
+        return $this;
+    }
+
+    public function getCommentsAllowed(): bool
+    {
+        return $this->commentsAllowed;
+    }
+
+    public function setCommentsAllowed(bool|int $commentsAllowed): static
+    {
+        $this->commentsAllowed = (bool) $commentsAllowed;
+        return $this;
+    }
+
+    /**
+     * @return array<int, \App\Entity\Comment>
+     */
+    public function getComments(): array
+    {
+        return $this->comments;
+    }
+
+    /**
+     * @param array<int, \App\Entity\Comment> $comments
+     */
+    public function setComments(array $comments): static
+    {
+        $this->comments = $comments;
         return $this;
     }
 }

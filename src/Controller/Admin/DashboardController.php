@@ -2,8 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Service\PostService;
-use App\Service\UserService;
+use App\Service\{PostService, UserService, CommentService};
 
 class DashboardController extends AdminController
 {
@@ -16,13 +15,16 @@ class DashboardController extends AdminController
     {
         $postService = new PostService();
         $userService = new UserService();
+        $commentService = new CommentService();
 
         $postCount = $postService->getPostCount(false);
         $userCount = $userService->getUserCount();
+        $commentCount = $commentService->getCommentCount();
 
         $stats = [
             "postCount" => $postCount,
             "userCount" => $userCount,
+            "commentCount" => $commentCount,
         ];
 
         $this->response->sendHTML(

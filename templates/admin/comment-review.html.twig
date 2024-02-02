@@ -1,0 +1,80 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"href": "/admin/comments",
+		"name": "Gestion des commentaires",
+		"title": "Gestion des commentaires"
+	},
+	{
+		"name": "Revue de commentaire"
+	},
+] %}
+
+
+{% block body %}
+	<header class="masthead page-heading">
+		<div class="container position-relative px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-3">
+					<div class="post-heading">
+						<h1>Revue de commentaire</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<main>
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+
+					<div class="mb-3">
+						<div class="fw-bold">Post</div>
+						<span>{{ post.title }}</span>
+						(<a href="/posts/{{ post.id }}" target="_blank">voir le post</a>)
+					</div>
+
+					<div class="mb-3">
+						<div class="fw-bold">Titre</div>
+						<span>{{ comment.title }}</span>
+					</div>
+
+					<div class="mb-3">
+						<div class="fw-bold">Corps</div>
+						<span>{{ comment.body|nl2br }}</span>
+					</div>
+
+					<form id="commentReviewForm" method="post" action="">
+
+						<div class="mt-4">
+							<button class="btn btn-success text-uppercase" id="approveButton" type="submit" formaction="/admin/comments/{{ comment.id }}/approve">Approuver</button>
+							<button class="btn btn-danger text-uppercase" id="rejectButton" type="submit" formaction="/admin/comments/{{ comment.id }}/reject">Rejeter</button>
+						</div>
+
+						<div class="input-group input-group-dynamic mt-3">
+							<label for="rejectReason" class="form-label">Raison du rejet</label>
+							<input type="text" class="form-control" id="rejectReason" name="commentReview[rejectReason]">
+							{% if formResult.errors.rejectReasonMissing %}
+								<div class="invalid-feedback">La raison du rejet est obligatoire.</div>
+							{% endif %}
+						</div>
+
+						<!-- Submit error message-->
+						{% if formResult.failure %}
+							<div id="submitErrorMessage">
+								<div class="text-center text-danger mb-3">L'identifiant et/ou le mot de passe est invalide.</div>
+							</div>
+						{% endif %}
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</main>
+{% endblock %}

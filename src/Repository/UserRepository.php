@@ -377,7 +377,8 @@ class UserRepository extends Repository
         $req = $db->prepare(
             "SELECT
                 u.id,
-                u.name
+                u.name,
+                u.email
             FROM users u
             WHERE u.id = :id"
         );

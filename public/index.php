@@ -29,9 +29,11 @@ use App\Core\Router;
 use App\Core\ErrorLogger;
 use App\Controller\HomepageController;
 use App\Controller\PostController;
+use App\Controller\CommentController;
 use App\Controller\UserController;
 use App\Controller\Admin\DashboardController;
 use App\Controller\Admin\PostManagementController;
+use App\Controller\Admin\CommentManagementController;
 use App\Controller\Admin\UserManagementController;
 use App\Controller\ErrorController;
 use App\Core\Exceptions\Client\ClientException;
@@ -51,6 +53,22 @@ $routes = [
     ],
     "/posts/(\d+)" => [
         "GET" => fn (int $id) => (new PostController())->showOne($id),
+    ],
+    "/posts/(\d+)/comments" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "POST" => fn (int $postId) => (new CommentController())->createComment($postId),
+    ],
+    "/posts/(\d+)/comments/(\d+)" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "DELETE" => fn (int $postId, int $commentId) => (new CommentController())->deleteComment($commentId),
+    ],
+    "/posts/(\d+)/comments/(\d+)/delete" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "POST" => fn (int $postId, int $commentId) => (new CommentController())->deleteComment($commentId),
+    ],
+    "/posts/(\d+)/comments/create" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "POST" => fn (int $postId) => (new CommentController())->createComment($postId),
     ],
     "/user" => [
         "GET" => fn () => (new UserController())->showAccountPage(),
@@ -102,6 +120,20 @@ $routes = [
     "/admin/posts/create" => [
         "GET" => fn () => (new PostManagementController())->showEditPage(),
         "POST" => fn () => (new PostManagementController())->createPost(),
+    ],
+    "/admin/comments" => [
+        "GET" => fn () => (new CommentManagementController())->show(),
+    ],
+    "/admin/comments/(\d+)" => [
+        "GET" => fn (int $id) => (new CommentManagementController())->showReviewPage($id),
+    ],
+    "/admin/comments/(\d+)/approve" => [
+        "GET" => fn (int $id) => (new CommentManagementController())->showReviewPage($id),
+        "POST" => fn (int $id) => (new CommentManagementController())->approveComment($id),
+    ],
+    "/admin/comments/(\d+)/reject" => [
+        "GET" => fn (int $id) => (new CommentManagementController())->showReviewPage($id),
+        "POST" => fn (int $id) => (new CommentManagementController())->rejectComment($id),
     ],
     "/admin/users" => [
         "GET" => fn () => (new UserManagementController())->show(),

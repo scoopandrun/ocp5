@@ -27,10 +27,11 @@ class PostRepository extends Repository
                 u.name as authorName,
                 c.id as categoryId,
                 c.name as categoryName,
-                p.published,
                 p.title,
                 p.leadParagraph,
-                p.body
+                p.body,
+                p.published,
+                p.commentsAllowed
             FROM posts p
             LEFT JOIN users u ON u.id = p.author
             LEFT JOIN categories c ON c.id = p.category
@@ -66,6 +67,7 @@ class PostRepository extends Repository
             ->setAuthor($author)
             ->setCategory($category)
             ->setIsPublished($postRaw["published"])
+            ->setCommentsAllowed($postRaw["commentsAllowed"])
             ->setTitle($postRaw["title"])
             ->setLeadParagraph($postRaw["leadParagraph"])
             ->setBody($postRaw["body"]);
@@ -99,7 +101,8 @@ class PostRepository extends Repository
                 c.name as categoryName,
                 p.title,
                 p.leadParagraph,
-                p.published
+                p.published,
+                p.commentsAllowed
             FROM posts p
             LEFT JOIN users u ON u.id = p.author
             LEFT JOIN categories c ON c.id = p.category
@@ -140,6 +143,7 @@ class PostRepository extends Repository
                 ->setAuthor($author)
                 ->setCategory($category)
                 ->setIsPublished($postRaw["published"])
+                ->setCommentsAllowed($postRaw["commentsAllowed"])
                 ->setTitle($postRaw["title"])
                 ->setLeadParagraph($postRaw["leadParagraph"]);
 
@@ -183,16 +187,18 @@ class PostRepository extends Repository
                 body = :body,
                 author = :author,
                 category = :category,
-                published = :published"
+                published = :published,
+                commentsAllowed = :commentsAllowed"
         );
 
         $req->execute([
             "title" => $data["title"],
             "leadParagraph" => $data["leadParagraph"],
             "body" => $data["body"],
+            "author" => $data["author"],
             "category" => (int) ($data["category"] ?? null) ?: null,
             "published" => (int) isset($data["isPublished"]),
-            "author" => $data["author"],
+            "commentsAllowed" => (int) isset($data["commentsAllowed"]),
         ]);
 
         $lastInsertId = $db->lastInsertId();
@@ -214,6 +220,7 @@ class PostRepository extends Repository
                 body = :body,
                 category = :category,
                 published = :published,
+                commentsAllowed = :commentsAllowed,
                 updatedAt = CURRENT_TIMESTAMP
             WHERE
                 id = :id"
@@ -226,6 +233,7 @@ class PostRepository extends Repository
             "body" => $data["body"],
             "category" => (int) ($data["category"] ?? null) ?: null,
             "published" => (int) isset($data["isPublished"]),
+            "commentsAllowed" => (int) isset($data["commentsAllowed"]),
         ]);
     }
 
