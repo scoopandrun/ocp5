@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use Throwable;
+use Twig\Error\SyntaxError as TwigSyntaxError;
 
 /**
  * Custom error logger.
@@ -10,6 +11,7 @@ use Throwable;
 class ErrorLogger
 {
     private string|null $emergencyMemory = null;
+    private array $originalError = [];
     const ERROR_INFO_MAX_DEPTH = 10;
 
     /**
@@ -25,6 +27,8 @@ class ErrorLogger
      */
     public function log(): void
     {
+        $this->originalError = ErrorLogger::errorInfo($this->error, maxDepth: 0);
+
         register_shutdown_function([$this, "emergencyShutdown"]);
 
         $error_string = ErrorLogger::errorInfo($this->error, "string");
@@ -69,14 +73,17 @@ class ErrorLogger
      * 
      * @return mixed Exception information.
      */
-    public static function errorInfo(?Throwable $e, string $format = "array", int $depth = 0): mixed
-    {
+    public static function errorInfo(
+        ?Throwable $e,
+        string $format = "array",
+        int $maxDepth = ErrorLogger::ERROR_INFO_MAX_DEPTH
+    ): mixed {
         if (!($e instanceof Throwable)) {
             return null;
         }
 
-        if ($depth > ErrorLogger::ERROR_INFO_MAX_DEPTH) {
-            return "Max depth (" . ErrorLogger::ERROR_INFO_MAX_DEPTH . ") reached";
+        if ($maxDepth < 0) {
+            return "Max depth reached";
         }
 
         $array_error = [
@@ -84,8 +91,9 @@ class ErrorLogger
             "message" => $e->getMessage(),
             "file" => $e->getFile(),
             "line" => $e->getLine(),
-            "previous" => ErrorLogger::errorInfo($e->getPrevious(), depth: $depth + 1),
-            "trace" => $e->getTrace(),
+            "previous" => ErrorLogger::errorInfo($e->getPrevious(), maxDepth: $maxDepth - 1),
+            // Twig stack trace is too long and causes OOM crash. Do not include in error log
+            "trace" => $e::class === TwigSyntaxError::class ? null : $e->getTrace(),
         ];
 
         $string_error = ErrorLogger::arrayStringify($array_error);
@@ -118,7 +126,7 @@ class ErrorLogger
                 PHP_EOL .
                     "=== Emergency shutdown ==="
                     . PHP_EOL
-                    . ErrorLogger::arrayStringify($lastError)
+                    . ErrorLogger::arrayStringify($this->originalError)
                     . PHP_EOL
             );
         }
