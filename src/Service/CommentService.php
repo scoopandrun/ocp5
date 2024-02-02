@@ -105,8 +105,6 @@ class CommentService
         $safeTitle = htmlspecialchars($comment->getTitle(), ENT_NOQUOTES);
         $safeBody = htmlspecialchars($comment->getBody(), ENT_NOQUOTES);
 
-        dd($comment);
-
         $comment
             ->setTitle($safeTitle)
             ->setBody($safeBody);
