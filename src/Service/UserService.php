@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Repository\UserRepository;
 use App\Entity\User;
-use App\Service\EmailService;
+use App\Service\{EmailService, TwigService};
 use Hidehalo\Nanoid\Client as Nanoid;
 
 class UserService
@@ -236,30 +236,32 @@ class UserService
      */
     public function sendVerificationEmail(string $email): bool
     {
-        $emailService = new EmailService();
-
         $emailVerificationToken = $this->generateToken();
 
         $this->userRepository->setEmailVerificationToken($email, $emailVerificationToken);
 
-        $emailBody = <<<HTML
-            Bonjour,
+        $twig = (new TwigService())->getEnvironment();
 
-            Cet e-mail automatique a été envoyé depuis le blog de Nicolas DENIS.
-            
-            Merci de vérifier votre adresse email en cliquant sur le lien ci-dessous :
+        $subject = "Vérification de votre adresse e-mail";
 
-            http://ocp5.local/user/verifyEmail/$emailVerificationToken
+        $emailBody = [
+            "html" => $twig->render(
+                "email/email-verification.html.twig",
+                compact("subject", "emailVerificationToken")
+            ),
+            "plain" => $twig->render(
+                "email/email-verification-plain.txt.twig",
+                compact("emailVerificationToken")
+            ),
+        ];
 
-            Merci
-            HTML;
+        $emailService = new EmailService();
 
         $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($email)
-            ->setSubject("[OCP5] E-mail de vérification")
-            ->setHTML(false)
-            ->setBody($emailBody);
+            ->setSubject($subject)
+            ->setBody($emailBody["html"], $emailBody["plain"]);
 
         return $emailService->send();
     }
@@ -308,8 +310,6 @@ class UserService
         /** @var string */
         $email = $formData["email"];
 
-        $emailService = new EmailService();
-
         $passwordResetToken = $this->generateToken();
 
         $tokenIsSet = $this->userRepository->setPasswordResetToken($email, $passwordResetToken);
@@ -327,27 +327,28 @@ class UserService
 
         // If a token really has been set, send the e-mail
 
-        $emailBody = <<<EMAIL
-            Bonjour,
+        $twig = (new TwigService())->getEnvironment();
 
-            Cet e-mail automatique a été envoyé depuis le blog de Nicolas DENIS.
-            
-            Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien ci-dessous :
+        $subject = "Réinitialisation de mot de passe";
 
-            http://ocp5.local/passwordReset/$passwordResetToken
+        $emailBody = [
+            "html" => $twig->render(
+                "email/password-reset.html.twig",
+                compact("subject", "passwordResetToken")
+            ),
+            "plain" => $twig->render(
+                "email/password-reset-plain.txt.twig",
+                compact("passwordResetToken")
+            ),
+        ];
 
-            Si vous n'avez pas demandé la réinitialisation de votre mot de passe,
-            veuillez ignorer ce message.
-
-            Merci
-            EMAIL;
+        $emailService = new EmailService();
 
         $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($email)
-            ->setSubject("[OCP5] Réinitialisation de mot de passe")
-            ->setHTML(false)
-            ->setBody($emailBody);
+            ->setSubject($subject)
+            ->setBody($emailBody["html"], $emailBody["plain"]);
 
         return $emailService->send();
     }
