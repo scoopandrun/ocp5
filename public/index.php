@@ -56,6 +56,15 @@ $routes = [
     ],
     "/posts/(\d+)/comments" => [
         "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "POST" => fn (int $postId) => (new CommentController())->createComment($postId),
+    ],
+    "/posts/(\d+)/comments/(\d+)" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "DELETE" => fn (int $postId, int $commentId) => (new CommentController())->deleteComment($commentId),
+    ],
+    "/posts/(\d+)/comments/(\d+)/delete" => [
+        "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
+        "POST" => fn (int $postId, int $commentId) => (new CommentController())->deleteComment($commentId),
     ],
     "/posts/(\d+)/comments/create" => [
         "GET" => fn (int $postId) => (new CommentController())->redirectToPostPage($postId),
