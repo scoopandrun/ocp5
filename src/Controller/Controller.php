@@ -2,20 +2,13 @@
 
 namespace App\Controller;
 
-use Twig\Loader\FilesystemLoader;
+use App\Service\TwigService;
 use Twig\Environment;
-use Twig\RuntimeLoader\RuntimeLoaderInterface;
-use Twig\Extra\Intl\IntlExtension;
-use Twig\Extra\Markdown\DefaultMarkdown;
-use Twig\Extra\Markdown\MarkdownRuntime;
-use Twig\Extra\Markdown\MarkdownExtension;
 use App\Core\HTTP\HTTPRequest;
 use App\Core\HTTP\HTTPResponse;
-use App\Core\Constants;
 
 abstract class Controller
 {
-    private FilesystemLoader $loader;
     protected Environment $twig;
 
     protected HTTPRequest $request;
@@ -29,22 +22,7 @@ abstract class Controller
         $this->request = new HTTPRequest($emergency);
         $this->response = new HTTPResponse();
 
-        $this->loader = new FilesystemLoader(Constants::$TEMPLATES);
-        $this->twig = new Environment($this->loader);
-        $this->twig->addGlobal("user", $this->request->user);
-        $this->twig->addExtension(new IntlExtension());
-        $this->twig->addExtension(new MarkdownExtension());
-        $this->twig->addRuntimeLoader(
-            new class implements RuntimeLoaderInterface
-            {
-                public function load(string $class)
-                {
-                    if (MarkdownRuntime::class === $class) {
-                        return new MarkdownRuntime(new DefaultMarkdown());
-                    }
-                }
-            }
-        );
+        $this->twig = (new TwigService($this->request))->getEnvironment();
     }
 
     protected function sendResponseWithSingleMessage(
