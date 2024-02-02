@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Service\{PostService, UserService, CommentService};
 
 class DashboardController extends AdminController
@@ -11,7 +12,7 @@ class DashboardController extends AdminController
         parent::__construct();
     }
 
-    public function show(): void
+    public function show(): HTTPResponse
     {
         $postService = new PostService();
         $userService = new UserService();
@@ -27,7 +28,7 @@ class DashboardController extends AdminController
             "commentCount" => $commentCount,
         ];
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "admin/dashboard.html.twig",
                 compact("stats")

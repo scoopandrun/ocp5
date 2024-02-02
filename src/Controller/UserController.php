@@ -2,13 +2,14 @@
 
 namespace App\Controller;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Service\UserService;
 use App\Core\Exceptions\Client\Auth\UnauthorizedException;
 use App\Core\Exceptions\Client\ClientException;
 
 class UserController extends Controller
 {
-    public function showAccountPage(): void
+    public function showAccountPage(): HTTPResponse
     {
         $user = $this->request->user;
 
@@ -16,22 +17,21 @@ class UserController extends Controller
             throw new UnauthorizedException();
         }
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render("front/user.html.twig", compact("user"))
         );
     }
 
-    public function redirectToAccountPage(): void
+    public function redirectToAccountPage(): HTTPResponse
     {
-        $this->response->redirect("/user");
+        return $this->response->redirect("/user");
     }
 
-    public function showLoginPage(): void
+    public function showLoginPage(): HTTPResponse
     {
         // If the user is already connected, redirect to homepage
         if ($this->request->user) {
-            $this->response->redirect("/");
-            return;
+            return $this->response->redirect("/");
         }
 
         $_SESSION["referer"] = $_SERVER["HTTP_REFERER"] ?? null;
@@ -41,17 +41,16 @@ class UserController extends Controller
             $_SESSION["referer"] = null;
         }
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render("front/user-login.html.twig")
         );
     }
 
-    public function showSignupPage(): void
+    public function showSignupPage(): HTTPResponse
     {
         // If the user is already connected, redirect to homepage
         if ($this->request->user) {
-            $this->response->redirect("/");
-            return;
+            return $this->response->redirect("/");
         }
 
         $_SESSION["referer"] = $_SERVER["HTTP_REFERER"] ?? null;
@@ -61,12 +60,12 @@ class UserController extends Controller
             $_SESSION["referer"] = null;
         }
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render("front/user-signup.html.twig")
         );
     }
 
-    public function login(): void
+    public function login(): HTTPResponse
     {
         $userService = new UserService();
 
@@ -75,9 +74,9 @@ class UserController extends Controller
         $loginOK = $userService->login($credentials);
 
         if (!$loginOK) {
-            $this->response
+            return $this->response
                 ->setCode(401)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "front/user-login.html.twig",
                         [
@@ -87,23 +86,22 @@ class UserController extends Controller
                         ]
                     )
                 );
-            return;
         }
 
         // Redirect to the previous page or the homepage if no referer
-        $this->response->redirect($_SESSION["referer"] ?? "/");
+        return $this->response->redirect($_SESSION["referer"] ?? "/");
     }
 
-    public function logout(): void
+    public function logout(): HTTPResponse
     {
         $userService = new UserService();
 
         $userService->logout();
 
-        $this->response->redirect("/");
+        return $this->response->redirect("/");
     }
 
-    public function createAccount(): void
+    public function createAccount(): HTTPResponse
     {
         $userService = new UserService();
 
@@ -117,15 +115,14 @@ class UserController extends Controller
         $formResult = $userService->checkUserFormData($userData, newAccount: true);
 
         if (in_array(true, array_values($formResult["errors"]))) {
-            $this->response
+            return $this->response
                 ->setCode(400)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "front/user-signup.html.twig",
                         compact("formResult")
                     )
                 );
-            return;
         }
 
         $userData["password"] = $userData["new-password"];
@@ -139,7 +136,7 @@ class UserController extends Controller
         $this->response->redirect($_SESSION["referer"] ?? "/", 303);
     }
 
-    public function editAccount(): void
+    public function editAccount(): HTTPResponse
     {
         $user = $this->request->user;
 
@@ -159,15 +156,14 @@ class UserController extends Controller
         $formResult = $userService->checkUserFormData($userData, $user);
 
         if (in_array(true, array_values($formResult["errors"]))) {
-            $this->response
+            return $this->response
                 ->setCode(400)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "front/user.html.twig",
                         compact("user", "formResult")
                     )
                 );
-            return;
         }
 
         $userData["id"] = $user->getId();
@@ -180,7 +176,7 @@ class UserController extends Controller
         $formResult["success"] = $success;
         $formResult["failure"] = !$success;
 
-        $this->response->sendHTML(
+        $this->response->setHTML(
             $this->twig->render(
                 "front/user.html.twig",
                 [
@@ -191,10 +187,10 @@ class UserController extends Controller
         );
     }
 
-    public function showDeleteAccountConfirmation(): void
+    public function showDeleteAccountConfirmation(): HTTPResponse
     {
-        $this->response
-            ->sendHTML(
+        return $this->response
+            ->setHTML(
                 $this->twig->render(
                     "front/user.html.twig",
                     ["showDeleteAccountConfirmation" => true]
@@ -202,7 +198,7 @@ class UserController extends Controller
             );
     }
 
-    public function deleteAccount(): void
+    public function deleteAccount(): HTTPResponse
     {
         $user = $this->request->user;
 
@@ -215,7 +211,7 @@ class UserController extends Controller
         $success = $userService->deleteUser($user->getId());
 
         if (!$success) {
-            $this->sendResponseWithSingleMessage(
+            return $this->setResponseWithSingleMessage(
                 "front/user.html.twig",
                 "deleteAccountFailure",
                 "Erreur lors de la suppression du compte",
@@ -223,11 +219,11 @@ class UserController extends Controller
             );
         } else {
             $userService->logout();
-            $this->response->redirect("/", 303);
+            return $this->response->redirect("/", 303);
         }
     }
 
-    public function sendVerificationEmail(): void
+    public function sendVerificationEmail(): HTTPResponse
     {
         $user = $this->request->user;
 
@@ -236,36 +232,37 @@ class UserController extends Controller
         }
 
         if ($user->getEmailVerified()) {
-            $this->sendResponseWithSingleMessage(
+            return $this->setResponseWithSingleMessage(
                 "front/user.html.twig",
                 "verificationEmailError",
                 "L'adresse e-mail est déjà vérifiée.",
                 400
             );
-            return;
         }
 
         $userService = new UserService();
 
         $emailSent = $userService->sendVerificationEmail($user->getEmail());
 
-        if (!$emailSent) {
-            $this->sendResponseWithSingleMessage(
-                "front/user.html.twig",
-                "verificationEmailError",
-                "Une erreur est survenue. L'email n'a pas été envoyé.",
-                500
-            );
+        if ($emailSent) {
+            $statusCode = 200;
+            $messageTitle = "verificationEmailSuccess";
+            $message = "L'email a été envoyé.";
         } else {
-            $this->sendResponseWithSingleMessage(
-                "front/user.html.twig",
-                "verificationEmailSuccess",
-                "L'email a été envoyé."
-            );
+            $statusCode = 500;
+            $messageTitle = "verificationEmailError";
+            $message = "Une erreur est survenue. L'email n'a pas été envoyé.";
         }
+
+        return $this->setResponseWithSingleMessage(
+            "front/user.html.twig",
+            $messageTitle,
+            $message,
+            $statusCode
+        );
     }
 
-    public function verifyEmail(string $token): void
+    public function verifyEmail(string $token): HTTPResponse
     {
         $userService = new UserService();
 
@@ -275,19 +272,19 @@ class UserController extends Controller
             throw new ClientException("Le jeton de vérification n'est pas valide");
         }
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render("front/user-email-verified.html.twig")
         );
     }
 
-    public function showPaswordResetAskEmailPage(): void
+    public function showPaswordResetAskEmailPage(): HTTPResponse
     {
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render("front/user-reset-password-1-ask-email.html.twig")
         );
     }
 
-    public function sendPasswordResetEmail(): void
+    public function sendPasswordResetEmail(): HTTPResponse
     {
         $userService = new UserService();
 
@@ -301,35 +298,36 @@ class UserController extends Controller
         $formResult = $userService->checkPasswordResetEmailFormData($formData);
 
         if ($formResult["error"]) {
-            $this->sendResponseWithSingleMessage(
+            return $this->setResponseWithSingleMessage(
                 "front/user-reset-password-1-ask-email.html.twig",
                 "passwordResetEmailError",
                 $formResult["error"],
                 400
             );
-            return;
         }
 
         $emailSent = $userService->sendPasswordResetEmail($formData);
 
-        if (!$emailSent) {
-            $this->sendResponseWithSingleMessage(
-                "front/user-reset-password-1-ask-email.html.twig",
-                "passwordResetEmailError",
-                "Une erreur est survenue. L'email n'a pas été envoyé.",
-                500
-            );
+        if ($emailSent) {
+            $statusCode = 200;
+            $messageTitle = "passwordResetEmailSuccess";
+            $message = "Si cette adresse est associée à un compte,
+             vous recevrez un e-mail de réinitialisation de mot de passe.";
         } else {
-            $this->sendResponseWithSingleMessage(
-                "front/user-reset-password-1-ask-email.html.twig",
-                "passwordResetEmailSuccess",
-                "Si cette adresse est associée à un compte,
-                vous recevrez un e-mail de réinitialisation de mot de passe."
-            );
+            $statusCode = 500;
+            $messageTitle = "passwordResetEmailError";
+            $message = "Une erreur est survenue. L'email n'a pas été envoyé.";
         }
+
+        return $this->setResponseWithSingleMessage(
+            "front/user-reset-password-1-ask-email.html.twig",
+            $messageTitle,
+            $message,
+            $statusCode
+        );
     }
 
-    public function showPaswordResetChangePasswordPage(string $token): void
+    public function showPaswordResetChangePasswordPage(string $token): HTTPResponse
     {
         $userService = new UserService();
 
@@ -339,14 +337,14 @@ class UserController extends Controller
             throw new ClientException("Le jeton n'est pas valide");
         }
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "front/user-reset-password-2-change-password.html.twig"
             )
         );
     }
 
-    public function resetPassword(string $token): void
+    public function resetPassword(string $token): HTTPResponse
     {
         $userService = new UserService();
 
@@ -366,13 +364,12 @@ class UserController extends Controller
         $formResult = $userService->checkPasswordResetFormData($formData);
 
         if ($formResult["error"]) {
-            $this->sendResponseWithSingleMessage(
+            return $this->setResponseWithSingleMessage(
                 "front/user-reset-password-2-change-password.html.twig",
                 "passwordResetError",
                 $formResult["error"],
                 400
             );
-            return;
         }
 
         /** @var string */
@@ -380,19 +377,21 @@ class UserController extends Controller
 
         $passwordHasBeenReset = $userService->resetPassword($token, $newPassword);
 
-        if (!$passwordHasBeenReset) {
-            $this->sendResponseWithSingleMessage(
-                "front/user-reset-password-2-change-password.html.twig",
-                "passwordResetError",
-                "Une erreur est survenue. Le mot de passe n'a pas été changé.",
-                500
-            );
+        if ($passwordHasBeenReset) {
+            $statusCode = 200;
+            $messageTitle = "passwordResetSuccess";
+            $message = "Le mot de passe a été correctement changé.";
         } else {
-            $this->sendResponseWithSingleMessage(
-                "front/user-reset-password-2-change-password.html.twig",
-                "passwordResetSuccess",
-                "Le mot de passe a été correctement changé."
-            );
+            $statusCode = 500;
+            $messageTitle = "passwordResetError";
+            $message = "Une erreur est survenue. Le mot de passe n'a pas été changé.";
         }
+
+        return $this->setResponseWithSingleMessage(
+            "front/user-reset-password-2-change-password.html.twig",
+            $messageTitle,
+            $message,
+            $statusCode
+        );
     }
 }
