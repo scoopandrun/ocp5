@@ -81,4 +81,71 @@ class CommentController extends Controller
                 )
             );
     }
+
+    public function deleteComment(int $id): void
+    {
+        $commentService = new CommentService();
+
+        $comment = $commentService->getComment($id);
+
+        if (!$comment) {
+            throw new NotFoundException("Le commentaire n'existe pas.");
+        }
+
+        $user = $this->request->user;
+
+        if (!$user) {
+            throw new UnauthorizedException();
+        }
+
+        $authorId = $comment->getAuthor()->getId();
+        $userId = $user->getId();
+        $userIsAdmin = $user->getIsAdmin();
+
+        if ($authorId !== $userId && !$userIsAdmin) {
+            throw new ForbiddenException();
+        }
+
+        $success = $commentService->deleteComment($id);
+
+        $postService = new PostService();
+
+        $post = $postService->getPost($comment->getPostId());
+
+        $deleteCommentFormResult =  [
+            "success" => $success,
+            "failure" => !$success,
+            "message" => $success
+                ? "Votre commentaire a été supprimé."
+                : "Une erreur est survenue. Votre commentaire n'a pas été supprimé."
+        ];
+
+        if (!$success) {
+            $this->response->setCode(500);
+        }
+
+        // HTML
+        if ($this->request->acceptsHTML()) {
+            $this->response
+                ->sendHTML(
+                    $this->twig->render(
+                        "/front/post-single.html.twig",
+                        compact(
+                            "post",
+                            "deleteCommentFormResult"
+                        )
+                    )
+                );
+            return;
+        }
+
+        // JSON
+        if ($this->request->acceptsJSON()) {
+            $this->response->sendJSON(json_encode($deleteCommentFormResult));
+            return;
+        }
+
+        // Default
+        $this->response->sendText($deleteCommentFormResult["message"]);
+    }
 }

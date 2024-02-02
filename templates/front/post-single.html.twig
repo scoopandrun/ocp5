@@ -5,6 +5,10 @@
 	<link rel="stylesheet" href="/assets/css/form.css">
 {% endblock %}
 
+{% block javascript %}
+	<script defer src="/assets/js/front/comments.js"></script>
+{% endblock %}
+
 {% block body %}
 	<!-- Page Header-->
 	<header class="masthead" style="background-image: url('/assets/img/home-bg.jpg')">
@@ -61,12 +65,28 @@
 			</div>
 		</div>
 
+		{% if deleteCommentFormResult %}
+			<div class="row gx-4 gx-lg-5 my-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7">
+
+					{% if deleteCommentFormResult.success %}
+						<span class="text-success">{{ deleteCommentFormResult.message }}</span>
+					{% endif %}
+
+					{% if deleteCommentFormResult.failure %}
+						<span class="invalid-feedback">{{ deleteCommentFormResult.message }}</span>
+					{% endif %}
+
+				</div>
+			</div>
+		{% endif %}
+
 		<div class="container px-4 px-lg-5">
 			{% if post.commentsAllowed %}
 				<div class="row gx-4 gx-lg-5 justify-content-center">
-					<div class="col-md-10 col-lg-8 col-xl-7">
+					<div class="col-md-10 col-lg-8 col-xl-7 p-0">
 						{% if post.comments|length > 0 %}
-							<ul class="list-group list-group-flush">
+							<ul class="list-group list-group-flush" id="commentList">
 								{% for comment in post.comments %}
 									{% include "front/includes/comment.html.twig" %}
 								{% endfor %}
@@ -77,7 +97,7 @@
 
 						{% if user %}
 							{% if user.emailVerified %}
-								<div class="row gx-4 gx-lg-5">
+								<div class="row gx-4 gx-lg-5 my-4">
 									<form id="commentForm" action="/posts/{{ post.id }}/comments/create#commentForm" method="post">
 										<div class="form-floating">
 											<input type="text" class="form-control" id="title" name="commentForm[title]" placeholder="Entrez votre nom..." value="{{ commentFormResult.values.title }}" maxlength="255" required/>

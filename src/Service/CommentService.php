@@ -115,6 +115,14 @@ class CommentService
     }
 
     /**
+     * @return bool `true` if the comment was deleted, `false` otherwise.
+     */
+    public function deleteComment(int $id): bool
+    {
+        return $this->commentRepository->deleteComment($id);
+    }
+
+    /**
      * Get the comments to be approved.
      * 
      * @return array<int, \App\Entity\Comment>
