@@ -21,9 +21,12 @@ abstract class Controller
     protected HTTPRequest $request;
     protected HTTPResponse $response;
 
-    public function __construct()
+    /**
+     * @param bool $emergency Avoid all risky calls (eg: database) in case of a serious crash.
+     */
+    public function __construct(bool $emergency = false)
     {
-        $this->request = new HTTPRequest();
+        $this->request = new HTTPRequest($emergency);
         $this->response = new HTTPResponse();
 
         $this->loader = new FilesystemLoader(Constants::$TEMPLATES);

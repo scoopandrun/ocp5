@@ -3,12 +3,19 @@
 namespace App\Controller;
 
 use App\Core\Exceptions\AppException;
+use App\Core\Exceptions\Client\ClientException;
+use App\Core\Exceptions\Server\ServerException;
+use App\Core\ErrorLogger;
 
 class ErrorController extends Controller
 {
-    public function __construct(protected AppException $e)
+    public function __construct(protected AppException $e, bool $emergency = false)
     {
-        parent::__construct();
+        parent::__construct($emergency);
+
+        if (!$e instanceof ClientException) {
+            (new ErrorLogger($e))->log();
+        }
     }
 
     public function show(): void
@@ -36,5 +43,11 @@ class ErrorController extends Controller
 
         // Default response
         $this->response->sendText($this->e->getMessage());
+    }
+
+    static public function emergencyShow(\Throwable $e)
+    {
+        $serverException = new ServerException(previous: $e);
+        (new static($serverException, true))->show();
     }
 }
