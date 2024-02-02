@@ -1,0 +1,19 @@
+{% extends "email/layout.html.twig" %}
+
+{% block body %}
+	<p>Bonjour,</p>
+
+	<p>Votre commentaire a été rejeté pour la raison suivante :</p>
+
+	<p>{{ reason }}</p>
+
+	<p>Post :
+		{{ postTitle }}</p>
+
+	<p>Commentaire</p>
+
+	<p>Titre :
+		{{ commentTitle }}</p>
+	<p>Corps :</p>
+	<p>{{ commentBody }}</p>
+{% endblock %}

@@ -5,6 +5,7 @@ namespace App\Service;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use App\Core\ErrorLogger;
+use App\Entity\EmailBody;
 
 class EmailService
 {
@@ -125,8 +126,11 @@ class EmailService
         return $this;
     }
 
-    public function setBody(string $html, string $plain = ""): static
+    public function setBody(EmailBody $body): static
     {
+        $html = $body->getHTML();
+        $plain = $body->getPlain();
+
         $this->htmlBody = $html;
 
         if ($plain) {
@@ -141,5 +145,22 @@ class EmailService
         $this->isHTML = $isHTML;
 
         return $this;
+    }
+
+    /**
+     * Create an email body from a Twig template.
+     * 
+     * @param string $template Filename of the template, without the extension.  
+     *                         eg: "reject-comment", without "html.twig" or "plain.txt.twig".
+     * @param string $subject  E-mail subject.
+     * @param array $context   Associative array to pass to the Twig template renderer.  
+     *                         Those variables can be used in the template.
+     */
+    public function createEmailBody(
+        string $template,
+        string $subject,
+        array $context,
+    ): EmailBody {
+        return new EmailBody($template, $subject, $context);
     }
 }
