@@ -52,27 +52,23 @@ class ContactFormService
 
         $twig = (new TwigService())->getEnvironment();
 
-        $subject = "Message de {$contactForm["name"]}";
-
-        $emailBody = [
-            "html" => $twig->render(
-                "email/contact-form.html.twig",
-                compact("subject", "contactForm")
-            ),
-            "plain" => $twig->render(
-                "email/contact-form-plain.txt.twig",
-                compact("contactForm")
-            ),
-        ];
-
         $emailService = new EmailService();
 
-        $emailService
+        $subject = "Message de {$contactForm["name"]}";
+
+        $emailBody = $emailService->createEmailBody(
+            "contact-form",
+            $subject,
+            compact("contactForm")
+        );
+
+        $emailSent = $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($_ENV["CONTACT_FORM_EMAIL"])
             ->setSubject($subject)
-            ->setBody($emailBody["html"], $emailBody["plain"]);
+            ->setBody($emailBody)
+            ->send();
 
-        return $emailService->send();
+        return $emailSent;
     }
 }
