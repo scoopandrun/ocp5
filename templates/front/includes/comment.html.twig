@@ -12,7 +12,7 @@
 		{{ comment.body|nl2br }}
 	</div>
 
-	{% if comment.author.id == user.id %}
+	{% if comment.author.id == user.id or user.isAdmin %}
 		<form action="/posts/{{ post.id }}/comments/{{ comment.id }}/delete#comments" method="post" class="js-delete-form">
 			<button type="submit" class="btn btn-danger btn-sm" style="--bs-btn-padding-y: 0.25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Supprimer</button>
 		</form>
