@@ -1,0 +1,14 @@
+{% extends "email/layout.html.twig" %}
+
+{% block body %}
+	<div>
+		De :
+		<strong>{{ contactForm.name }}
+			&lt;{{ contactForm.email }}&gt;</strong>
+	</div>
+
+	<hr/>
+
+	<div>Message :</div>
+	<div>{{ contactForm.message|nl2br }}</div>
+{% endblock %}

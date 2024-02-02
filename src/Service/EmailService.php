@@ -65,6 +65,7 @@ class EmailService
 
             //Content
             $this->mail->isHTML($this->isHTML);                                  //Set email format to HTML
+            $this->mail->CharSet = "UTF-8";
             $this->mail->Subject = $this->subject;
             $this->mail->Body    = $this->htmlBody;
             if ($this->textBody) {

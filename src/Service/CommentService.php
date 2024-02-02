@@ -176,7 +176,7 @@ class CommentService
         $commentTitle = $comment->getTitle();
         $commentBody = $comment->getBody();
 
-        $subject = "[OCP5] Commentaire rejeté";
+        $subject = "Commentaire rejeté";
 
         $emailBody = <<<HTML
             Bonjour,

@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Service\EmailService;
+use App\Service\{EmailService, TwigService};
 
 class ContactFormService
 {
@@ -48,52 +48,31 @@ class ContactFormService
      */
     public function sendEmail(): bool
     {
-        $emailService = new EmailService();
+        $contactForm = $this->data;
 
-        $senderName = $this->data["name"];
-        $senderEmail = $this->data["email"];
-        $body = $this->constructEmailBody();
+        $twig = (new TwigService())->getEnvironment();
+
+        $subject = "Message de {$contactForm["name"]}";
+
+        $emailBody = [
+            "html" => $twig->render(
+                "email/contact-form.html.twig",
+                compact("subject", "contactForm")
+            ),
+            "plain" => $twig->render(
+                "email/contact-form-plain.txt.twig",
+                compact("contactForm")
+            ),
+        ];
+
+        $emailService = new EmailService();
 
         $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($_ENV["CONTACT_FORM_EMAIL"])
-            ->setSubject("[OCP5] Message de $senderName ($senderEmail)")
-            ->setBody($body["html"], $body["text"]);
+            ->setSubject($subject)
+            ->setBody($emailBody["html"], $emailBody["plain"]);
 
         return $emailService->send();
-    }
-
-    /**
-     * Make the email body for the contact form.
-     * 
-     * @return array Array with HTML and text email body.
-     */
-    private function constructEmailBody(): array
-    {
-        $name = $this->data["name"];
-        $email = $this->data["email"];
-        $message = $this->data["message"];
-
-        $htmlMessage = str_replace(["\n", "\r\n"], "<br/>", $message);
-
-        $emailBody = <<<HTML
-            <div>De : <b>$name &lt;$email&gt;</b></div>
-            <hr />
-            <div>Message :</div>
-            <div>$htmlMessage</div>
-            HTML;
-
-        $emailAltBody = <<<TEXT
-            De : name ($email)
-            Message :
-            $message
-            TEXT;
-
-        $emailBody = [
-            "html" => $emailBody,
-            "text" => $emailAltBody,
-        ];
-
-        return $emailBody;
     }
 }
