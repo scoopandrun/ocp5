@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\PostService;
 
 class PostController extends Controller
 {
-    public function showAll(): void
+    public function showAll(): HTTPResponse
     {
         $postService = new PostService();
 
@@ -27,8 +28,8 @@ class PostController extends Controller
 
         $posts = $postService->getPostsSummaries($pageNumber, $pageSize);
 
-        $this->response
-            ->sendHTML(
+        return $this->response
+            ->setHTML(
                 $this->twig->render(
                     "front/post-archive.html.twig",
                     [
@@ -41,7 +42,7 @@ class PostController extends Controller
             );
     }
 
-    public function showOne(int $postId): void
+    public function showOne(int $postId): HTTPResponse
     {
         $postService = new PostService();
 
@@ -51,8 +52,8 @@ class PostController extends Controller
             throw new NotFoundException("Le post demandé n'existe pas");
         }
 
-        $this->response
-            ->sendHTML(
+        return $this->response
+            ->setHTML(
                 $this->twig->render(
                     "front/post-single.html.twig",
                     compact("post")

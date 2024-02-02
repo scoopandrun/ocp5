@@ -2,16 +2,18 @@
 
 namespace App\Controller;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Service\ContactFormService;
 use App\Service\PostService;
 
 class HomepageController extends Controller
 {
-    public function show(): void
+    public function show(): HTTPResponse
     {
         $postService = new PostService();
         $latestPosts = $postService->getPostsSummaries(1, 1);
-        $this->response->sendHTML(
+
+        return $this->response->setHTML(
             $this->twig->render(
                 "front/homepage.html.twig",
                 compact("latestPosts")
@@ -19,7 +21,7 @@ class HomepageController extends Controller
         );
     }
 
-    public function processContactForm(): void
+    public function processContactForm(): HTTPResponse
     {
         $postService = new PostService();
         $latestPosts = $postService->getPostsSummaries(1, 1);
@@ -31,15 +33,14 @@ class HomepageController extends Controller
         $contactFormResult = $contactFormService->checkContactForm();
 
         if (in_array(true, array_values($contactFormResult["errors"]))) {
-            $this->response
+            return $this->response
                 ->setCode(400)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "front/homepage.html.twig",
                         compact("latestPosts", "contactFormResult")
                     )
                 );
-            return;
         }
 
         $emailSent = $contactFormService->sendEmail();
@@ -51,7 +52,7 @@ class HomepageController extends Controller
             $contactFormResult["failure"] = true;
         }
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "front/homepage.html.twig",
                 compact("latestPosts", "contactFormResult")

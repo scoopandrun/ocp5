@@ -24,19 +24,26 @@ session_start([
     "cookie_httponly" => true,
 ]);
 
-use App\Core\Constants;
-use App\Core\Router;
-use App\Core\Exceptions\AppException;
-use App\Core\Exceptions\Server\ServerException;
-use App\Controller\HomepageController;
-use App\Controller\PostController;
-use App\Controller\CommentController;
-use App\Controller\UserController;
-use App\Controller\Admin\DashboardController;
-use App\Controller\Admin\PostManagementController;
-use App\Controller\Admin\CommentManagementController;
-use App\Controller\Admin\UserManagementController;
-use App\Controller\ErrorController;
+use App\Core\{
+    Constants,
+    Router,
+    HTTP\HTTPResponse,
+};
+use App\Core\Exceptions\{
+    AppException,
+    Server\ServerException,
+};
+use App\Controller\{
+    ErrorController,
+    HomepageController,
+    PostController,
+    CommentController,
+    UserController,
+    Admin\DashboardController,
+    Admin\PostManagementController,
+    Admin\CommentManagementController,
+    Admin\UserManagementController,
+};
 
 Constants::setRoot(ROOT);
 Constants::setTemplates(TEMPLATES);
@@ -146,11 +153,15 @@ $routes = [
     ],
 ];
 
+$response = new HTTPResponse();
+
 try {
     $router = new Router($routes);
-    $router->match();
+    $response = $router->match();
 } catch (AppException $e) {
-    (new ErrorController($e))->show();
+    $response = (new ErrorController($e))->show();
 } catch (\Throwable $th) {
-    (new ErrorController(new ServerException(previous: $th)))->show();
+    $response = (new ErrorController(new ServerException(previous: $th)))->show();
 }
+
+$response->send();
