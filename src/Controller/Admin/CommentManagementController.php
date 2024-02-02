@@ -2,17 +2,18 @@
 
 namespace App\Controller\Admin;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\{PostService, CommentService};
 
 class CommentManagementController extends AdminController
 {
-    public function show(): void
+    public function show(): HTTPResponse
     {
         $commentService = new CommentService();
         $comments = $commentService->getCommentsToApprove();
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "admin/comment-management.html.twig",
                 compact("comments")
@@ -20,7 +21,7 @@ class CommentManagementController extends AdminController
         );
     }
 
-    public function showReviewPage(int $id): void
+    public function showReviewPage(int $id): HTTPResponse
     {
         $commentService = new CommentService();
         $comment = $commentService->getComment($id);
@@ -33,7 +34,7 @@ class CommentManagementController extends AdminController
         $postId = $comment->getPostId();
         $post = $postService->getPost($postId);
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "admin/comment-review.html.twig",
                 compact("comment", "post")
@@ -41,16 +42,16 @@ class CommentManagementController extends AdminController
         );
     }
 
-    public function approveComment(int $id): void
+    public function approveComment(int $id): HTTPResponse
     {
         $commentService = new CommentService();
 
         $success = $commentService->approveComment($id);
 
-        $this->response->redirect("/admin/comments", 303);
+        return $this->response->redirect("/admin/comments", 303);
     }
 
-    public function rejectComment(int $id): void
+    public function rejectComment(int $id): HTTPResponse
     {
         $commentService = new CommentService();
         $comment = $commentService->getComment($id);
@@ -72,15 +73,14 @@ class CommentManagementController extends AdminController
             $postId = $comment->getPostId();
             $post = $postService->getPost($postId);
 
-            $this->response
+            return $this->response
                 ->setCode(400)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "admin/comment-review.html.twig",
                         compact("comment", "post", "formResult")
                     )
                 );
-            return;
         }
 
         $rejectReason = $formData["rejectReason"];
@@ -91,16 +91,16 @@ class CommentManagementController extends AdminController
         $formResult["failure"] = !$success;
 
         if (!$success) {
-            $this->response
+            return $this->response
                 ->setCode(500)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "admin/comment-review.html.twig",
                         compact("comment", "post", "formResult")
                     )
                 );
-        } else {
-            $this->response->redirect("/admin/comments", 303);
         }
+
+        return $this->response->redirect("/admin/comments", 303);
     }
 }

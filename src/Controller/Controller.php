@@ -25,18 +25,18 @@ abstract class Controller
         $this->twig = (new TwigService($this->request))->getEnvironment();
     }
 
-    protected function sendResponseWithSingleMessage(
+    protected function setResponseWithSingleMessage(
         string $template,
         string $messageTitle,
         string $message,
         int $statusCode = 200
-    ): void {
+    ): HTTPResponse {
         $this->response->setCode($statusCode);
 
         // HTML
         if ($this->request->acceptsHTML()) {
-            $this->response
-                ->sendHTML(
+            return $this->response
+                ->setHTML(
                     $this->twig->render(
                         $template,
                         [
@@ -46,19 +46,16 @@ abstract class Controller
                         ]
                     )
                 );
-            return;
         }
 
         // JSON
         if ($this->request->acceptsJSON()) {
-            $this->response
-                ->sendJSON(
-                    json_encode(["message" => $message])
-                );
-            return;
+            return $this->response->setJSON(
+                json_encode(["message" => $message])
+            );
         }
 
         // Text (default)
-        $this->response->sendText($message);
+        return $this->response->setText($message);
     }
 }
