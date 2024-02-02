@@ -32,6 +32,12 @@ if (commentList) {
     deleteForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      const deleteConfirmed = confirm(
+        "Êtes-vous sûr(e) de vouloir supprimer ce commentaire ?"
+      );
+
+      if (!deleteConfirmed) return;
+
       deleteFormResult.classList.add("d-none");
 
       try {
