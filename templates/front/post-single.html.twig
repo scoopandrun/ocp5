@@ -2,6 +2,11 @@
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="/assets/css/front/common.css">
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% block javascript %}
+	<script defer src="/assets/js/front/comments.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -51,4 +56,110 @@
 			</div>
 		</div>
 	</article>
+
+	<!-- Comments -->
+	<div class="container px-4 px-lg-5 my-3">
+		<div class="row gx-4 gx-lg-5 justify-content-center">
+			<div class="col-md-10 col-lg-8 col-xl-7">
+				<h2 id="comments">Commentaires</h2>
+			</div>
+		</div>
+
+		{% if deleteCommentFormResult %}
+			<div class="row gx-4 gx-lg-5 my-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7">
+
+					{% if deleteCommentFormResult.success %}
+						<span class="text-success">{{ deleteCommentFormResult.message }}</span>
+					{% endif %}
+
+					{% if deleteCommentFormResult.failure %}
+						<span class="invalid-feedback">{{ deleteCommentFormResult.message }}</span>
+					{% endif %}
+
+				</div>
+			</div>
+		{% endif %}
+
+		<div class="container px-4 px-lg-5">
+			{% if post.commentsAllowed %}
+				<div class="row gx-4 gx-lg-5 justify-content-center">
+					<div class="col-md-10 col-lg-8 col-xl-7 p-0">
+						{% if post.comments|length > 0 %}
+							<ul class="list-group list-group-flush" id="commentList">
+								{% for comment in post.comments %}
+									{% include "front/includes/comment.html.twig" %}
+								{% endfor %}
+							</ul>
+						{% else %}
+							<div class="row gx-4 gx-lg-5 justify-content-center">Aucun commentaire sur ce post.</div>
+						{% endif %}
+
+						{% if user %}
+							{% if user.emailVerified %}
+								<div class="row gx-4 gx-lg-5 my-4">
+									<form id="commentForm" action="/posts/{{ post.id }}/comments/create#commentForm" method="post">
+										<div class="form-floating">
+											<input type="text" class="form-control" id="title" name="commentForm[title]" placeholder="Entrez votre nom..." value="{{ commentFormResult.values.title }}" maxlength="255" required/>
+											<label for="title">Titre</label>
+											{% if commentFormResult.errors.titleMissing %}
+												<div class="invalid-feedback">Le titre est requis.</div>
+											{% endif %}
+											{% if commentFormResult.errors.titleTooLong %}
+												<div class="invalid-feedback">Le titre ne peut pas dépasser 255 caractères.</div>
+											{% endif %}
+										</div>
+
+										<div class="form-floating">
+											<textarea class="form-control" id="message" name="commentForm[body]" placeholder="Entrez votre commentaire..." style="height: 12rem" maxlength="65535" required>{{ commentFormResult.values.body }}</textarea>
+											<label for="comment">Commentaire</label>
+											{% if commentFormResult.errors.bodyMissing %}
+												<div class="invalid-feedback">Le commentaire ne peut pas être vide.</div>
+											{% endif %}
+											{% if commentFormResult.errors.bodyTooLong %}
+												<div class="invalid-feedback">Le commentaire ne peut pas dépasser 65535 caractères.</div>
+											{% endif %}
+										</div>
+
+										<!-- Submit success message-->
+										{% if commentFormResult.success %}
+											<div id="submitSuccessMessage">
+												<div class="text-center mb-3">
+													<div class="fw-bolder">
+														Le commentaire a été envoyé.<br/>
+														Il est soumis à validation avant publication sur le blog.</div>
+												</div>
+											</div>
+										{% endif %}
+
+										<!-- Submit error message-->
+										{% if commentFormResult.failure %}
+											<div id="submitErrorMessage">
+												<div class="text-center text-danger mb-3">Erreur lors de l'envoi.</div>
+											</div>
+										{% endif %}
+
+										<!-- Submit Button-->
+										<div class="text-center">
+											<button class="btn btn-primary text-uppercase my-2" id="submitButton" type="submit">Envoyer</button>
+										</div>
+									</form>
+								</div>
+							{% else %}
+								<div>Vous devez vérifier votre adresse e-mail pour poster des commentaires.</div>
+							{% endif %}
+						{% else %}
+							<div>Vous devez vous connecter pour poster des commentaires.</div>
+							<div class="text-center">
+								<a class="btn btn-primary text-uppercase my-2" href="/login">Se connecter</a>
+							</div>
+						{% endif %}
+
+					{% else %}
+						<div class="row gx-4 gx-lg-5 justify-content-center">Les commentaires ne sont pas autorisés.</div>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
 {% endblock %}
