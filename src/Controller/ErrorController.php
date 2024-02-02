@@ -45,7 +45,7 @@ class ErrorController extends Controller
         $this->response->sendText($this->e->getMessage());
     }
 
-    static public function emergencyShow(\Throwable $e)
+    static public function emergencyShow(\Throwable $e): void
     {
         $serverException = new ServerException(previous: $e);
         (new static($serverException, true))->show();
