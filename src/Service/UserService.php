@@ -242,28 +242,24 @@ class UserService
 
         $twig = (new TwigService())->getEnvironment();
 
-        $subject = "Vérification de votre adresse e-mail";
-
-        $emailBody = [
-            "html" => $twig->render(
-                "email/email-verification.html.twig",
-                compact("subject", "emailVerificationToken")
-            ),
-            "plain" => $twig->render(
-                "email/email-verification-plain.txt.twig",
-                compact("emailVerificationToken")
-            ),
-        ];
-
         $emailService = new EmailService();
 
-        $emailService
+        $subject = "Vérification de votre adresse e-mail";
+
+        $emailBody = $emailService->createEmailBody(
+            "email-verification",
+            $subject,
+            compact("emailVerificationToken")
+        );
+
+        $emailSent = $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($email)
             ->setSubject($subject)
-            ->setBody($emailBody["html"], $emailBody["plain"]);
+            ->setBody($emailBody)
+            ->send();
 
-        return $emailService->send();
+        return $emailSent;
     }
 
     /**
@@ -329,28 +325,24 @@ class UserService
 
         $twig = (new TwigService())->getEnvironment();
 
-        $subject = "Réinitialisation de mot de passe";
-
-        $emailBody = [
-            "html" => $twig->render(
-                "email/password-reset.html.twig",
-                compact("subject", "passwordResetToken")
-            ),
-            "plain" => $twig->render(
-                "email/password-reset-plain.txt.twig",
-                compact("passwordResetToken")
-            ),
-        ];
-
         $emailService = new EmailService();
 
-        $emailService
+        $subject = "Réinitialisation de mot de passe";
+
+        $emailBody = $emailService->createEmailBody(
+            "password-reset",
+            $subject,
+            compact("passwordResetToken")
+        );
+
+        $emailSent = $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($email)
             ->setSubject($subject)
-            ->setBody($emailBody["html"], $emailBody["plain"]);
+            ->setBody($emailBody)
+            ->send();
 
-        return $emailService->send();
+        return $emailSent;
     }
 
     public function verifyPasswordResetToken(string $token): bool
