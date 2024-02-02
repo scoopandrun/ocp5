@@ -191,72 +191,20 @@ class HTTPResponse
     }
 
     /**
-     * Send the HTML response.
-     * 
-     * This method is a shortcut to:  
-     * ```php
-     * $response->setType("html")->setBody($html)->send()
-     * ```
-     * 
-     * @param string $html HTML body of the response.
-     */
-    public function sendHTML(string $html): void
-    {
-        $this->setType("html");
-        $this->setBody($html);
-        $this->send();
-    }
-
-    /**
-     * Send the JSON response.
-     * 
-     * The body must already be JSON-encoded.
-     * 
-     * This method is a shortcut to:  
-     * ```php
-     * $response->setType("text")->setBody($json)->send()
-     * ```
-     * 
-     * @param string $json JSON body of the response.
-     */
-    public function sendJSON(string $json): void
-    {
-        $this->setType("json");
-        $this->setBody($json);
-        $this->send();
-    }
-
-    /**
-     * Send the plain text response.
-     * 
-     * This method is a shortcut to:  
-     * ```php
-     * $response->setType("text")->setBody($text)->send()
-     * ```
-     * 
-     * @param string $text Text body of the response.
-     */
-    public function sendText(string $text): void
-    {
-        $this->setType("text");
-        $this->setBody($text);
-        $this->send();
-    }
-
-    /**
      * Redirect the user to the target URI.
      * 
      * @param string $targetURI Target of the redirection.
      * @param int    $code      Optional. HTTP status code. Default = 302.
      */
-    public function redirect(string $targetURI, int $code = 302): void
+    public function redirect(string $targetURI, int $code = 302): HTTPResponse
     {
         $this
             ->setCode($code)
             ->addHeader("Location", $targetURI)
             ->setBody(null)
-            ->setCompression(false)
-            ->send();
+            ->setCompression(false);
+
+        return $this;
     }
 
     /**

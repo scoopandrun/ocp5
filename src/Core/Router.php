@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\Client\{NotFoundException, MethodNotAllowedException};
 
 /**
@@ -22,7 +23,7 @@ class Router
      * 
      * @param string $uri Optional. Path to be matched.
      */
-    public function match(string $uri = ""): void
+    public function match(string $uri = ""): HTTPResponse
     {
         if (!$uri) {
             $uri = $_SERVER["REQUEST_URI"] ?? "/";
@@ -40,8 +41,7 @@ class Router
                     if (strtolower($method) === strtolower($requestMethod)) {
                         $routeMatched = $methodMatched = true;
                         array_shift($matches); // Preserve only captured matches
-                        $controller(...$matches);
-                        return;
+                        return $controller(...$matches);
                     }
                 }
 

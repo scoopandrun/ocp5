@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\AppException;
 use App\Core\Exceptions\Client\ClientException;
 use App\Core\Exceptions\Server\ServerException;
@@ -18,17 +19,16 @@ class ErrorController extends Controller
         }
     }
 
-    public function show(): void
+    public function show(): HTTPResponse
     {
         $this->response->setCode($this->e->httpStatus);
 
         // HTML response
         if ($this->request->acceptsHTML()) {
-            $this->response
-                ->sendHTML($this->twig->render("front/error.html.twig", [
+            return $this->response
+                ->setHTML($this->twig->render("front/error.html.twig", [
                     "error" => $this->e
                 ]));
-            return;
         }
 
         // JSON response
@@ -37,17 +37,17 @@ class ErrorController extends Controller
                 "message" => $this->e->getMessage(),
             ]);
 
-            $this->response->sendJSON($json);
-            return;
+            return $this->response->setJSON($json);
         }
 
         // Default response
-        $this->response->sendText($this->e->getMessage());
+        return $this->response->setText($this->e->getMessage());
     }
 
     static public function emergencyShow(\Throwable $e): void
     {
         $serverException = new ServerException(previous: $e);
-        (new static($serverException, true))->show();
+        $response = (new static($serverException, true))->show();
+        $response->send();
     }
 }

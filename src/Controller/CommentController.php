@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Service\{CommentService, PostService, UserService};
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Core\Exceptions\Client\Auth\UnauthorizedException;
@@ -9,12 +10,12 @@ use App\Core\Exceptions\Client\Auth\ForbiddenException;
 
 class CommentController extends Controller
 {
-    public function redirectToPostPage(int $postId): void
+    public function redirectToPostPage(int $postId): HTTPResponse
     {
-        $this->response->redirect("/posts/$postId");
+        return $this->response->redirect("/posts/$postId");
     }
 
-    public function createComment(int $postId): void
+    public function createComment(int $postId): HTTPResponse
     {
         $postService = new PostService();
 
@@ -48,15 +49,14 @@ class CommentController extends Controller
         $commentFormResult = $commentService->checkFormData($commentData);
 
         if (in_array(true, array_values($commentFormResult["errors"]))) {
-            $this->response
+            return $this->response
                 ->setCode(400)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "front/post-single.html.twig",
                         compact("post", "commentFormResult")
                     )
                 );
-            return;
         }
 
         $commentData["postId"] = $postId;
@@ -72,9 +72,9 @@ class CommentController extends Controller
             "body" => "",
         ];
 
-        $this->response
+        return $this->response
             ->setCode(201)
-            ->sendHTML(
+            ->setHTML(
                 $this->twig->render(
                     "front/post-single.html.twig",
                     compact("post", "commentFormResult")
@@ -82,7 +82,7 @@ class CommentController extends Controller
             );
     }
 
-    public function deleteComment(int $id): void
+    public function deleteComment(int $id): HTTPResponse
     {
         $commentService = new CommentService();
 
@@ -126,8 +126,8 @@ class CommentController extends Controller
 
         // HTML
         if ($this->request->acceptsHTML()) {
-            $this->response
-                ->sendHTML(
+            return $this->response
+                ->setHTML(
                     $this->twig->render(
                         "/front/post-single.html.twig",
                         compact(
@@ -136,16 +136,14 @@ class CommentController extends Controller
                         )
                     )
                 );
-            return;
         }
 
         // JSON
         if ($this->request->acceptsJSON()) {
-            $this->response->sendJSON(json_encode($deleteCommentFormResult));
-            return;
+            return $this->response->setJSON(json_encode($deleteCommentFormResult));
         }
 
         // Default
-        $this->response->sendText($deleteCommentFormResult["message"]);
+        return $this->response->setText($deleteCommentFormResult["message"]);
     }
 }

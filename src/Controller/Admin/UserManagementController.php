@@ -2,17 +2,18 @@
 
 namespace App\Controller\Admin;
 
+use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\UserService;
 
 class UserManagementController extends AdminController
 {
-    public function show(): void
+    public function show(): HTTPResponse
     {
         $userService = new UserService();
         $users = $userService->getUsers(1, 10);
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "admin/user-management.html.twig",
                 compact("users")
@@ -20,7 +21,7 @@ class UserManagementController extends AdminController
         );
     }
 
-    public function showEditPage(?int $userId = null): void
+    public function showEditPage(?int $userId = null): HTTPResponse
     {
         $userService = new UserService();
 
@@ -30,7 +31,7 @@ class UserManagementController extends AdminController
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
 
-        $this->response->sendHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "admin/user-edit.html.twig",
                 compact("user")
@@ -38,7 +39,7 @@ class UserManagementController extends AdminController
         );
     }
 
-    public function editUser(int $userId): void
+    public function editUser(int $userId): HTTPResponse
     {
         $userService = new UserService();
 
@@ -48,15 +49,14 @@ class UserManagementController extends AdminController
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $user = $userId ? $userService->getUser($userId) : null;
-            $this->response
+            return $this->response
                 ->setCode(400)
-                ->sendHTML(
+                ->setHTML(
                     $this->twig->render(
                         "admin/user-edit.html.twig",
                         compact("user", "formResult")
                     )
                 );
-            return;
         }
 
         $userData["id"] = $userId;
@@ -65,17 +65,19 @@ class UserManagementController extends AdminController
 
         $userService->editUser($userEdited, $userOriginal);
 
-        $this->response->redirect("/admin/users");
+        return $this->response->redirect("/admin/users");
     }
 
-    public function deleteUser(int $userId): void
+    public function deleteUser(int $userId): HTTPResponse
     {
         $userService = new UserService();
 
         $success = $userService->deleteUser($userId);
 
-        if ($success) {
-            $this->response->setCode(204)->send();
+        if (!$success) {
+            return $this->response->setCode(500);
         }
+
+        return $this->response->setCode(204);
     }
 }
