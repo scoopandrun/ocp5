@@ -176,33 +176,29 @@ class CommentService
         $commentTitle = $comment->getTitle();
         $commentBody = $comment->getBody();
 
-        $subject = "Commentaire rejeté";
-
-        $emailBody = <<<HTML
-            Bonjour,
-
-            Votre commentaire a été rejeté pour la raison suivante :
-
-            $reason
-
-            Post : $postTitle
-            
-            Commentaire
-            ===========
-            Titre : $commentTitle
-            Corps :
-            $commentBody
-            HTML;
+        $twig = (new TwigService())->getEnvironment();
 
         $emailService = new EmailService();
+
+        $subject = "Commentaire rejeté";
+
+        $emailBody = $emailService->createEmailBody(
+            "reject-comment",
+            $subject,
+            compact(
+                "reason",
+                "postTitle",
+                "commentTitle",
+                "commentBody",
+            )
+        );
 
         $emailSent = $emailService
             ->addTo($comment->getAuthor()->getEmail())
             ->setSubject($subject)
             ->setBody($emailBody)
-            ->setHTML(false)
             ->send();
 
-        return true;
+        return $emailSent;
     }
 }
