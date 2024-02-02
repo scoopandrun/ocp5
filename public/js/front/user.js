@@ -10,7 +10,7 @@ if (deleteAccountButton) {
     e.preventDefault();
 
     const deleteConfirmed = confirm(
-      "Êtes-vous sûr(e) de vouloir supprimervotre compte ?"
+      "Êtes-vous sûr(e) de vouloir supprimer votre compte ?"
     );
 
     if (!deleteConfirmed) return;
