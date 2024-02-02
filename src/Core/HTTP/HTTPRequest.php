@@ -41,7 +41,7 @@ class HTTPRequest
      */
     public readonly ?User $user;
 
-    public function __construct()
+    public function __construct(bool $emergency = false)
     {
         $this->method = $_SERVER["REQUEST_METHOD"];
 
@@ -61,8 +61,7 @@ class HTTPRequest
             : (array) json_decode(file_get_contents("php://input"), true);
 
 
-
-        if (isset($_SESSION["userId"])) {
+        if (isset($_SESSION["userId"]) && !$emergency) {
             $this->user = (new UserService())->getUser($_SESSION["userId"]);
         } else {
             $this->user = null;

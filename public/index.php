@@ -26,7 +26,8 @@ session_start([
 
 use App\Core\Constants;
 use App\Core\Router;
-use App\Core\ErrorLogger;
+use App\Core\Exceptions\AppException;
+use App\Core\Exceptions\Server\ServerException;
 use App\Controller\HomepageController;
 use App\Controller\PostController;
 use App\Controller\CommentController;
@@ -36,11 +37,11 @@ use App\Controller\Admin\PostManagementController;
 use App\Controller\Admin\CommentManagementController;
 use App\Controller\Admin\UserManagementController;
 use App\Controller\ErrorController;
-use App\Core\Exceptions\Client\ClientException;
-use App\Core\Exceptions\Server\ServerException;
 
 Constants::setRoot(ROOT);
 Constants::setTemplates(TEMPLATES);
+
+set_exception_handler(["\App\Controller\ErrorController", "emergencyShow"]);
 
 $routes = [
     // Front office
@@ -148,12 +149,8 @@ $routes = [
 try {
     $router = new Router($routes);
     $router->match();
-} catch (ClientException $e) {
-    (new ErrorController($e))->show();
-} catch (ServerException $e) {
-    (new ErrorLogger($e))->log();
+} catch (AppException $e) {
     (new ErrorController($e))->show();
 } catch (\Throwable $th) {
-    (new ErrorLogger($th))->log();
-    (new ErrorController(new ServerException()))->show();
+    (new ErrorController(new ServerException(previous: $th)))->show();
 }
