@@ -208,7 +208,7 @@ class PostRepository extends Repository
         return $count;
     }
 
-    public function createPost(array $data): int
+    public function createPost(Post $post): int
     {
         $db = $this->connection;
 
@@ -227,13 +227,13 @@ class PostRepository extends Repository
         );
 
         $req->execute([
-            "title" => $data["title"],
-            "leadParagraph" => $data["leadParagraph"],
-            "body" => $data["body"],
-            "author" => $data["author"],
-            "category" => (int) ($data["category"] ?? null) ?: null,
-            "published" => (int) isset($data["isPublished"]),
-            "commentsAllowed" => (int) isset($data["commentsAllowed"]),
+            "title" => $post->getTitle(),
+            "leadParagraph" => $post->getLeadParagraph(),
+            "body" => $post->getBody(),
+            "author" => $post->getAuthor()?->getId(),
+            "category" => $post->getCategory()?->getId(),
+            "published" => (int) $post->getIsPublished(),
+            "commentsAllowed" => (int) $post->getCommentsAllowed(),
         ]);
 
         $lastInsertId = $db->lastInsertId();
@@ -243,7 +243,7 @@ class PostRepository extends Repository
         return (int) $lastInsertId;
     }
 
-    public function editPost(int $id, array $data): void
+    public function editPost(Post $post): bool
     {
         $db = $this->connection;
 
@@ -256,20 +256,23 @@ class PostRepository extends Repository
                 category = :category,
                 published = :published,
                 commentsAllowed = :commentsAllowed,
-                updatedAt = CURRENT_TIMESTAMP
+                updatedAt = :updatedAt
             WHERE
                 id = :id"
         );
 
-        $req->execute([
-            "id" => $id,
-            "title" => $data["title"],
-            "leadParagraph" => $data["leadParagraph"],
-            "body" => $data["body"],
-            "category" => (int) ($data["category"] ?? null) ?: null,
-            "published" => (int) isset($data["isPublished"]),
-            "commentsAllowed" => (int) isset($data["commentsAllowed"]),
+        $success = $req->execute([
+            "id" => $post->getId(),
+            "title" => $post->getTitle(),
+            "leadParagraph" => $post->getLeadParagraph(),
+            "body" => $post->getBody(),
+            "category" => $post->getCategory()?->getId(),
+            "published" => (int) $post->getIsPublished(),
+            "commentsAllowed" => (int) $post->getCommentsAllowed(),
+            "updatedAt" => $post->getUpdatedAt(),
         ]);
+
+        return $success;
     }
 
     public function deletePost(int $id): bool

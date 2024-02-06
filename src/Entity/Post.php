@@ -10,7 +10,7 @@ use App\Entity\{User, Category};
  */
 class Post
 {
-    private int $id;
+    private ?int $id = null;
     private DateTime $createdAt;
     private ?DateTime $updatedAt = null;
     private ?User $author = null;
@@ -27,12 +27,12 @@ class Post
     {
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): static
+    public function setId(?int $id): static
     {
         $this->id = $id;
         return $this;

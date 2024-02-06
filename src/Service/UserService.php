@@ -99,8 +99,10 @@ class UserService
      * 
      * @return int|false The user ID if the credentials are correct, `false` if the email OR password are incorrect.
      */
-    public function checkCredentials(?string $email = null, ?string $password = null): int|false
-    {
+    public function checkCredentials(
+        ?string $email = null,
+        ?string $password = null
+    ): int|false {
         if (!$email || !$password) {
             return false;
         }
@@ -136,8 +138,14 @@ class UserService
      */
     public function login(array $credentials): bool
     {
-        $email = $credentials["email"] ?? null;
-        $password = $credentials["password"] ?? null;
+        $email =
+            is_string($credentials["email"] ?? null)
+            ? $credentials["email"]
+            : "";
+        $password =
+            is_string($credentials["password"] ?? null)
+            ? $credentials["password"]
+            : "";
 
         if (!$email || !$password) {
             return false;
