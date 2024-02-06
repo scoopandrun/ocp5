@@ -142,6 +142,17 @@ class CategoryRepository extends Repository
         return $success;
     }
 
+    public function deleteCategory(int $id): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare("DELETE FROM categories WHERE id = :id");
+
+        $success = $req->execute(["id" => $id]);
+
+        return $success;
+    }
+
     /**
      * Check if a category already exists with the name.
      * 
