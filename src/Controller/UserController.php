@@ -3,9 +3,10 @@
 namespace App\Controller;
 
 use App\Core\HTTP\HTTPResponse;
-use App\Service\UserService;
+use App\Core\Security;
 use App\Core\Exceptions\Client\Auth\UnauthorizedException;
 use App\Core\Exceptions\Client\ClientException;
+use App\Service\UserService;
 
 class UserController extends Controller
 {
@@ -74,6 +75,7 @@ class UserController extends Controller
         $loginOK = $userService->login($credentials);
 
         if (!$loginOK) {
+            Security::preventBruteforce();
             return $this->response
                 ->setCode(401)
                 ->setHTML(
