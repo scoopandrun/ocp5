@@ -1,9 +1,9 @@
-const postsTable = document.getElementById("datatable");
-const postRows = postsTable.querySelectorAll("tbody > tr");
+const categoriesTable = document.getElementById("datatable");
+const categoryRows = categoriesTable.querySelectorAll("tbody > tr");
 
-postRows.forEach((row) => {
-  const postId = row.dataset.postId;
-  const deleteURI = "/admin/posts/" + postId;
+categoryRows.forEach((row) => {
+  const categoryId = row.dataset.categoryId;
+  const deleteURI = "/admin/categories/" + categoryId;
 
   const deleteButton = row.querySelector("button[data-delete]");
 
@@ -13,7 +13,7 @@ postRows.forEach((row) => {
     e.preventDefault();
 
     const deleteConfirmed = confirm(
-      "Êtes-vous sûr(e) de vouloir supprimer ce post ?"
+      "Êtes-vous sûr(e) de vouloir supprimer cette catégorie ?"
     );
 
     if (!deleteConfirmed) return;

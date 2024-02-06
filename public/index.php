@@ -42,6 +42,7 @@ use App\Controller\{
     Admin\DashboardController,
     Admin\PostManagementController,
     Admin\CommentManagementController,
+    Admin\CategoryManagementController,
     Admin\UserManagementController,
 };
 
@@ -128,6 +129,18 @@ $routes = [
     "/admin/posts/create" => [
         "GET" => fn () => (new PostManagementController())->showEditPage(),
         "POST" => fn () => (new PostManagementController())->createPost(),
+    ],
+    "/admin/categories" => [
+        "GET" => fn () => (new CategoryManagementController())->show(),
+    ],
+    "/admin/categories/(\d+)" => [
+        "GET" => fn (int $id) => (new CategoryManagementController())->showEditPage($id),
+        "POST" => fn (int $id) => (new CategoryManagementController())->editCategory($id),
+        "DELETE" => fn (int $id) => (new CategoryManagementController())->deleteCategory($id),
+    ],
+    "/admin/categories/create" => [
+        "GET" => fn () => (new CategoryManagementController())->showEditPage(),
+        "POST" => fn () => (new CategoryManagementController())->createCategory(),
     ],
     "/admin/comments" => [
         "GET" => fn () => (new CommentManagementController())->show(),
