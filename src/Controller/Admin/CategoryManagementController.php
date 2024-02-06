@@ -119,4 +119,17 @@ class CategoryManagementController extends AdminController
 
         return $this->response->redirect("/admin/categories");
     }
+
+    public function deleteCategory(int $categoryId): HTTPResponse
+    {
+        $categoryService = new CategoryService();
+
+        $success = $categoryService->deleteCategory($categoryId);
+
+        if (!$success) {
+            return $this->response->setCode(500);
+        }
+
+        return $this->response->setCode(204);
+    }
 }

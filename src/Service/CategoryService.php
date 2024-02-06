@@ -93,4 +93,9 @@ class CategoryService
 
         return $success;
     }
+
+    public function deleteCategory(int $id): bool
+    {
+        return $this->categoryRepository->deleteCategory($id);
+    }
 }
