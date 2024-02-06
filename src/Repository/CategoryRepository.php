@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Core\Exceptions\Server\DB\DBException;
+use App\Core\ErrorLogger;
 use App\Entity\Category;
 
 class CategoryRepository extends Repository
@@ -61,5 +62,107 @@ class CategoryRepository extends Repository
         }, $categoriesRaw);
 
         return $categories;
+    }
+
+    /**
+     * Fetch a single category based on its ID.
+     * 
+     * @param int $id ID of the category.
+     */
+    public function getCategory(int $id): Category | null
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "SELECT
+                c.id,
+                c.name
+            FROM categories c
+            WHERE
+                c.id = :id"
+        );
+
+        $req->execute(compact("id"));
+
+        $categoryRaw = $req->fetch();
+
+        if (!$categoryRaw) {
+            return null;
+        }
+
+        $category = (new Category)
+            ->setId($categoryRaw["id"])
+            ->setName($categoryRaw["name"]);
+
+        return $category;
+    }
+
+    public function createCategory(Category $category): int|false
+    {
+        $db = $this->connection;
+
+        try {
+            $db->beginTransaction();
+
+            $req = $db->prepare("INSERT INTO categories SET name = :name");
+
+            $req->execute([
+                "name" => $category->getName(),
+            ]);
+
+            $lastInsertId = $db->lastInsertId();
+
+            $db->commit();
+
+            return (int) $lastInsertId;
+        } catch (\PDOException $e) {
+            $db->rollBack();
+            (new ErrorLogger($e))->log();
+            return false;
+        }
+    }
+
+    public function editCategory(Category $category): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "UPDATE categories
+            SET
+                name = :name
+            WHERE
+                id = :id"
+        );
+
+        $success = $req->execute([
+            "id" => $category->getId(),
+            "name" => $category->getName(),
+        ]);
+
+        return $success;
+    }
+
+    /**
+     * Check if a category already exists with the name.
+     * 
+     * @param string $name Category name to check.
+     * 
+     * @return bool `true` if a category already exists with that name, `false` otherwise.
+     */
+    public function nameAlreadyExists(string $name): bool
+    {
+        $db = $this->connection;
+
+        $req = $db->prepare(
+            "SELECT COUNT(*)
+            FROM categories c
+            WHERE c.name = :name"
+        );
+
+        $req->execute(compact("name"));
+
+        $nameExists = (bool) $req->fetch(\PDO::FETCH_COLUMN);
+
+        return $nameExists;
     }
 }

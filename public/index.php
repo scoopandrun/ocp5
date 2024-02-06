@@ -133,6 +133,14 @@ $routes = [
     "/admin/categories" => [
         "GET" => fn () => (new CategoryManagementController())->show(),
     ],
+    "/admin/categories/(\d+)" => [
+        "GET" => fn (int $id) => (new CategoryManagementController())->showEditPage($id),
+        "POST" => fn (int $id) => (new CategoryManagementController())->editCategory($id),
+    ],
+    "/admin/categories/create" => [
+        "GET" => fn () => (new CategoryManagementController())->showEditPage(),
+        "POST" => fn () => (new CategoryManagementController())->createCategory(),
+    ],
     "/admin/comments" => [
         "GET" => fn () => (new CommentManagementController())->show(),
     ],
