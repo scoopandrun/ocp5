@@ -53,15 +53,20 @@
 						</div>
 
 						<div class="form-floating">
-							<input type="password" class="form-control" id="password" name="signupForm[new-password]" placeholder="Mot de passe" autocomplete="new-password" required/>
+							<input type="password" class="form-control" id="password" name="signupForm[new-password]" placeholder="Mot de passe" autocomplete="new-password" minlength="{{ MINIMUM_PASSWORD_LENGTH }}" required/>
 							<label for="password">Mot de passe</label>
 							{% if formResult.errors.newPasswordMissing %}
 								<div class="invalid-feedback">Le mot de passe est obligatoire.</div>
 							{% endif %}
+							{% if formResult.errors.newPasswordTooShort %}
+								<div class="invalid-feedback">Le nouveau mot de passe doit être supérieur à
+									{{ MINIMUM_PASSWORD_LENGTH }}
+									caractères.</div>
+							{% endif %}
 						</div>
 
 						<div class="form-floating">
-							<input type="password" class="form-control" id="password" name="signupForm[password-confirm]" placeholder="Retapez le mot de passe" autocomplete="new-password" required/>
+							<input type="password" class="form-control" id="password" name="signupForm[password-confirm]" placeholder="Retapez le mot de passe" autocomplete="new-password" minlength="{{ MINIMUM_PASSWORD_LENGTH }}" required/>
 							<label for="password">Retapez le mot de passe</label>
 							{% if formResult.errors.passwordConfirmMissing %}
 								<div class="invalid-feedback">Le mot de passe doit être retapé dans ce champ.</div>
