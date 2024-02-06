@@ -157,6 +157,9 @@ class UserService
             return false;
         }
 
+        // Prevent session fixing
+        session_regenerate_id();
+
         $_SESSION["userId"] = $userId;
 
         return true;
