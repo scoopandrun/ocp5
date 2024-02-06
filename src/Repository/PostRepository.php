@@ -78,17 +78,30 @@ class PostRepository extends Repository
     /**
      * Fetch the blog posts summaries.
      * 
-     * @param int $pageNumber     Page number.
-     * @param int $pageSize       Number of blog posts to show on a page.
-     * @param bool $publishedOnly Optional. Fetch only published posts. Default = `true`.
+     * @param int   $pageNumber    Page number.
+     * @param int   $pageSize      Number of blog posts to show on a page.
+     * @param bool  $publishedOnly Optional. Fetch only published posts. Default = `true`.
+     * @param array $categories    Optional. Array of category IDs to filter the posts.
+     * @param array $authors       Optional. Array of author IDs to filter the posts.
      * 
      * @return array<int, \App\Entity\Post> 
      */
-    public function getPostsSummaries(int $pageNumber, int $pageSize, bool $publishedOnly = true): array
-    {
+    public function getPostsSummaries(
+        int $pageNumber,
+        int $pageSize,
+        bool $publishedOnly = true,
+        array $categories = [],
+        array $authors = [],
+    ): array {
         $db = $this->connection;
 
-        $publishedOnlySql = $publishedOnly ? "WHERE p.published = 1" : "";
+        $publishedSql = $publishedOnly ? "AND p.published = 1" : "";
+        $categoriesSql = empty($categories)
+            ? ""
+            : "AND p.category IN (" . join(",", $categories) . ")";
+        $authorsSql = empty($authors)
+            ? ""
+            : "AND p.author IN (" . join(",", $authors) . ")";
 
         $req = $db->prepare(
             "SELECT
@@ -106,7 +119,10 @@ class PostRepository extends Repository
             FROM posts p
             LEFT JOIN users u ON u.id = p.author
             LEFT JOIN categories c ON c.id = p.category
-            $publishedOnlySql
+            WHERE 1
+            $publishedSql
+            $categoriesSql
+            $authorsSql
             ORDER BY p.createdAt DESC
             LIMIT :limit
             OFFSET :offset"
@@ -119,7 +135,7 @@ class PostRepository extends Repository
 
         $postsRaw = $req->fetchAll();
 
-        if (!$postsRaw) {
+        if ($postsRaw === false) {
             throw new DBException("Erreur lors de la récupération des posts.");
         }
 
@@ -158,15 +174,34 @@ class PostRepository extends Repository
     /**
      * Get the amount of blog posts in the database.
      * 
-     * @param bool $published Optional. Count only published posts. Default = `true`.
+     * @param bool  $publishedOnly Optional. Count only published posts. Default = `true`.
+     * @param array $categories    Optional. Array of category IDs to filter the post count.
+     * @param array $authors       Optional. Array of author IDs to filter the post count.
      */
-    public function getPostCount(bool $published = true): int
-    {
+    public function getPostCount(
+        bool $publishedOnly = true,
+        array $categories = [],
+        array $authors = [],
+    ): int {
         $db = $this->connection;
 
-        $whereClause = $published ? "WHERE published = 1" : "";
+        $publishedSql = $publishedOnly ? "AND published = 1" : "";
+        $categoriesSql = empty($categories)
+            ? ""
+            : "AND category IN (" . join(",", $categories) . ")";
+        $authorsSql = empty($authors)
+            ? ""
+            : "AND author IN (" . join(",", $authors) . ")";
 
-        $req = $db->query("SELECT COUNT(*) FROM posts $whereClause");
+        $req = $db->query(
+            "SELECT COUNT(*)
+            FROM posts
+            WHERE 1
+            $publishedSql
+            $categoriesSql
+            $authorsSql
+            "
+        );
 
         $count = $req->fetch(\PDO::FETCH_COLUMN);
 
