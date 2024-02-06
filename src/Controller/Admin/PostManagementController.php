@@ -27,7 +27,7 @@ class PostManagementController extends AdminController
         $categoryService = new CategoryService();
 
         $post = $postId ? $postService->getPost($postId, false) : null;
-        $categories = $categoryService->getAll();
+        $categories = $categoryService->getCategories();
 
         if ($postId && !$post) {
             throw new NotFoundException("Le post demandé n'existe pas");
@@ -46,7 +46,7 @@ class PostManagementController extends AdminController
         $postService = new PostService();
         $categoryService = new CategoryService();
 
-        $categories = $categoryService->getAll();
+        $categories = $categoryService->getCategories();
 
         /** @var array */
         $postData = $this->request->body["post"] ?? [];
@@ -77,7 +77,7 @@ class PostManagementController extends AdminController
         $postService = new PostService();
         $categoryService = new CategoryService();
 
-        $categories = $categoryService->getAll();
+        $categories = $categoryService->getCategories();
 
         $postData = $this->request->body["post"] ?? [];
 
