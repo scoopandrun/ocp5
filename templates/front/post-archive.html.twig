@@ -17,22 +17,31 @@
 		<div class="row gx-4 gx-lg-5 justify-content-center">
 			<div class="col-md-10 col-lg-8 col-xl-7">
 
-				{% for post in posts %}
-					<!-- Post preview-->
-					{{ include("front/includes/post-summary.html.twig") }}
-					<!-- Divider-->
-					<hr class="my-4"/>
-				{% endfor %}
+				{% if posts|length > 0 %}
+					{% for post in posts %}
+						<!-- Post preview-->
+						{{ include("front/includes/post-summary.html.twig") }}
+						<!-- Divider-->
+						<hr class="my-4"/>
+					{% endfor %}
 
-				<!-- Pager-->
-				<div class="d-flex justify-content-between mb-4">
-					{% if previousPage %}
-						<a class="btn btn-primary text-uppercase" href="/posts?page={{ page - 1 }}">← Posts plus récents</a>
-					{% endif %}
-					{% if nextPage %}
-						<a class="btn btn-primary text-uppercase ms-auto" href="/posts?page={{ page + 1 }}">Posts plus anciens →</a>
-					{% endif %}
-				</div>
+					<!-- Pager-->
+					<div class="d-flex justify-content-between mb-4">
+						{% if previousPage %}
+							<a class="btn btn-primary text-uppercase" href="/posts?page={{ page - 1 }}{{ categoriesQuery }}{{ authorsQuery }}">← Posts plus récents</a>
+						{% endif %}
+						{% if nextPage %}
+							<a class="btn btn-primary text-uppercase ms-auto" href="/posts?page={{ page + 1 }}{{ categoriesQuery }}{{ authorsQuery }}">Posts plus anciens →</a>
+						{% endif %}
+					</div>
+				{% else %}
+					<div class="text-center mb-4">Aucun post ne correcpond à votre requête.</div>
+
+					<div class="d-flex justify-content-around mb-4">
+						<a class="btn btn-primary text-uppercase" href="/posts">Voir tous les posts</a>
+					</div>
+				{% endif %}
+
 			</div>
 		</div>
 	</div>

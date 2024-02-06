@@ -40,22 +40,50 @@ class PostService
      * @param int $pageNumber     Page number.
      * @param int $pageSize       Number of blog posts to show on a page.
      * @param bool $publishedOnly Optional. Fetch only published posts. Default = `true`.
+     * @param array $categories    Optional. Array of category IDs to filter the posts.
+     * @param array $authors       Optional. Array of author IDs to filter the posts.
      * 
      * @return array<int, \App\Entity\Post> 
      */
-    public function getPostsSummaries(int $pageNumber, int $pageSize, bool $publishedOnly = true): array
-    {
-        return $this->postRepository->getPostsSummaries($pageNumber, $pageSize, $publishedOnly);
+    public function getPostsSummaries(
+        int $pageNumber,
+        int $pageSize,
+        bool $publishedOnly = true,
+        array $categories = [],
+        array $authors = []
+    ): array {
+        return
+            $this
+            ->postRepository
+            ->getPostsSummaries(
+                $pageNumber,
+                $pageSize,
+                $publishedOnly,
+                $categories,
+                $authors
+            );
     }
 
     /**
      * Get the amount of blog posts in the database.
      * 
-     * @param bool $publishedOnly Optional. Count only published posts. Default = `true`.
+     * @param bool  $publishedOnly Optional. Count only published posts. Default = `true`.
+     * @param array $categories    Optional. Array of category IDs to filter the post count.
+     * @param array $authors       Optional. Array of author IDs to filter the post count.
      */
-    public function getPostCount(bool $publishedOnly = true): int
-    {
-        return $this->postRepository->getPostCount($publishedOnly);
+    public function getPostCount(
+        bool $publishedOnly = true,
+        array $categories = [],
+        array $authors = []
+    ): int {
+        return
+            $this
+            ->postRepository
+            ->getPostCount(
+                $publishedOnly,
+                $categories,
+                $authors
+            );
     }
 
     public function checkFormData(array $formData): array
@@ -87,5 +115,18 @@ class PostService
     public function deletePost(int $id): bool
     {
         return $this->postRepository->deletePost($id);
+    }
+
+    public function parseQuery(array $query): array
+    {
+        $categories =
+            $query["categories"] ?? null
+            ? array_map(fn (mixed $category): int => (int) $category, explode(",", $query["categories"]))
+            : [];
+        $authors = $query["authors"] ?? null
+            ? array_map(fn (mixed $author): int => (int) $author, explode(",", $query["authors"]))
+            : [];
+
+        return compact("categories", "authors");
     }
 }
