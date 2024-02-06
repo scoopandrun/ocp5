@@ -7,6 +7,10 @@ header .post-heading .meta {
   margin-top: 0.5rem;
 }
 
+header .post-heading .meta a:hover {
+  color: #d2ecec;
+}
+
 @media (min-width: 768px) {
   header.page-heading {
     padding-top: 8rem;
