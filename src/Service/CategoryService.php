@@ -14,16 +14,22 @@ class CategoryService
         $this->categoryRepository = new CategoryRepository();
     }
 
+    public function makeCategoryObject(array $categoryData): Category
+    {
+        $category = (new Category())
+            ->setId($categoryData["id"] ?? null)
+            ->setName($categoryData["name"] ?? "");
+
+        return $category;
+    }
+
     /**
-     * Get a single blog post based on its ID.
-     * 
-     * @param int $id             ID of the blog post.
-     * @param bool $publishedOnly Optional. Fetch only if the post is published. Default = `true`.
+     * Get all categories.
      * 
      * @return array<int, \App\Entity\Category>
      */
-    public function getAll(): array
+    public function getCategories(): array
     {
-        return $this->categoryRepository->getAll();
+        return $this->categoryRepository->getCategories(true);
     }
 }

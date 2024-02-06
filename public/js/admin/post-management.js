@@ -7,6 +7,8 @@ postRows.forEach((row) => {
 
   const deleteButton = row.querySelector("button[data-delete]");
 
+  if (!deleteButton) return;
+
   deleteButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
