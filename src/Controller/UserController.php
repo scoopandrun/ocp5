@@ -75,7 +75,6 @@ class UserController extends Controller
         $loginOK = $userService->login($credentials);
 
         if (!$loginOK) {
-            Security::preventBruteforce();
             return $this->response
                 ->setCode(401)
                 ->setHTML(
