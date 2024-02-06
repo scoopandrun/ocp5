@@ -12,8 +12,14 @@ class PostController extends Controller
     {
         $postService = new PostService();
 
+        /**
+         * @var array $categories
+         * @var array $authors
+         */
+        extract($postService->parseQuery($this->request->query));
+
         /** @var int $postCount Total number of posts. */
-        $postCount = $postService->getPostCount();
+        $postCount = $postService->getPostCount(true, $categories, $authors);
 
         /** @var int $pageNumber Defaults to `1` in case of inconsistency. */
         $pageNumber = max((int) ($this->request->query["page"] ?? null), 1);
@@ -23,10 +29,16 @@ class PostController extends Controller
 
         // Show last page in case $pageNumber is too high
         if ($postCount < ($pageNumber * $pageSize)) {
-            $pageNumber = ceil($postCount / $pageSize);
+            $pageNumber = max(ceil($postCount / $pageSize), 1);
         }
 
-        $posts = $postService->getPostsSummaries($pageNumber, $pageSize);
+        $posts = $postService->getPostsSummaries(
+            $pageNumber,
+            $pageSize,
+            true,
+            $categories,
+            $authors
+        );
 
         return $this->response
             ->setHTML(
@@ -37,6 +49,14 @@ class PostController extends Controller
                         "page" => $pageNumber,
                         "previousPage" => $pageNumber > 1,
                         "nextPage" => $postCount > ($pageNumber * $pageSize),
+                        "categoriesQuery" =>
+                        empty($categories)
+                            ? ""
+                            : "&categories=" . join(",", $categories),
+                        "authorsQuery" =>
+                        empty($authors)
+                            ? ""
+                            : "&authors=" . join(",", $authors),
                     ]
                 )
             );
