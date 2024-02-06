@@ -1,0 +1,72 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="/assets/css/form.css">
+{% endblock %}
+
+{% set breadcrumbs = [
+	{
+		"href": "/admin/categories",
+		"name": "Gestion des catégories",
+		"title": "Gestion des catégories"
+	},
+	{
+		"name": category.id ? "Modification de catégorie" : "Création de catégorie"
+	},
+] %}
+
+
+{% block body %}
+	<header class="masthead page-heading">
+		<div class="container position-relative px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 gy-4 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-3">
+					<div class="post-heading">
+						{% if category %}
+							<h1>Modification de catégorie</h1>
+						{% else %}
+							<h1>Création de catégorie</h1>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	{% if formResult.failure %}
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<div class="invalid-feedback">Une ou plusieurs erreurs se sont produites</div>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	<main>
+		<div class="container px-4 px-lg-5">
+			<div class="row gx-4 gx-lg-5 justify-content-center">
+				<div class="col-md-10 col-lg-8 col-xl-7 mb-5">
+					<form id="categoryForm" method="post" action="">
+						<div class="input-group input-group-static">
+							<label for="name">Nom (20 caractères maximum)</label>
+							<input type="text" id="name" name="category[name]" class="form-control" maxlength="20" placeholder="Nom" value="{{ category.name }}" required/>
+							{% if formResult.errors.nameMissing %}
+								<div class="invalid-feedback">Le nom est requis.</div>
+							{% endif %}
+							{% if formResult.errors.nameTooLong %}
+								<div class="invalid-feedback">Le nom ne doit pas dépasser 20 caractères.</div>
+							{% endif %}
+							{% if formResult.errors.nameAlreadyExists %}
+								<div class="invalid-feedback">Une catégorie porte déjà ce nom.</div>
+							{% endif %}
+						</div>
+
+						<button class="btn btn-primary text-uppercase mt-5" id="submitButton" type="submit">Enregistrer</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</main>
+
+{% endblock %}
