@@ -11,6 +11,7 @@ use Twig\Extra\Markdown\MarkdownRuntime;
 use Twig\Extra\Markdown\MarkdownExtension;
 use App\Core\HTTP\HTTPRequest;
 use App\Core\Constants;
+use App\Core\Security;
 
 class TwigService
 {
@@ -26,6 +27,8 @@ class TwigService
         if ($request) {
             $this->environment->addGlobal("user", $request->user);
         }
+
+        $this->environment->addGlobal("MINIMUM_PASSWORD_LENGTH", Security::MINIMUM_PASSWORD_LENGTH);
 
         $this->environment->addExtension(new IntlExtension());
         $this->environment->addExtension(new MarkdownExtension());

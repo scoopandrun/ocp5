@@ -3,9 +3,10 @@
 namespace App\Controller;
 
 use App\Core\HTTP\HTTPResponse;
-use App\Service\UserService;
+use App\Core\Security;
 use App\Core\Exceptions\Client\Auth\UnauthorizedException;
 use App\Core\Exceptions\Client\ClientException;
+use App\Service\UserService;
 
 class UserController extends Controller
 {
@@ -18,7 +19,7 @@ class UserController extends Controller
         }
 
         return $this->response->setHTML(
-            $this->twig->render("front/user.html.twig", compact("user"))
+            $this->twig->render("front/user.html.twig")
         );
     }
 
@@ -161,7 +162,7 @@ class UserController extends Controller
                 ->setHTML(
                     $this->twig->render(
                         "front/user.html.twig",
-                        compact("user", "formResult")
+                        compact("formResult")
                     )
                 );
         }
@@ -176,7 +177,7 @@ class UserController extends Controller
         $formResult["success"] = $success;
         $formResult["failure"] = !$success;
 
-        $this->response->setHTML(
+        return $this->response->setHTML(
             $this->twig->render(
                 "front/user.html.twig",
                 [
@@ -193,7 +194,9 @@ class UserController extends Controller
             ->setHTML(
                 $this->twig->render(
                     "front/user.html.twig",
-                    ["showDeleteAccountConfirmation" => true]
+                    [
+                        "showDeleteAccountConfirmation" => true,
+                    ]
                 )
             );
     }

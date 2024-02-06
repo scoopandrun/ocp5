@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Core\Security;
 use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Service\{EmailService, TwigService};
@@ -58,6 +59,7 @@ class UserService
                     && $currentPassword
                     && $this->checkCredentials($user?->getEmail(), $currentPassword) === false,
                 "newPasswordMissing" => $newAccount && !$newPassword,
+                "newPasswordTooShort" => $newPassword && mb_strlen($newPassword) < Security::MINIMUM_PASSWORD_LENGTH,
                 "passwordConfirmMissing" => $newPassword && !$passwordConfirm,
                 "passwordMismatch" => $newPassword !== $passwordConfirm,
             ],
@@ -97,8 +99,10 @@ class UserService
      * 
      * @return int|false The user ID if the credentials are correct, `false` if the email OR password are incorrect.
      */
-    public function checkCredentials(?string $email = null, ?string $password = null): int|false
-    {
+    public function checkCredentials(
+        ?string $email = null,
+        ?string $password = null
+    ): int|false {
         if (!$email || !$password) {
             return false;
         }
@@ -134,8 +138,14 @@ class UserService
      */
     public function login(array $credentials): bool
     {
-        $email = $credentials["email"] ?? null;
-        $password = $credentials["password"] ?? null;
+        $email =
+            is_string($credentials["email"] ?? null)
+            ? $credentials["email"]
+            : "";
+        $password =
+            is_string($credentials["password"] ?? null)
+            ? $credentials["password"]
+            : "";
 
         if (!$email || !$password) {
             return false;
@@ -146,6 +156,9 @@ class UserService
         if (!$userId) {
             return false;
         }
+
+        // Prevent session fixing
+        session_regenerate_id();
 
         $_SESSION["userId"] = $userId;
 
@@ -353,14 +366,15 @@ class UserService
 
     public function checkPasswordResetFormData(array $formData): array
     {
-        $newPassword = $formData["new-password"] ?? "";
-        $passwordConfirm = $formData["password-confirm"] ?? "";
+        $newPasswordIsString = is_string($formData["new-password"] ?? null);
+        $passwordConfirmIsString = is_string($formData["password-confirm"] ?? null);
 
-        $newPasswordIsString = gettype($newPassword) === "string";
-        $passwordConfirmIsString = gettype($passwordConfirm) === "string";
+        $newPassword = $newPasswordIsString ? $formData["new-password"] : "";
+        $passwordConfirm = $passwordConfirmIsString ? $formData["password-confirm"] : "";
 
-        $newPasswordMissing = !$newPassword || !$newPasswordIsString;
-        $passwordConfirmMissing = !$passwordConfirm || !$passwordConfirmIsString;
+        $newPasswordMissing = !$newPassword;
+        $newPasswordTooShort = $newPassword && mb_strlen($newPassword < Security::MINIMUM_PASSWORD_LENGTH);
+        $passwordConfirmMissing = !$passwordConfirm;
         $passwordMismatch = $newPassword !== $passwordConfirm;
 
         $errorMessage = "";
@@ -370,8 +384,16 @@ class UserService
                 $errorMessage = "Le mot de passe est obligatoire.";
                 break;
 
+            case $newPasswordTooShort:
+                $errorMessage =
+                    "Le mot de passe doit être supérieur à "
+                    . Security::MINIMUM_PASSWORD_LENGTH
+                    . " caractères.";
+                break;
+
             case $passwordConfirmMissing:
                 $errorMessage = "Le mot de passe doit être retapé.";
+                break;
 
             case $passwordMismatch:
                 $errorMessage = "Le mot de passe n'a pas été correctement retapé.";

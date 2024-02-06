@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use App\Repository\PostRepository;
-use App\Entity\Post;
+use App\Repository\{CategoryRepository, PostRepository, UserRepository};
+use App\Entity\{Category, Post, User};
 use App\Service\CommentService;
 
 class PostService
@@ -13,6 +13,38 @@ class PostService
     public function __construct()
     {
         $this->postRepository = new PostRepository();
+    }
+
+    public function makePostObject(array $postData): Post
+    {
+        $userRepository = new UserRepository();
+
+        $author = $postData["author"] ?? null
+            ? ($postData["author"] instanceof User
+                ? $postData["author"]
+                : $userRepository->getAuthor($postData["author"]))
+            : null;
+
+        $categoryRepository = new CategoryRepository();
+
+        $category = $postData["category"] ?? null
+            ? ($postData["category"] instanceof Category
+                ? $postData["category"]
+                : $categoryRepository->getCategory($postData["category"]))
+            : null;
+
+        $post = (new Post())
+            ->setId($postData["id"] ?? null)
+            ->setTitle($postData["title"] ?? "")
+            ->setLeadParagraph($postData["leadParagraph"] ?? "")
+            ->setBody($postData["body"] ?? "")
+            ->setAuthor($author)
+            ->setCategory($category)
+            ->setIsPublished(isset($postData["isPublished"]))
+            ->setCommentsAllowed(isset($postData["commentsAllowed"]))
+            ->setCreatedAt($postData["createdAt"] ?? "now");
+
+        return $post;
     }
 
     /**
@@ -102,14 +134,42 @@ class PostService
         return $formResult;
     }
 
-    public function createPost(array $data): int
+    public function createPost(Post $post): int
     {
-        return $this->postRepository->createPost($data);
+        $safeTitle = trim(htmlspecialchars($post->getTitle(), ENT_NOQUOTES));
+        $safeLeadParagraph = trim(htmlspecialchars($post->getLeadParagraph(), ENT_NOQUOTES));
+        $safeBody = trim(htmlspecialchars($post->getBody(), ENT_NOQUOTES));
+
+        $post
+            ->setTitle($safeTitle)
+            ->setLeadParagraph($safeLeadParagraph)
+            ->setBody($safeBody);
+
+        return $this->postRepository->createPost($post);
     }
 
-    public function editPost(int $id, array $data): void
+    public function editPost(Post $post): bool
     {
-        $this->postRepository->editPost($id, $data);
+        $safeTitle = trim(htmlspecialchars($post->getTitle(), ENT_NOQUOTES));
+        $safeLeadParagraph = trim(htmlspecialchars($post->getLeadParagraph(), ENT_NOQUOTES));
+        $safeBody = trim(htmlspecialchars($post->getBody(), ENT_NOQUOTES));
+
+        $post
+            ->setTitle($safeTitle)
+            ->setLeadParagraph($safeLeadParagraph)
+            ->setBody($safeBody);
+
+        $originalPost = $this->postRepository->getPost($post->getId(), false);
+
+        $titleChanged = $post->getTitle() !== $originalPost->getTitle();
+        $leadParagraphChanged = $post->getLeadParagraph() !== $originalPost->getLeadParagraph();
+        $bodyChanged = $post->getBody() !== $originalPost->getBody();
+
+        if ($titleChanged || $leadParagraphChanged || $bodyChanged) {
+            $post->setUpdatedAt("now");
+        }
+
+        return $this->postRepository->editPost($post);
     }
 
     public function deletePost(int $id): bool
