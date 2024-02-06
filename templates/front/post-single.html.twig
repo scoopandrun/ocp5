@@ -19,7 +19,11 @@
 						<h1>{{ post.title }}</h1>
 						<h2 class="subheading">{{ post.leadParagraph }}</h2>
 						<div class="meta">Posté par
-							{{ post.author ?? "Anonyme" }}
+							{% if post.author.id %}
+								<a href="/posts?authors={{ post.author.id }}">{{ post.author.name }}</a>
+							{% else %}
+								Anonyme
+							{% endif %}
 							le
 							{{ post.createdAt|format_date("full", locale="fr") }}</div>
 						{% if post.updatedAt %}
@@ -28,7 +32,8 @@
 						{% endif %}
 						{% if post.category %}
 							<div class="meta">Catégorie
-								{{ post.category }}</div>
+								<a href="/posts?categories={{ post.category.id }}">{{ post.category }}</a>
+							</div>
 						{% endif %}
 					</div>
 				</div>
