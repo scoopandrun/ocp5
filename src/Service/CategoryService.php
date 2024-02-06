@@ -26,11 +26,13 @@ class CategoryService
     /**
      * Get all categories.
      * 
+     * @param bool $withCount Also fetch the number of blog posts for each category.
+     * 
      * @return array<int, \App\Entity\Category>
      */
-    public function getCategories(): array
+    public function getCategories(bool $withCount = true): array
     {
-        return $this->categoryRepository->getCategories(true);
+        return $this->categoryRepository->getCategories($withCount);
     }
 
     /**
