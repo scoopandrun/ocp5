@@ -121,9 +121,9 @@ class User implements \Stringable
     {
         if (is_null($createdAt)) {
             $this->createdAt = null;
-        } elseif (gettype($createdAt) === "string") {
+        } elseif (is_string($createdAt)) {
             $this->createdAt = new DateTime($createdAt);
-        } elseif (gettype($createdAt) === "object" && $createdAt::class === DateTime::class) {
+        } elseif ($createdAt instanceof DateTime) {
             $this->createdAt = $createdAt;
         } else {
             $this->createdAt = null;

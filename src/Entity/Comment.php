@@ -11,7 +11,7 @@ use App\Entity\User;
 class Comment
 {
     private ?int $id = null;
-    private int $postId;
+    private ?int $postId = null;
     private DateTime $createdAt;
     private ?User $author = null;
     private string $title = "";
@@ -20,6 +20,7 @@ class Comment
 
     public function __construct()
     {
+        $this->createdAt = new DateTime();
     }
 
     public function getId(): int
@@ -33,7 +34,7 @@ class Comment
         return $this;
     }
 
-    public function getPostId(): int
+    public function getPostId(): ?int
     {
         return $this->postId;
     }
@@ -51,9 +52,9 @@ class Comment
 
     public function setCreatedAt(DateTime|string $createdAt): static
     {
-        if (gettype($createdAt) === "string") {
+        if (is_string($createdAt)) {
             $this->createdAt = new DateTime($createdAt);
-        } elseif ($createdAt::class === DateTime::class) {
+        } elseif ($createdAt instanceof DateTime) {
             $this->createdAt = $createdAt;
         }
 

@@ -76,9 +76,7 @@ class CategoryService
      */
     public function createCategory(Category $category): int|false
     {
-        $safeName = trim(htmlspecialchars($category->getName(), ENT_NOQUOTES));
-
-        $category->setName($safeName);
+        $this->sanitizeCategory($category);
 
         $lastIdOrFalse = $this->categoryRepository->createCategory($category);
 
@@ -87,13 +85,18 @@ class CategoryService
 
     public function editCategory(Category $category): bool
     {
-        $safeName = trim(htmlspecialchars($category->getName(), ENT_NOQUOTES));
-
-        $category->setName($safeName);
+        $this->sanitizeCategory($category);
 
         $success = $this->categoryRepository->editCategory($category);
 
         return $success;
+    }
+
+    private function sanitizeCategory(Category $category): void
+    {
+        $safeName = trim(htmlspecialchars($category->getName(), ENT_NOQUOTES));
+
+        $category->setName($safeName);
     }
 
     public function deleteCategory(int $id): bool

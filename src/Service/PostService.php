@@ -136,28 +136,14 @@ class PostService
 
     public function createPost(Post $post): int
     {
-        $safeTitle = trim(htmlspecialchars($post->getTitle(), ENT_NOQUOTES));
-        $safeLeadParagraph = trim(htmlspecialchars($post->getLeadParagraph(), ENT_NOQUOTES));
-        $safeBody = trim(htmlspecialchars($post->getBody(), ENT_NOQUOTES));
-
-        $post
-            ->setTitle($safeTitle)
-            ->setLeadParagraph($safeLeadParagraph)
-            ->setBody($safeBody);
+        $this->sanitizePost($post);
 
         return $this->postRepository->createPost($post);
     }
 
     public function editPost(Post $post): bool
     {
-        $safeTitle = trim(htmlspecialchars($post->getTitle(), ENT_NOQUOTES));
-        $safeLeadParagraph = trim(htmlspecialchars($post->getLeadParagraph(), ENT_NOQUOTES));
-        $safeBody = trim(htmlspecialchars($post->getBody(), ENT_NOQUOTES));
-
-        $post
-            ->setTitle($safeTitle)
-            ->setLeadParagraph($safeLeadParagraph)
-            ->setBody($safeBody);
+        $this->sanitizePost($post);
 
         $originalPost = $this->postRepository->getPost($post->getId(), false);
 
@@ -188,5 +174,17 @@ class PostService
             : [];
 
         return compact("categories", "authors");
+    }
+
+    private function sanitizePost(Post $post): void
+    {
+        $safeTitle = trim(htmlspecialchars($post->getTitle(), ENT_NOQUOTES));
+        $safeLeadParagraph = trim(htmlspecialchars($post->getLeadParagraph(), ENT_NOQUOTES));
+        $safeBody = trim(htmlspecialchars($post->getBody(), ENT_NOQUOTES));
+
+        $post
+            ->setTitle($safeTitle)
+            ->setLeadParagraph($safeLeadParagraph)
+            ->setBody($safeBody);
     }
 }
