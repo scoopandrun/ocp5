@@ -65,7 +65,12 @@
 										</div>
 									</td>
 									<td class="d-none d-md-table-cell">
-										<p class="text-xs mb-0">{{ user.email }}</p>
+										<p class="text-xs mb-0">
+											{{ user.email }}
+											{% if user.emailVerified %}
+												<i class="text-success material-icons">check</i>
+											{% endif %}
+										</p>
 									</td>
 									<td class="d-none d-md-table-cell">
 										<p class="text-xs mb-0">{{ user.createdAt|format_date("short", locale="fr") }}</p>
