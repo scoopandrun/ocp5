@@ -259,17 +259,16 @@ class UserService
 
         $subject = "Vérification de votre adresse e-mail";
 
-        $emailBody = $emailService->createEmailBody(
-            "email-verification",
-            $subject,
-            compact("emailVerificationToken")
-        );
+        $template = "email-verification";
+
+        $context = compact("emailVerificationToken");
 
         $emailSent = $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($email)
             ->setSubject($subject)
-            ->setBody($emailBody)
+            ->setTemplate($template)
+            ->setContext($context)
             ->send();
 
         return $emailSent;
@@ -342,17 +341,16 @@ class UserService
 
         $subject = "Réinitialisation de mot de passe";
 
-        $emailBody = $emailService->createEmailBody(
-            "password-reset",
-            $subject,
-            compact("passwordResetToken")
-        );
+        $template = "password-reset";
+
+        $context = compact("passwordResetToken");
 
         $emailSent = $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
             ->addTo($email)
             ->setSubject($subject)
-            ->setBody($emailBody)
+            ->setTemplate($template)
+            ->setContext($context)
             ->send();
 
         return $emailSent;
