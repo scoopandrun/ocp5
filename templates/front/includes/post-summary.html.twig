@@ -13,6 +13,10 @@
 		{% endif %}
 		le
 		{{ post.createdAt|format_date("full", locale="fr") }}
+		{% if post.updatedAt %}
+			(modifié le
+			{{ post.updatedAt|format_date("full", locale="fr") }})
+		{% endif %}
 		{% if post.category %}
 			dans
 			<a href="/posts?categories={{ post.category.id }}">{{ post.category }}</a>
