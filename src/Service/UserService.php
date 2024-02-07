@@ -253,8 +253,6 @@ class UserService
 
         $this->userRepository->setEmailVerificationToken($email, $emailVerificationToken);
 
-        $twig = (new TwigService())->getEnvironment();
-
         $emailService = new EmailService();
 
         $subject = "Vérification de votre adresse e-mail";
@@ -334,8 +332,6 @@ class UserService
         }
 
         // If a token really has been set, send the e-mail
-
-        $twig = (new TwigService())->getEnvironment();
 
         $emailService = new EmailService();
 
