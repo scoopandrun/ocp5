@@ -68,15 +68,15 @@ class CommentService
 
     public function checkFormData(array $formData): array
     {
-        $titleIsString = gettype($formData["title"] ?? null) === "string";
-        $bodyIsString = gettype($formData["body"] ?? null) === "string";
+        $titleIsString = is_string($formData["title"] ?? null);
+        $bodyIsString = is_string($formData["body"] ?? null);
 
         $title = $titleIsString ? $formData["title"] : "";
         $body = $bodyIsString ? $formData["body"] : "";
 
-        $titleMissing = $title === "";
+        $titleMissing = !$title;
         $titleTooLong = mb_strlen($title) > 255;
-        $bodyMissing = $body === "";
+        $bodyMissing = !$body;
         $bodyTooLong = strlen($body) > pow(2, 16) + 2; // MySQL TEXT limit;
 
         $formResult = [
@@ -102,14 +102,19 @@ class CommentService
      */
     public function createComment(Comment $comment): int
     {
+        $this->sanitizeComment($comment);
+
+        return $this->commentRepository->createComment($comment);
+    }
+
+    private function sanitizeComment(Comment $comment): void
+    {
         $safeTitle = htmlspecialchars($comment->getTitle(), ENT_NOQUOTES);
         $safeBody = htmlspecialchars($comment->getBody(), ENT_NOQUOTES);
 
         $comment
             ->setTitle($safeTitle)
             ->setBody($safeBody);
-
-        return $this->commentRepository->createComment($comment);
     }
 
     /**
