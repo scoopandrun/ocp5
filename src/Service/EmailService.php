@@ -5,24 +5,29 @@ namespace App\Service;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use App\Core\ErrorLogger;
-use App\Entity\EmailBody;
+use App\Service\TwigService;
+use Twig\Environment;
+use Twig\Error\LoaderError;
 
 class EmailService
 {
     private PHPMailer $mail;
+    private Environment $twig;
+
     private string $fromAddress = "";
     private string $fromName =  "";
     private array $to = [];
     private array $cc = [];
     private array $bcc = [];
     private string $subject = "";
-    private string $htmlBody = "";
-    private string $textBody = "";
+    private string $template = "";
+    private array $context = [];
     private bool $isHTML = true;
 
     public function __construct()
     {
         $this->mail = new PHPMailer(true);
+        $this->twig = (new TwigService())->getEnvironment();
     }
 
     /**
@@ -68,10 +73,8 @@ class EmailService
             $this->mail->isHTML($this->isHTML);                                  //Set email format to HTML
             $this->mail->CharSet = "UTF-8";
             $this->mail->Subject = $this->subject;
-            $this->mail->Body    = $this->htmlBody;
-            if ($this->textBody) {
-                $this->mail->AltBody = $this->textBody;
-            }
+            $this->mail->Body    = $this->makeHTMLBody();
+            $this->mail->AltBody = $this->makePlainBody();
 
             $this->mail->send();
 
@@ -85,6 +88,13 @@ class EmailService
 
             return false;
         }
+    }
+
+    public function setHTML(bool $isHTML): static
+    {
+        $this->isHTML = $isHTML;
+
+        return $this;
     }
 
     public function setFrom(string $address, string $name = ""): static
@@ -119,6 +129,9 @@ class EmailService
         return $this;
     }
 
+    /**
+     * Set the e-mail subject.
+     */
     public function setSubject(string $subject): static
     {
         $this->subject = $subject;
@@ -126,41 +139,53 @@ class EmailService
         return $this;
     }
 
-    public function setBody(EmailBody $body): static
+    /**
+     * Set the Twig template.
+     * 
+     * @param string $template Filename of the template, without the extension.  
+     *                         eg: "reject-comment", without "html.twig" or "plain.txt.twig".  
+     *                         The template files must be located in the "templates/email" directory.
+     */
+    public function setTemplate(string $template): static
     {
-        $html = $body->getHTML();
-        $plain = $body->getPlain();
-
-        $this->htmlBody = $html;
-
-        if ($plain) {
-            $this->textBody = $plain;
-        }
-
-        return $this;
-    }
-
-    public function setHTML(bool $isHTML): static
-    {
-        $this->isHTML = $isHTML;
+        $this->template = $template;
 
         return $this;
     }
 
     /**
-     * Create an email body from a Twig template.
+     * Set the context for the Twig template.
      * 
-     * @param string $template Filename of the template, without the extension.  
-     *                         eg: "reject-comment", without "html.twig" or "plain.txt.twig".
-     * @param string $subject  E-mail subject.
-     * @param array $context   Associative array to pass to the Twig template renderer.  
-     *                         Those variables can be used in the template.
+     * @param array $context Associative array to pass to the Twig template renderer.  
+     *                       Those variables can be used in the template.
      */
-    public function createEmailBody(
-        string $template,
-        string $subject,
-        array $context,
-    ): EmailBody {
-        return new EmailBody($template, $subject, $context);
+    public function setContext(array $context): static
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    private function makeHTMLBody(): string
+    {
+        return $this->twig->render(
+            "email/{$this->template}.html.twig",
+            array_merge(
+                ["subject" => $this->subject],
+                $this->context,
+            )
+        );
+    }
+
+    private function makePlainBody(): string
+    {
+        try {
+            return $this->twig->render(
+                "email/{$this->template}-plain.txt.twig",
+                $this->context,
+            );
+        } catch (LoaderError $e) {
+            return "";
+        }
     }
 }
