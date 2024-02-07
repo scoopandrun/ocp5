@@ -42,7 +42,7 @@ class CommentController extends Controller
         /** @var array */
         $commentData = $this->request->body["commentForm"] ?? [];
 
-        if (gettype($commentData) !== "array") {
+        if (!is_array($commentData)) {
             $commentData = [];
         }
 

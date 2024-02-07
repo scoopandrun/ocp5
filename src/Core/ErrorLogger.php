@@ -51,7 +51,7 @@ class ErrorLogger
 
         foreach ($array as $key => $value) {
             // If $value is an array, recursive stringification
-            if (gettype($value) === "array") {
+            if (is_array($value)) {
                 $value = "[" . PHP_EOL . ErrorLogger::arrayStringify($value, $indentation + 2) . str_repeat(" ", $indentation) . "]";
             }
 
@@ -93,7 +93,7 @@ class ErrorLogger
             "line" => $e->getLine(),
             "previous" => ErrorLogger::errorInfo($e->getPrevious(), maxDepth: $maxDepth - 1),
             // Twig stack trace is too long and causes OOM crash. Do not include in error log
-            "trace" => $e::class === TwigSyntaxError::class ? null : $e->getTrace(),
+            "trace" => $e instanceof TwigSyntaxError ? null : $e->getTrace(),
         ];
 
         $string_error = ErrorLogger::arrayStringify($array_error);

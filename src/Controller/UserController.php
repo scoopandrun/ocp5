@@ -109,7 +109,7 @@ class UserController extends Controller
         /** @var array */
         $userData = $this->request->body["signupForm"] ?? [];
 
-        if (gettype($userData) !== "array") {
+        if (!is_array($userData)) {
             $userData = [];
         }
 
@@ -150,7 +150,7 @@ class UserController extends Controller
         /** @var array */
         $userData = $this->request->body["user"] ?? [];
 
-        if (gettype($userData) !== "array") {
+        if (!is_array($userData)) {
             $userData = [];
         }
 
@@ -294,7 +294,7 @@ class UserController extends Controller
         /** @var array */
         $formData = $this->request->body["passwordResetEmailForm"] ?? [];
 
-        if (gettype($formData) !== "array") {
+        if (!is_array($formData)) {
             $formData = [];
         }
 
@@ -360,7 +360,7 @@ class UserController extends Controller
         /** @var array */
         $formData = $this->request->body["passwordResetForm"] ?? [];
 
-        if (gettype($formData) !== "array") {
+        if (!is_array($formData)) {
             $formData = [];
         }
 

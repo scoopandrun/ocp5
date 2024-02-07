@@ -286,12 +286,12 @@ class UserService
 
     public function checkPasswordResetEmailFormData(array $formData): array
     {
-        $email = $formData["email"] ?? "";
+        $emailIsString = is_string($email ?? null);
 
-        $emailIsString = gettype($email) === "string";
+        $email = $emailIsString ? $formData["email"] : "";
 
-        $emailMissing = !$email || !$emailIsString;
-        $emailInvalid = $emailIsString && !preg_match("/.*@.*\.[a-z]+/", $email);
+        $emailMissing = !$email;
+        $emailInvalid = $email && !preg_match("/.*@.*\.[a-z]+/", $email);
 
         $errorMessage = $emailMissing
             ? "L'adresse e-mail est requise."
