@@ -46,9 +46,9 @@ class Post
 
     public function setCreatedAt(DateTime|string $createdAt): static
     {
-        if (gettype($createdAt) === "string") {
+        if (is_string($createdAt)) {
             $this->createdAt = new DateTime($createdAt);
-        } elseif ($createdAt::class === DateTime::class) {
+        } elseif ($createdAt instanceof DateTime) {
             $this->createdAt = $createdAt;
         }
 
@@ -64,9 +64,9 @@ class Post
     {
         if (is_null($updatedAt)) {
             $this->updatedAt = null;
-        } elseif (gettype($updatedAt) === "string") {
+        } elseif (is_string($updatedAt)) {
             $this->updatedAt = new DateTime($updatedAt);
-        } elseif (gettype($updatedAt) === "object" && $updatedAt::class === DateTime::class) {
+        } elseif ($updatedAt instanceof DateTime) {
             $this->updatedAt = $updatedAt;
         } else {
             $this->updatedAt = null;

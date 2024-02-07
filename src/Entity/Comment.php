@@ -52,9 +52,9 @@ class Comment
 
     public function setCreatedAt(DateTime|string $createdAt): static
     {
-        if (gettype($createdAt) === "string") {
+        if (is_string($createdAt)) {
             $this->createdAt = new DateTime($createdAt);
-        } elseif ($createdAt::class === DateTime::class) {
+        } elseif ($createdAt instanceof DateTime) {
             $this->createdAt = $createdAt;
         }
 
