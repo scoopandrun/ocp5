@@ -11,12 +11,36 @@ class PostManagementController extends AdminController
     public function show(): HTTPResponse
     {
         $postService = new PostService();
-        $posts = $postService->getPostsSummaries(1, 100, false);
+
+        /** @var int $postCount Total number of posts. */
+        $postCount = $postService->getPostCount(false);
+
+        /** @var int $pageNumber Defaults to `1` in case of inconsistency. */
+        $pageNumber = max((int) ($this->request->query["page"] ?? null), 1);
+
+        $pageSize = max((int) ($this->request->query["limit"] ?? null), 0) ?: 10;
+
+        // Show last page in case $pageNumber is too high
+        if ($postCount < ($pageNumber * $pageSize)) {
+            $pageNumber = max(ceil($postCount / $pageSize), 1);
+        }
+
+        $posts = $postService->getPostsSummaries($pageNumber, $pageSize, false);
 
         return $this->response->setHTML(
             $this->twig->render(
                 "admin/post-management.html.twig",
-                compact("posts")
+                [
+                    "posts" => $posts,
+                    "pageSize" => $pageSize,
+                    "currentPage" => $pageNumber,
+                    "previousPage" => max($pageNumber - 1, 1),
+                    "nextPage" => max(ceil($postCount / $pageSize), 1),
+                    "lastPage" => max(ceil($postCount / $pageSize), 1),
+                    "firstItem" => ($pageNumber - 1) * $pageSize + 1,
+                    "lastItem" => min($pageNumber * $pageSize, $postCount),
+                    "itemCount" => $postCount,
+                ]
             )
         );
     }

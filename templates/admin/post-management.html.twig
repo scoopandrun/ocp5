@@ -25,7 +25,7 @@
 	<div class="card">
 		<div class="table-responsive">
 			<div class="dataTable-wrapper">
-				<div class="dataTable-top">
+				<div class="dataTable-top" hidden>
 					<div class="dataTable-dropdown">
 						<label>
 							<select class="dataTable-selector">
@@ -119,25 +119,27 @@
 					</table>
 				</div>
 				<div class="dataTable-bottom">
-					<div class="dataTable-info">Affichage de 1 à 10 sur
-						{{ posts|length }}
-						posts</div>
+					<div class="dataTable-info">
+						Affichage de
+						{{ firstItem }}
+						à
+						{{ lastItem }}
+						sur
+						{{ itemCount }}
+						posts
+					</div>
 					<nav class="dataTable-pagination">
 						<ul class="dataTable-pagination-list">
 							<li class="pager">
-								<a href="#" data-page="1">‹</a>
+								<a href="/admin/posts?page={{ previousPage }}" data-page="{{ previousPage }}">‹</a>
 							</li>
-							<li class="active">
-								<a href="#" data-page="1">1</a>
-							</li>
-							<li class="">
-								<a href="#" data-page="2">2</a>
-							</li>
-							<li class="">
-								<a href="#" data-page="3">3</a>
-							</li>
+							{% for page in range(1, lastPage) %}
+								<li class="{{ page == currentPage ? 'active' }}">
+									<a href="/admin/posts?page={{ page }}" data-page="{{ page }}">{{ page }}</a>
+								</li>
+							{% endfor %}
 							<li class="pager">
-								<a href="#" data-page="2">›</a>
+								<a href="/admin/posts?page={{ nextPage }}" data-page="{{ nextPage }}">›</a>
 							</li>
 						</ul>
 					</nav>
