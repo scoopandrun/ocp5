@@ -50,8 +50,6 @@ class ContactFormService
     {
         $contactForm = $this->data;
 
-        $twig = (new TwigService())->getEnvironment();
-
         $emailService = new EmailService();
 
         $subject = "Message de {$contactForm["name"]}";

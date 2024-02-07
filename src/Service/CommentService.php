@@ -181,8 +181,6 @@ class CommentService
         $commentTitle = $comment->getTitle();
         $commentBody = $comment->getBody();
 
-        $twig = (new TwigService())->getEnvironment();
-
         $emailService = new EmailService();
 
         $subject = "Commentaire rejeté";
