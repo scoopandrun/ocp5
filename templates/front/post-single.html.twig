@@ -1,5 +1,9 @@
 {% extends "front/layout.html.twig" %}
 
+{% block title %}
+	{{ post.title }}
+{% endblock %}
+
 {% block stylesheets %}
 	<link rel="stylesheet" href="/assets/css/front/common.css">
 	<link rel="stylesheet" href="/assets/css/form.css">
