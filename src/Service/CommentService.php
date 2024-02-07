@@ -187,21 +187,20 @@ class CommentService
 
         $subject = "Commentaire rejeté";
 
-        $emailBody = $emailService->createEmailBody(
-            "reject-comment",
-            $subject,
-            compact(
-                "reason",
-                "postTitle",
-                "commentTitle",
-                "commentBody",
-            )
+        $template = "reject-comment";
+
+        $context = compact(
+            "reason",
+            "postTitle",
+            "commentTitle",
+            "commentBody",
         );
 
         $emailSent = $emailService
             ->addTo($comment->getAuthor()->getEmail())
             ->setSubject($subject)
-            ->setBody($emailBody)
+            ->setTemplate($template)
+            ->setContext($context)
             ->send();
 
         return $emailSent;
