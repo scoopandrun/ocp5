@@ -2,6 +2,9 @@
 
 namespace App\Service;
 
+use App\Core\Constants;
+use App\Core\Security;
+use App\Core\HTTP\HTTPRequest;
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
@@ -9,9 +12,8 @@ use Twig\Extra\Intl\IntlExtension;
 use Twig\Extra\Markdown\DefaultMarkdown;
 use Twig\Extra\Markdown\MarkdownRuntime;
 use Twig\Extra\Markdown\MarkdownExtension;
-use App\Core\HTTP\HTTPRequest;
-use App\Core\Constants;
-use App\Core\Security;
+use nadar\quill\Lexer;
+use Twig\TwigFilter;
 
 class TwigService
 {
@@ -42,6 +44,13 @@ class TwigService
                     }
                 }
             }
+        );
+
+        $this->environment->addFilter(
+            new TwigFilter(
+                "quill",
+                fn (string $delta) => (new Lexer($delta))->render()
+            )
         );
     }
 
