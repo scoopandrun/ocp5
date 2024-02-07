@@ -44,9 +44,6 @@ class PostManagementController extends AdminController
     public function createPost(): HTTPResponse
     {
         $postService = new PostService();
-        $categoryService = new CategoryService();
-
-        $categories = $categoryService->getCategories();
 
         /** @var array */
         $postData = $this->request->body["post"] ?? [];
@@ -55,6 +52,8 @@ class PostManagementController extends AdminController
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $post = null;
+            $categoryService = new CategoryService();
+            $categories = $categoryService->getCategories();
             return $this->response
                 ->setCode(400)
                 ->setHTML(
@@ -77,16 +76,16 @@ class PostManagementController extends AdminController
     public function editPost(int $postId): HTTPResponse
     {
         $postService = new PostService();
-        $categoryService = new CategoryService();
 
-        $categories = $categoryService->getCategories();
-
+        /** @var array */
         $postData = $this->request->body["post"] ?? [];
 
         $formResult = $postService->checkFormData($postData);
 
         if (in_array(true, array_values($formResult["errors"]))) {
             $post = $postId ? $postService->getPost($postId, false) : null;
+            $categoryService = new CategoryService();
+            $categories = $categoryService->getCategories();
             return $this->response
                 ->setCode(400)
                 ->setHTML(
