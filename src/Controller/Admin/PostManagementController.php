@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\{PostService, CategoryService};
+use App\Entity\Post;
 
 class PostManagementController extends AdminController
 {
@@ -27,19 +28,36 @@ class PostManagementController extends AdminController
 
         $posts = $postService->getPostsSummaries($pageNumber, $pageSize, false);
 
+        $paginationInfo = [
+            "pageSize" => $pageSize,
+            "currentPage" => $pageNumber,
+            "previousPage" => max($pageNumber - 1, 1),
+            "nextPage" => min($pageNumber + 1, max(ceil($postCount / $pageSize), 1)),
+            "lastPage" => max(ceil($postCount / $pageSize), 1),
+            "firstItem" => ($pageNumber - 1) * $pageSize + 1,
+            "lastItem" => min($pageNumber * $pageSize, $postCount),
+            "itemCount" => $postCount,
+            "itemName" => "posts",
+            "endpoint" => "/admin/posts",
+        ];
+
+        if ($this->request->acceptsJSON()) {
+            return $this->response->setJSON(
+                json_encode(
+                    [
+                        "posts" => array_map(fn (Post $post) => $post->toArray(), $posts),
+                        "paginationInfo" => $paginationInfo,
+                    ]
+                )
+            );
+        }
+
         return $this->response->setHTML(
             $this->twig->render(
                 "admin/post-management.html.twig",
                 [
                     "posts" => $posts,
-                    "pageSize" => $pageSize,
-                    "currentPage" => $pageNumber,
-                    "previousPage" => max($pageNumber - 1, 1),
-                    "nextPage" => max(ceil($postCount / $pageSize), 1),
-                    "lastPage" => max(ceil($postCount / $pageSize), 1),
-                    "firstItem" => ($pageNumber - 1) * $pageSize + 1,
-                    "lastItem" => min($pageNumber * $pageSize, $postCount),
-                    "itemCount" => $postCount,
+                    "paginationInfo" => $paginationInfo,
                 ]
             )
         );
