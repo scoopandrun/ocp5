@@ -134,7 +134,7 @@ class UserController extends Controller
         $_SESSION["usedId"] = $userId;
 
         // Redirect to the previous page or the homepage if no referer
-        $this->response->redirect($_SESSION["referer"] ?? "/", 303);
+        return $this->response->redirect($_SESSION["referer"] ?? "/", 303);
     }
 
     public function editAccount(): HTTPResponse
