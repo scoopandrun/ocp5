@@ -33,21 +33,6 @@ abstract class Controller
     ): HTTPResponse {
         $this->response->setCode($statusCode);
 
-        // HTML
-        if ($this->request->acceptsHTML()) {
-            return $this->response
-                ->setHTML(
-                    $this->twig->render(
-                        $template,
-                        [
-                            "$messageTitle" => [
-                                "message" => $message
-                            ]
-                        ]
-                    )
-                );
-        }
-
         // JSON
         if ($this->request->acceptsJSON()) {
             return $this->response->setJSON(
@@ -55,7 +40,16 @@ abstract class Controller
             );
         }
 
-        // Text (default)
-        return $this->response->setText($message);
+        return $this->response
+            ->setHTML(
+                $this->twig->render(
+                    $template,
+                    [
+                        "$messageTitle" => [
+                            "message" => $message
+                        ]
+                    ]
+                )
+            );
     }
 }
