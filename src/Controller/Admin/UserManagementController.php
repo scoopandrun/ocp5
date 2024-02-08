@@ -5,18 +5,60 @@ namespace App\Controller\Admin;
 use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\UserService;
+use App\Entity\User;
 
 class UserManagementController extends AdminController
 {
     public function show(): HTTPResponse
     {
         $userService = new UserService();
-        $users = $userService->getUsers(1, 10);
+
+        /** @var int $userCount Total number of users. */
+        $userCount = $userService->getUserCount();
+
+        /** @var int $pageNumber Defaults to `1` in case of inconsistency. */
+        $pageNumber = max((int) ($this->request->query["page"] ?? null), 1);
+
+        $pageSize = max((int) ($this->request->query["limit"] ?? null), 0) ?: 10;
+
+        // Show last page in case $pageNumber is too high
+        if ($userCount < ($pageNumber * $pageSize)) {
+            $pageNumber = max(ceil($userCount / $pageSize), 1);
+        }
+
+        $users = $userService->getUsers($pageNumber, $pageSize);
+
+        $paginationInfo = [
+            "pageSize" => $pageSize,
+            "currentPage" => $pageNumber,
+            "previousPage" => max($pageNumber - 1, 1),
+            "nextPage" => min($pageNumber + 1, max(ceil($userCount / $pageSize), 1)),
+            "lastPage" => max(ceil($userCount / $pageSize), 1),
+            "firstItem" => ($pageNumber - 1) * $pageSize + 1,
+            "lastItem" => min($pageNumber * $pageSize, $userCount),
+            "itemCount" => $userCount,
+            "itemName" => "utilisateurs",
+            "endpoint" => "/admin/users",
+        ];
+
+        if ($this->request->acceptsJSON()) {
+            return $this->response->setJSON(
+                json_encode(
+                    [
+                        "users" => array_map(fn (User $user) => $user->toArray(), $users),
+                        "paginationInfo" => $paginationInfo,
+                    ]
+                )
+            );
+        }
 
         return $this->response->setHTML(
             $this->twig->render(
                 "admin/user-management.html.twig",
-                compact("users")
+                [
+                    "users" => $users,
+                    "paginationInfo" => $paginationInfo,
+                ]
             )
         );
     }

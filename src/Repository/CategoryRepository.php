@@ -11,12 +11,17 @@ class CategoryRepository extends Repository
     /**
      * Fetch all categories.
      * 
+     * @param int $pageNumber Page number.
+     * @param int $pageSize   Number of blog posts to show on a page.
      * @param bool $withCount Also fetch the number of blog posts for each category.
      * 
      * @return array<int, \App\Entity\Category>
      */
-    public function getCategories(bool $withCount = false): array
-    {
+    public function getCategories(
+        int $pageNumber,
+        int $pageSize,
+        bool $withCount = false
+    ): array {
         $db = $this->connection;
 
         $queryWithoutCount =
@@ -24,7 +29,9 @@ class CategoryRepository extends Repository
                 c.id,
                 c.name
             FROM categories c
-            ORDER BY c.name ASC";
+            ORDER BY c.name ASC
+            LIMIT :limit
+            OFFSET :offset";
 
         $queryWithCount =
             "SELECT
@@ -42,9 +49,16 @@ class CategoryRepository extends Repository
             FROM categories c
             RIGHT JOIN posts p ON c.id = p.category
             WHERE p.category IS NULL
-            ORDER BY name ASC";
+            ORDER BY name ASC
+            LIMIT :limit
+            OFFSET :offset";
 
-        $req = $db->query($withCount ? $queryWithCount : $queryWithoutCount);
+        $req = $db->prepare($withCount ? $queryWithCount : $queryWithoutCount);
+
+        $req->bindValue(":limit", $pageSize, \PDO::PARAM_INT);
+        $req->bindValue(":offset", $pageSize * ($pageNumber - 1), \PDO::PARAM_INT);
+
+        $req->execute();
 
         $categoriesRaw = $req->fetchAll();
 
@@ -95,6 +109,20 @@ class CategoryRepository extends Repository
             ->setName($categoryRaw["name"]);
 
         return $category;
+    }
+
+    /**
+     * Get the amount of categories in the database.
+     */
+    public function getCategoryCount(): int
+    {
+        $db = $this->connection;
+
+        $req = $db->query("SELECT COUNT(*) FROM categories");
+
+        $count = $req->fetch(\PDO::FETCH_COLUMN);
+
+        return $count;
     }
 
     public function createCategory(Category $category): int|false

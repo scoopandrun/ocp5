@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block javascript %}
-	<script defer src="/assets/js/admin/user-management.js"></script>
+	<script defer src="/assets/js/admin/user-management.js" type="module"></script>
 {% endblock %}
 
 {% set breadcrumbs = [
@@ -21,19 +21,7 @@
 	<div class="card">
 		<div class="table-responsive">
 			<div class="dataTable-wrapper">
-				<div class="dataTable-top">
-					<div class="dataTable-dropdown">
-						<label>
-							<select class="dataTable-selector">
-								<option value="5">5</option>
-								<option value="10" selected>10</option>
-								<option value="15">15</option>
-								<option value="20">20</option>
-								<option value="25">25</option>
-							</select>
-							utilisateurs par page</label>
-					</div>
-				</div>
+				{% include "admin/includes/table-top.html.twig" %}
 				<div class="dataTable-container">
 					<table id="datatable" class="table align-items-center mb-0 dataTable-table">
 						<thead>
@@ -46,7 +34,7 @@
 						</thead>
 						<tbody>
 							{% for user in users %}
-								<tr data-user-id="{{ user.id }}">
+								<tr data-id="{{ user.id }}">
 									<td>
 										<div class="d-flex px-2 py-1">
 											<div class="d-flex flex-column justify-content-center">
@@ -55,7 +43,12 @@
 													<span class="badge badge-sm badge-success">Admin</span>
 												{% endif %}
 												<div class="d-md-none mt-1">
-													<p class="text-xs text-secondary mb-0">{{ user.email }}</p>
+													<p class="text-xs text-secondary mb-0">
+														{{ user.email }}
+														{% if user.emailVerified %}
+															<i class="text-success material-icons">check</i>
+														{% endif %}
+													</p>
 													<p class="text-xs text-secondary mb-0">
 														Inscrit(e) le
 														{{ user.createdAt|format_date("short", locale="fr") }}
@@ -95,30 +88,7 @@
 						</tbody>
 					</table>
 				</div>
-				<div class="dataTable-bottom">
-					<div class="dataTable-info">Affichage de 1 à 10 sur
-						{{ users|length }}
-						utilisateurs</div>
-					<nav class="dataTable-pagination">
-						<ul class="dataTable-pagination-list">
-							<li class="pager">
-								<a href="#" data-page="1">‹</a>
-							</li>
-							<li class="active">
-								<a href="#" data-page="1">1</a>
-							</li>
-							<li class="">
-								<a href="#" data-page="2">2</a>
-							</li>
-							<li class="">
-								<a href="#" data-page="3">3</a>
-							</li>
-							<li class="pager">
-								<a href="#" data-page="2">›</a>
-							</li>
-						</ul>
-					</nav>
-				</div>
+				{% include "admin/includes/table-pagination.html.twig" %}
 			</div>
 
 

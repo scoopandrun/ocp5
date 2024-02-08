@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block javascript %}
-	<script defer src="/assets/js/admin/category-management.js"></script>
+	<script defer src="/assets/js/admin/category-management.js" type="module"></script>
 {% endblock %}
 
 {% set breadcrumbs = [
@@ -25,6 +25,7 @@
 	<div class="card">
 		<div class="table-responsive">
 			<div class="dataTable-wrapper">
+				{% include "admin/includes/table-top.html.twig" %}
 				<div class="dataTable-container">
 					<table id="datatable" class="table align-items-center mb-0 dataTable-table">
 						<thead>
@@ -35,54 +36,60 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for category in categories %}
-								<tr data-category-id="{{ category.id }}">
+							{% if categories|length > 0 %}
+								{% for category in categories %}
+									<tr data-id="{{ category.id }}">
 
-									<td>
-										<div class="d-flex px-2 py-1">
-											<div class="d-flex flex-column justify-content-center">
-												<h6 class="mb-0 text-xs">{{ category.name }}</h6>
-												<div class="d-md-none mt-1">
-													<p class="text-xs text-secondary mb-0">
-														{{ category.postCount }}
-														posts
-													</p>
+										<td>
+											<div class="d-flex px-2 py-1">
+												<div class="d-flex flex-column justify-content-center">
+													<h6 class="mb-0 text-xs">{{ category.name }}</h6>
+													<div class="d-md-none mt-1">
+														<p class="text-xs text-secondary mb-0">
+															{{ category.postCount }}
+															posts
+														</p>
+													</div>
 												</div>
 											</div>
-										</div>
-									</td>
+										</td>
 
-									<td class="d-none d-md-table-cell">
-										<p class="text-xs mb-0">
-											{{ category.postCount }}
-											posts
-										</p>
-									</td>
+										<td class="d-none d-md-table-cell">
+											<p class="text-xs mb-0">
+												{{ category.postCount }}
+												posts
+											</p>
+										</td>
 
-									<td class="align-middle">
-										{% if category.id %}
-											<div class="row text-center">
-												<div class="col">
-													<a href="/admin/categories/{{ category.id }}" class="text-secondary font-weight-normal text-xs" title="Modifier la catégorie">
-														Modifier
-													</a>
+										<td class="align-middle">
+											{% if category.id %}
+												<div class="row text-center">
+													<div class="col">
+														<a href="/admin/categories/{{ category.id }}" class="text-secondary font-weight-normal text-xs" title="Modifier la catégorie">
+															Modifier
+														</a>
+													</div>
+													<div class="col">
+														<button type="button" class="btn btn-outline-danger btn-sm mb-0" title="Supprimer la catégorie" data-delete>
+															<span class="text">Supprimer</span>
+															<span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+														</button>
+													</div>
 												</div>
-												<div class="col">
-													<button type="button" class="btn btn-outline-danger btn-sm mb-0" title="Supprimer la catégorie" data-delete>
-														<span class="text">Supprimer</span>
-														<span class="spinner spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-													</button>
-												</div>
-											</div>
-										{% endif %}
-									</td>
+											{% endif %}
+										</td>
 
-								</tr>
-							{% endfor %}
+									</tr>
+								{% endfor %}
+							{% else %}
+								<td colspan="3" class="text-center">Aucune catégorie</td>
+							{% endif %}
 						</tbody>
 					</table>
 				</div>
+				{% include "admin/includes/table-pagination.html.twig" %}
 			</div>
+
 		</div>
 	</div>
 {% endblock %}

@@ -1,0 +1,26 @@
+<div class="dataTable-bottom">
+	<div class="dataTable-info">
+		Affichage de
+		<span id="first-item">{{ paginationInfo.firstItem }}</span>
+		à
+		<span id="last-item">{{ paginationInfo.lastItem }}</span>
+		sur
+		<span id="item-count">{{ paginationInfo.itemCount }}</span>
+		{{ paginationInfo.itemName }}
+	</div>
+	<nav class="dataTable-pagination">
+		<ul class="dataTable-pagination-list">
+			<li class="pager">
+				<a href="{{ paginationInfo.endpoint }}?page={{ paginationInfo.previousPage }}" id="previous-page" data-page="{{ paginationInfo.previousPage }}">‹</a>
+			</li>
+			{% for page in range(1, paginationInfo.lastPage) %}
+				<li class="{{ page == paginationInfo.currentPage ? 'active' }} page-link">
+					<a href="{{ paginationInfo.endpoint }}?page={{ page }}" data-page="{{ page }}">{{ page }}</a>
+				</li>
+			{% endfor %}
+			<li class="pager">
+				<a href="{{ paginationInfo.endpoint }}?page={{ paginationInfo.nextPage }}" id="next-page" data-page="{{ paginationInfo.nextPage }}">›</a>
+			</li>
+		</ul>
+	</nav>
+</div>
