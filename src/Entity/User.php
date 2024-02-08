@@ -3,8 +3,9 @@
 namespace App\Entity;
 
 use App\Core\DateTime;
+use App\Core\Interfaces\Arrayable;
 
-class User implements \Stringable
+class User implements \Stringable, Arrayable
 {
     private ?int $id = null;
     private string $name = "Anonyme";
@@ -135,5 +136,17 @@ class User implements \Stringable
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            "id" => $this->id,
+            "name" => $this->name,
+            "email" => $this->email,
+            "emailVerified" => $this->emailVerified,
+            "isAdmin" => $this->isAdmin,
+            "createdAt" => (string) $this->createdAt,
+        ];
     }
 }

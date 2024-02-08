@@ -26,13 +26,18 @@ class CategoryService
     /**
      * Get all categories.
      * 
+     * @param int $pageNumber Page number.
+     * @param int $pageSize   Number of blog posts to show on a page.
      * @param bool $withCount Also fetch the number of blog posts for each category.
      * 
      * @return array<int, \App\Entity\Category>
      */
-    public function getCategories(bool $withCount = true): array
-    {
-        return $this->categoryRepository->getCategories($withCount);
+    public function getCategories(
+        int $pageNumber = 1,
+        int $pageSize = 9999,
+        bool $withCount = false
+    ): array {
+        return $this->categoryRepository->getCategories($pageNumber, $pageSize, $withCount);
     }
 
     /**
@@ -43,6 +48,11 @@ class CategoryService
     public function getCategory(int $id): Category|null
     {
         return $this->categoryRepository->getCategory($id);
+    }
+
+    public function getCategoryCount(): int
+    {
+        return $this->categoryRepository->getCategoryCount();
     }
 
     public function checkFormData(array $formData): array

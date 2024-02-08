@@ -4,11 +4,12 @@ namespace App\Entity;
 
 use App\Core\DateTime;
 use App\Entity\{User, Category};
+use App\Core\Interfaces\Arrayable;
 
 /**
  * A blog post.
  */
-class Post
+class Post implements Arrayable
 {
     private ?int $id = null;
     private DateTime $createdAt;
@@ -167,5 +168,21 @@ class Post
     {
         $this->comments = $comments;
         return $this;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            "id" => $this->id,
+            "title" => $this->title,
+            "leadParagraph" => $this->leadParagraph,
+            "body" => $this->body,
+            "author" => (string) $this->author,
+            "category" => (string) $this->category,
+            "isPublished" => $this->isPublished,
+            "commentsAllowed" => $this->commentsAllowed,
+            "createdAt" => (string) $this->createdAt,
+            "updatedAt" => (string) $this->updatedAt ?: null,
+        ];
     }
 }
