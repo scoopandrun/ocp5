@@ -23,14 +23,6 @@ class ErrorController extends Controller
     {
         $this->response->setCode($this->e->httpStatus);
 
-        // HTML response
-        if ($this->request->acceptsHTML()) {
-            return $this->response
-                ->setHTML($this->twig->render("front/error.html.twig", [
-                    "error" => $this->e
-                ]));
-        }
-
         // JSON response
         if ($this->request->acceptsJSON()) {
             $json = json_encode([
@@ -40,8 +32,10 @@ class ErrorController extends Controller
             return $this->response->setJSON($json);
         }
 
-        // Default response
-        return $this->response->setText($this->e->getMessage());
+        return $this->response
+            ->setHTML($this->twig->render("front/error.html.twig", [
+                "error" => $this->e
+            ]));
     }
 
     static public function emergencyShow(\Throwable $e): void

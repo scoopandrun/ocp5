@@ -124,26 +124,21 @@ class CommentController extends Controller
             $this->response->setCode(500);
         }
 
-        // HTML
-        if ($this->request->acceptsHTML()) {
-            return $this->response
-                ->setHTML(
-                    $this->twig->render(
-                        "/front/post-single.html.twig",
-                        compact(
-                            "post",
-                            "deleteCommentFormResult"
-                        )
-                    )
-                );
-        }
-
         // JSON
         if ($this->request->acceptsJSON()) {
             return $this->response->setJSON(json_encode($deleteCommentFormResult));
         }
 
         // Default
-        return $this->response->setText($deleteCommentFormResult["message"]);
+        return $this->response
+            ->setHTML(
+                $this->twig->render(
+                    "/front/post-single.html.twig",
+                    compact(
+                        "post",
+                        "deleteCommentFormResult"
+                    )
+                )
+            );
     }
 }
