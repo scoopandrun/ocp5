@@ -171,26 +171,6 @@ class HTTPResponse
     }
 
     /**
-     * Set the plain text response type and body.
-     * 
-     * This method is a shortcut to:  
-     * ```php
-     * $response->setType("text")->setBody($text)
-     * ```
-     * 
-     * @param string $text Text body of the response.
-     * 
-     * @return HTTPResponse 
-     */
-    public function setText(string $text): HTTPResponse
-    {
-        $this->setType("text");
-        $this->setBody($text);
-
-        return $this;
-    }
-
-    /**
      * Redirect the user to the target URI.
      * 
      * @param string $targetURI Target of the redirection.
