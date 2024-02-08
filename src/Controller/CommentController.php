@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Core\HTTP\HTTPResponse;
-use App\Service\{CommentService, PostService, UserService};
-use App\Core\Exceptions\Client\NotFoundException;
-use App\Core\Exceptions\Client\Auth\UnauthorizedException;
-use App\Core\Exceptions\Client\Auth\ForbiddenException;
+use App\Service\{CommentService, PostService};
+use App\Core\Exceptions\Client\{
+    NotFoundException,
+    Auth\UnauthorizedException,
+    Auth\ForbiddenException,
+};
 
 class CommentController extends Controller
 {
@@ -23,6 +25,10 @@ class CommentController extends Controller
 
         if (!$post) {
             throw new NotFoundException("Le post n'existe pas.");
+        }
+
+        if ($post->getCommentsAllowed() === false) {
+            throw new ForbiddenException("Les commentaires ne sont pas autorisés sur ce post.");
         }
 
         $user = $this->request->user;
