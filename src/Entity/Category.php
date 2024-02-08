@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
-class Category
+use App\Core\Interfaces\Arrayable;
+
+class Category implements \Stringable, Arrayable
 {
     private ?int $id = null;
     private string $name = "Aucune catégorie";
@@ -48,5 +50,14 @@ class Category
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            "id" => $this->id,
+            "name" => $this->name,
+            "postCount" => $this->postCount,
+        ];
     }
 }

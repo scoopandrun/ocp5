@@ -5,18 +5,60 @@ namespace App\Controller\Admin;
 use App\Core\HTTP\HTTPResponse;
 use App\Core\Exceptions\Client\NotFoundException;
 use App\Service\CategoryService;
+use App\Entity\Category;
 
 class CategoryManagementController extends AdminController
 {
     public function show(): HTTPResponse
     {
         $categoryService = new CategoryService();
-        $categories = $categoryService->getCategories();
+
+        /** @var int $categoryCount Total number of users. */
+        $categoryCount = $categoryService->getCategoryCount() + 1; // Add 1 for the "no category line"
+
+        /** @var int $pageNumber Defaults to `1` in case of inconsistency. */
+        $pageNumber = max((int) ($this->request->query["page"] ?? null), 1);
+
+        $pageSize = max((int) ($this->request->query["limit"] ?? null), 0) ?: 10;
+
+        // Show last page in case $pageNumber is too high
+        if ($categoryCount < ($pageNumber * $pageSize)) {
+            $pageNumber = max(ceil($categoryCount / $pageSize), 1);
+        }
+
+        $categories = $categoryService->getCategories($pageNumber, $pageSize, true);
+
+        $paginationInfo = [
+            "pageSize" => $pageSize,
+            "currentPage" => $pageNumber,
+            "previousPage" => max($pageNumber - 1, 1),
+            "nextPage" => min($pageNumber + 1, max(ceil($categoryCount / $pageSize), 1)),
+            "lastPage" => max(ceil($categoryCount / $pageSize), 1),
+            "firstItem" => ($pageNumber - 1) * $pageSize + 1,
+            "lastItem" => min($pageNumber * $pageSize, $categoryCount),
+            "itemCount" => $categoryCount,
+            "itemName" => "catégories",
+            "endpoint" => "/admin/categories",
+        ];
+
+        if ($this->request->acceptsJSON()) {
+            return $this->response->setJSON(
+                json_encode(
+                    [
+                        "categories" => array_map(fn (Category $category) => $category->toArray(), $categories),
+                        "paginationInfo" => $paginationInfo,
+                    ]
+                )
+            );
+        }
 
         return $this->response->setHTML(
             $this->twig->render(
                 "admin/category-management.html.twig",
-                compact("categories")
+                [
+                    "categories" => $categories,
+                    "paginationInfo" => $paginationInfo,
+                ]
             )
         );
     }
@@ -26,7 +68,6 @@ class CategoryManagementController extends AdminController
         $categoryService = new CategoryService();
 
         $category = $categoryId ? $categoryService->getCategory($categoryId) : null;
-        $categories = $categoryService->getCategories();
 
         if ($categoryId && !$category) {
             throw new NotFoundException("La catégorie demandée n'existe pas");

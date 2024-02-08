@@ -69,7 +69,7 @@ class PostManagementController extends AdminController
         $categoryService = new CategoryService();
 
         $post = $postId ? $postService->getPost($postId, false) : null;
-        $categories = $categoryService->getCategories(false);
+        $categories = $categoryService->getCategories();
 
         if ($postId && !$post) {
             throw new NotFoundException("Le post demandé n'existe pas");
