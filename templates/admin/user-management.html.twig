@@ -21,20 +21,7 @@
 	<div class="card">
 		<div class="table-responsive">
 			<div class="dataTable-wrapper">
-				<div class="dataTable-top" hidden>
-					<div class="dataTable-dropdown">
-						<label>
-							<select class="dataTable-selector">
-								<option value="1">1</option>
-								<option value="5">5</option>
-								<option value="10" selected>10</option>
-								<option value="15">15</option>
-								<option value="20">20</option>
-								<option value="25">25</option>
-							</select>
-							utilisateurs par page</label>
-					</div>
-				</div>
+				{% include "admin/includes/table-top.html.twig" %}
 				<div class="dataTable-container">
 					<table id="datatable" class="table align-items-center mb-0 dataTable-table">
 						<thead>

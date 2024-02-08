@@ -28,53 +28,56 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for comment in comments %}
-								<tr data-comment-id="{{ comment.id }}">
-									<td>
-										<p class="text-xs mb-0">{{ comment.createdAt|format_date("short", locale="fr") }}</p>
-										<div class="d-md-none mt-1">
-											<p class="text-xs text-secondary mb-0">
-												{{ comment.author }}
-											</p>
-											<p class="text-xs text-secondary mb-0">
-												{{ comment.title }}
-											</p>
-										</div>
-									</td>
-
-									<td class="d-none d-md-table-cell">
-										<div class="d-flex px-2 py-1">
-											<div class="d-flex flex-column justify-content-center">
-												<h6 class="mb-0 text-xs">{{ comment.author }}</h6>
-
+							{% if comments|length > 0 %}
+								{% for comment in comments %}
+									<tr data-comment-id="{{ comment.id }}">
+										<td>
+											<p class="text-xs mb-0">{{ comment.createdAt|format_date("short", locale="fr") }}</p>
+											<div class="d-md-none mt-1">
+												<p class="text-xs text-secondary mb-0">
+													{{ comment.author }}
+												</p>
+												<p class="text-xs text-secondary mb-0">
+													{{ comment.title }}
+												</p>
 											</div>
-										</div>
-									</td>
+										</td>
 
-									<td class="d-none d-md-table-cell">
-										<div class="d-flex px-2 py-1">
-											<div class="d-flex flex-column justify-content-center">
-												<h6 class="mb-0 text-xs">{{ comment.title }}</h6>
+										<td class="d-none d-md-table-cell">
+											<div class="d-flex px-2 py-1">
+												<div class="d-flex flex-column justify-content-center">
+													<h6 class="mb-0 text-xs">{{ comment.author }}</h6>
 
+												</div>
 											</div>
-										</div>
-									</td>
+										</td>
 
-									<td class="align-middle">
-										<div class="row text-center">
-											<div class="col">
-												<a href="/admin/comments/{{ comment.id }}" class="btn btn-outline-info btn-sm mb-0" title="Vérifier le commentaire">Vérifier</a>
+										<td class="d-none d-md-table-cell">
+											<div class="d-flex px-2 py-1">
+												<div class="d-flex flex-column justify-content-center">
+													<h6 class="mb-0 text-xs">{{ comment.title }}</h6>
+
+												</div>
 											</div>
-										</div>
-									</td>
+										</td>
 
-								</tr>
-							{% endfor %}
+										<td class="align-middle">
+											<div class="row text-center">
+												<div class="col">
+													<a href="/admin/comments/{{ comment.id }}" class="btn btn-outline-info btn-sm mb-0" title="Vérifier le commentaire">Vérifier</a>
+												</div>
+											</div>
+										</td>
+
+									</tr>
+								{% endfor %}
+							{% else %}
+								<td colspan="4" class="text-center">Aucun commentaire à valider</td>
+							{% endif %}
 						</tbody>
 					</table>
 				</div>
 			</div>
-
 
 		</div>
 	</div>

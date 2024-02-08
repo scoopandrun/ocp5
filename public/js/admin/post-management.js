@@ -47,6 +47,7 @@ function displayPosts(posts) {
 
     // Column 1
     const column1 = document.createElement("td");
+    tr.appendChild(column1);
 
     const col1div0 = document.createElement("div");
     column1.appendChild(col1div0);
@@ -108,6 +109,7 @@ function displayPosts(posts) {
 
     // Column 2
     const column2 = document.createElement("td");
+    tr.appendChild(column2);
     column2.classList.add("d-none", "d-md-table-cell");
 
     const col2CreatedAt = document.createElement("p");
@@ -124,6 +126,7 @@ function displayPosts(posts) {
 
     // Column 3
     const column3 = document.createElement("td");
+    tr.appendChild(column3);
     column3.classList.add("d-none", "d-md-table-cell");
 
     const col3Category = document.createElement("p");
@@ -133,6 +136,7 @@ function displayPosts(posts) {
 
     // Column 4
     const column4 = document.createElement("td");
+    tr.appendChild(column4);
     column4.classList.add(
       "align-middle",
       "text-center",
@@ -150,31 +154,32 @@ function displayPosts(posts) {
     );
     col4IsPublished.textContent = post.isPublished ? "Publié" : "Non publié";
 
-    // Column 5
-    const column5 = document.createElement("td");
-    column5.classList.add("align-middle");
+    // Last column
+    const lastColumn = document.createElement("td");
+    tr.appendChild(lastColumn);
+    lastColumn.classList.add("align-middle");
 
-    const col5div0 = document.createElement("div");
-    column5.appendChild(col5div0);
-    col5div0.classList.add("row", "text-center");
+    const lastColDiv0 = document.createElement("div");
+    lastColumn.appendChild(lastColDiv0);
+    lastColDiv0.classList.add("row", "text-center");
 
-    const col5div0div0 = document.createElement("div");
-    col5div0.appendChild(col5div0div0);
-    col5div0div0.classList.add("col");
+    const lastColumndiv0div0 = document.createElement("div");
+    lastColDiv0.appendChild(lastColumndiv0div0);
+    lastColumndiv0div0.classList.add("col");
 
     const editLink = document.createElement("a");
-    col5div0div0.appendChild(editLink);
+    lastColumndiv0div0.appendChild(editLink);
     editLink.classList.add("text-secondary", "font-weight-normal", "text-xs");
-    editLink.href = "/admin/posts/" + post.id;
-    editLink.title = "Modifier le post";
+    editLink.href = endpoint + "/" + post.id;
+    editLink.title = "Modifier le post'";
     editLink.textContent = "Modifier";
 
-    const col5div0div1 = document.createElement("div");
-    col5div0.appendChild(col5div0div1);
-    col5div0div1.classList.add("col");
+    const lastColDiv0div1 = document.createElement("div");
+    lastColDiv0.appendChild(lastColDiv0div1);
+    lastColDiv0div1.classList.add("col");
 
     const deleteButton = document.createElement("button");
-    col5div0div1.appendChild(deleteButton);
+    lastColDiv0div1.appendChild(deleteButton);
     deleteButton.classList.add("btn", "btn-outline-danger", "btn-sm", "mb-0");
     deleteButton.type = "button";
     deleteButton.title = "Supprimer le post";
@@ -195,12 +200,6 @@ function displayPosts(posts) {
     );
     deleteButtonSpinner.role = "status";
     deleteButtonSpinner.ariaHidden = "true";
-
-    tr.appendChild(column1);
-    tr.appendChild(column2);
-    tr.appendChild(column3);
-    tr.appendChild(column4);
-    tr.appendChild(column5);
 
     tableBody.appendChild(tr);
   }

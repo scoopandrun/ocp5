@@ -173,6 +173,7 @@ class Post implements Arrayable
     public function toArray(): array
     {
         return [
+            "id" => $this->id,
             "title" => $this->title,
             "leadParagraph" => $this->leadParagraph,
             "body" => $this->body,
