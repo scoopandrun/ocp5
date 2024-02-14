@@ -1,15 +1,10 @@
--- Active: 1702975947841@@localhost@3308@ocp5
-SET
-  time_zone = "+01:00";
+SET time_zone = "+01:00";
 
-SET
-  default_storage_engine = InnoDB;
+SET default_storage_engine = InnoDB;
 
 DROP DATABASE IF EXISTS `ocp5`;
 
-CREATE DATABASE IF NOT EXISTS `ocp5` DEFAULT CHARACTER
-SET
-  utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS `ocp5` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 USE `ocp5`;
 
