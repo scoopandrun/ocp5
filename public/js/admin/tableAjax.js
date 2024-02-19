@@ -103,7 +103,7 @@ export function registerDeleteButtons(
 
   for (const row of rows) {
     const id = row.dataset.id;
-    const deleteURI = endpoint + id;
+    const deleteURI = endpoint + "/" + id;
 
     const deleteButton = row.querySelector("button[data-delete]");
 
