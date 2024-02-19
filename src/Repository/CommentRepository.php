@@ -224,7 +224,7 @@ class CommentRepository extends Repository
                 c.createdAt
             FROM comments c
             LEFT JOIN posts p ON p.id = c.postId
-            LEFT JOIN users u ON u.id = p.author
+            LEFT JOIN users u ON u.id = c.author
             WHERE approved = 0
             ORDER BY c.createdAt ASC"
         );
