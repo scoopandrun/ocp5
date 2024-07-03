@@ -2,10 +2,11 @@
 
 namespace App\Service;
 
+use App\Core\HTTP\HTTPRequest;
 use App\Core\Security;
 use App\Repository\UserRepository;
 use App\Entity\User;
-use App\Service\{EmailService, TwigService};
+use App\Service\EmailService;
 use Hidehalo\Nanoid\Client as Nanoid;
 
 class UserService
@@ -259,7 +260,9 @@ class UserService
 
         $template = "email-verification";
 
-        $context = compact("emailVerificationToken");
+        $url = HTTPRequest::getRootUrl() . "/user/verifyEmail/{$emailVerificationToken}";
+
+        $context = compact("url");
 
         $emailSent = $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])
@@ -339,7 +342,9 @@ class UserService
 
         $template = "password-reset";
 
-        $context = compact("passwordResetToken");
+        $url = HTTPRequest::getRootUrl() . "/passwordReset/{$passwordResetToken}";
+
+        $context = compact("url");
 
         $emailSent = $emailService
             ->setFrom($_ENV["MAIL_SENDER_EMAIL"], $_ENV["MAIL_SENDER_NAME"])

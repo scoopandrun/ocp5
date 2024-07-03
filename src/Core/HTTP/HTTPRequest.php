@@ -70,19 +70,32 @@ class HTTPRequest
 
     /**
      * Returns `true` if a request accepts an HTML response, `false` otherwise.
-     * @return bool 
      */
-    public function acceptsHTML()
+    public function acceptsHTML(): bool
     {
         return in_array("text/html", $this->headers["Accept"] ?? []);
     }
 
     /**
      * Returns `true` if a request accepts an HTML response, `false` otherwise.
-     * @return bool 
      */
-    public function acceptsJSON()
+    public function acceptsJSON(): bool
     {
         return in_array("application/json", $this->headers["Accept"] ?? []);
+    }
+
+    public static function getProtocol(): string
+    {
+        return strtolower($_SERVER["REQUEST_SCHEME"]);
+    }
+
+    public static function getHost(): string
+    {
+        return $_SERVER["HTTP_HOST"];
+    }
+
+    public static function getRootUrl(): string
+    {
+        return self::getProtocol() . "://" . self::getHost();
     }
 }

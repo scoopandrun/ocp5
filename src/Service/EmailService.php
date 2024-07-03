@@ -45,7 +45,9 @@ class EmailService
             $this->mail->SMTPAuth   = true;                                //Enable SMTP authentication
             $this->mail->Username   = $_ENV["SMTP_USER"];                  //SMTP username
             $this->mail->Password   = $_ENV["SMTP_PASS"];                  //SMTP password
-            $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;      //Enable implicit TLS encryption
+            if ($_ENV["SMTP_PORT"] == 587) {
+                $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;      //Enable implicit TLS encryption
+            }
             $this->mail->Port       = $_ENV["SMTP_PORT"];                  //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
             // From
