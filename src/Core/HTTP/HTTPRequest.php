@@ -47,9 +47,7 @@ class HTTPRequest
 
         $this->headers = getallheaders();
 
-        if (isset($this->headers["Accept"])) {
-            $this->headers["Accept"] = explode(",", $this->headers["Accept"]);
-        }
+        $this->headers["Accept"] = explode(",", $this->headers["Accept"] ?? $this->headers["accept"] ?? "");
 
         $url = parse_url($_SERVER['REQUEST_URI']);
         $this->path = $url["path"];
